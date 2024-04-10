@@ -6,9 +6,9 @@ _tabversion = '3.10'
 
 _lr_method = 'LALR'
 
-_lr_signature = 'leftORleftANDleftEQUALNOT_EQUALleftGREATER_THANGREATER_THAN_EQUALLESS_THANLESS_THAN_EQUALleftPLUSMINUSleftTIMESDIVIDEMODrightPOWERrightNOTleftLPARENRPARENAND ASSIGN BOOL_LITERAL BOOL_TYPE COLON COMMA COMMENT DIVIDE ELSE EQUAL FALSE FLOAT_LITERAL FLOAT_TYPE FUNCTION GREATER_THAN GREATER_THAN_EQUAL ID IF INTEGER_LITERAL INT_TYPE LBRACE LESS_THAN LESS_THAN_EQUAL LPAREN LSQUARE MINUS MOD NOT NOT_EQUAL OR PLUS POWER RBRACE RPAREN RSQUARE SEMICOLON STRING_LITERAL STRING_TYPE THEN TIMES TRUE VAL VAR VOID_TYPE WHILEtype : INT_TYPE\n            | FLOAT_TYPE\n            | STRING_TYPE\n            | BOOL_TYPEexpression : expression PLUS expression\n                  | expression MINUS expression\n                  | expression TIMES expression\n                  | expression DIVIDE expression\n                  | expression MOD expression\n                  | expression POWER expression\n                  | expression EQUAL expression\n                  | expression NOT_EQUAL expression\n                  | expression GREATER_THAN expression\n                  | expression GREATER_THAN_EQUAL expression\n                  | expression LESS_THAN expression\n                  | expression LESS_THAN_EQUAL expression\n                  | expression AND expression\n                  | expression OR expression\n                  | NOT expression\n                  | INTEGER_LITERAL\n                  | FLOAT_LITERAL\n                  | STRING_LITERAL\n                  | BOOL_LITERAL\n                  | ID\n                  | LPAREN expression RPARENconstant_declaration : VAL ID COLON type ASSIGN expression SEMICOLONvariable_declaration : VAR ID COLON type ASSIGN expression SEMICOLONfunction_declaration : FUNCTION ID LPAREN function_param_list RPAREN COLON type SEMICOLON\n    |  FUNCTION ID LPAREN function_param_list RPAREN COLON type LBRACE function_body RBRACEfunction_param_list : parameter COMMA function_param_list\n    | parameter parameter : VAL ID COLON type\n    | VAR ID COLON typefunction_call : ID LPAREN function_param_list_call RPAREN SEMICOLON\n    function_param_list_call : ID COMMA function_param_list_call\n    | IDfunction_body : block_sequenceblock_sequence : block SEMICOLON block_sequence\n\t | blockblock : constant_declaration\n     | variable_declaration\n\t | if_block\n\t | while_block\n\t | function_call\n\t |\n\tif_block : IF expression LBRACE block RBRACE LBRACE ELSE block RBRACE\n\t| IF expression THEN block ELSE block\n\twhile_block : WHILE expression LBRACE block RBRACE'
+_lr_signature = 'start_blockleftORleftANDleftEQUALNOT_EQUALleftGREATER_THANGREATER_THAN_EQUALLESS_THANLESS_THAN_EQUALleftPLUSMINUSleftTIMESDIVIDEMODrightPOWERrightNOTleftLPARENRPARENAND ASSIGN BOOL_LITERAL BOOL_TYPE COLON COMMA COMMENT DIVIDE ELSE EQUAL FALSE FLOAT_LITERAL FLOAT_TYPE FUNCTION GREATER_THAN GREATER_THAN_EQUAL ID IF INTEGER_LITERAL INT_TYPE LBRACE LESS_THAN LESS_THAN_EQUAL LPAREN LSQUARE MINUS MOD NOT NOT_EQUAL OR PLUS POWER RBRACE RPAREN RSQUARE SEMICOLON STRING_LITERAL STRING_TYPE THEN TIMES TRUE VAL VAR VOID_TYPE WHILEstart_block :  constant_declaration\n    | variable_declaration\n    | function_declaration\n    |\n\ttype : INT_TYPE\n            | FLOAT_TYPE\n            | STRING_TYPE\n            | BOOL_TYPEexpression : expression PLUS expression\n                  | expression MINUS expression\n                  | expression TIMES expression\n                  | expression DIVIDE expression\n                  | expression MOD expression\n                  | expression POWER expression\n                  | expression EQUAL expression\n                  | expression NOT_EQUAL expression\n                  | expression GREATER_THAN expression\n                  | expression GREATER_THAN_EQUAL expression\n                  | expression LESS_THAN expression\n                  | expression LESS_THAN_EQUAL expression\n                  | expression AND expression\n                  | expression OR expression\n                  | NOT expression\n                  | INTEGER_LITERAL\n                  | FLOAT_LITERAL\n                  | STRING_LITERAL\n                  | BOOL_LITERAL\n                  | ID\n                  | LPAREN expression RPARENconstant_declaration : VAL ID COLON type ASSIGN expression SEMICOLONvariable_declaration : VAR ID COLON type ASSIGN expression SEMICOLONfunction_declaration : FUNCTION ID LPAREN function_param_list RPAREN COLON type SEMICOLON\n    |  FUNCTION ID LPAREN function_param_list RPAREN COLON type LBRACE function_body RBRACEfunction_param_list : parameter COMMA function_param_list\n    | parameter parameter : VAL ID COLON type\n    | VAR ID COLON typefunction_call : ID LPAREN function_param_list_call RPAREN SEMICOLON\n    function_param_list_call : ID COMMA function_param_list_call\n    | IDfunction_body : block_sequenceblock_sequence : block SEMICOLON block_sequence\n\t | blockblock : constant_declaration\n     | variable_declaration\n\t | if_block\n\t | while_block\n\t | function_call\n\t |\n\tif_block : IF expression LBRACE block RBRACE LBRACE ELSE block RBRACE\n\t| IF expression LBRACE block RBRACE \n\twhile_block : WHILE expression LBRACE block RBRACE'
     
-_lr_action_items = {'INT_TYPE':([0,],[2,]),'FLOAT_TYPE':([0,],[3,]),'STRING_TYPE':([0,],[4,]),'BOOL_TYPE':([0,],[5,]),'$end':([1,2,3,4,5,],[0,-1,-2,-3,-4,]),}
+_lr_action_items = {'$end':([0,1,2,3,4,43,60,79,93,],[-4,0,-1,-2,-3,-30,-31,-32,-33,]),'VAL':([0,13,27,80,94,100,101,111,],[5,22,22,5,5,5,5,5,]),'VAR':([0,13,27,80,94,100,101,111,],[6,23,23,6,6,6,6,6,]),'FUNCTION':([0,],[7,]),'ID':([5,6,7,22,23,24,25,32,37,44,45,46,47,48,49,50,51,52,53,54,55,56,57,80,90,91,92,94,100,101,102,111,],[8,9,10,28,29,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,81,30,30,97,81,81,81,97,81,]),'COLON':([8,9,26,28,29,],[11,12,39,41,42,]),'LPAREN':([10,24,25,32,37,44,45,46,47,48,49,50,51,52,53,54,55,56,57,81,90,91,],[13,37,37,37,37,37,37,37,37,37,37,37,37,37,37,37,37,37,37,92,37,37,]),'INT_TYPE':([11,12,39,41,42,],[15,15,15,15,15,]),'FLOAT_TYPE':([11,12,39,41,42,],[16,16,16,16,16,]),'STRING_TYPE':([11,12,39,41,42,],[17,17,17,17,17,]),'BOOL_TYPE':([11,12,39,41,42,],[18,18,18,18,18,]),'ASSIGN':([14,15,16,17,18,19,],[24,-5,-6,-7,-8,25,]),'SEMICOLON':([15,16,17,18,30,31,33,34,35,36,38,43,58,60,61,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,80,84,85,86,87,88,89,94,103,107,108,109,113,],[-5,-6,-7,-8,-28,43,-24,-25,-26,-27,60,-30,-23,-31,79,-9,-10,-11,-12,-13,-14,-15,-16,-17,-18,-19,-20,-21,-22,-29,-49,94,-44,-45,-46,-47,-48,-49,107,-38,-51,-52,-50,]),'LBRACE':([15,16,17,18,30,33,34,35,36,58,61,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,95,96,108,],[-5,-6,-7,-8,-28,-24,-25,-26,-27,-23,80,-9,-10,-11,-12,-13,-14,-15,-16,-17,-18,-19,-20,-21,-22,-29,100,101,110,]),'COMMA':([15,16,17,18,21,62,63,97,],[-5,-6,-7,-8,27,-36,-37,102,]),'RPAREN':([15,16,17,18,20,21,30,33,34,35,36,40,58,59,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,97,98,106,],[-5,-6,-7,-8,26,-35,-28,-24,-25,-26,-27,-34,-23,78,-36,-37,-9,-10,-11,-12,-13,-14,-15,-16,-17,-18,-19,-20,-21,-22,-29,-40,103,-39,]),'NOT':([24,25,32,37,44,45,46,47,48,49,50,51,52,53,54,55,56,57,90,91,],[32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,]),'INTEGER_LITERAL':([24,25,32,37,44,45,46,47,48,49,50,51,52,53,54,55,56,57,90,91,],[33,33,33,33,33,33,33,33,33,33,33,33,33,33,33,33,33,33,33,33,]),'FLOAT_LITERAL':([24,25,32,37,44,45,46,47,48,49,50,51,52,53,54,55,56,57,90,91,],[34,34,34,34,34,34,34,34,34,34,34,34,34,34,34,34,34,34,34,34,]),'STRING_LITERAL':([24,25,32,37,44,45,46,47,48,49,50,51,52,53,54,55,56,57,90,91,],[35,35,35,35,35,35,35,35,35,35,35,35,35,35,35,35,35,35,35,35,]),'BOOL_LITERAL':([24,25,32,37,44,45,46,47,48,49,50,51,52,53,54,55,56,57,90,91,],[36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,36,]),'PLUS':([30,31,33,34,35,36,38,58,59,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,95,96,],[-28,44,-24,-25,-26,-27,44,-23,44,-9,-10,-11,-12,-13,-14,44,44,44,44,44,44,44,44,-29,44,44,]),'MINUS':([30,31,33,34,35,36,38,58,59,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,95,96,],[-28,45,-24,-25,-26,-27,45,-23,45,-9,-10,-11,-12,-13,-14,45,45,45,45,45,45,45,45,-29,45,45,]),'TIMES':([30,31,33,34,35,36,38,58,59,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,95,96,],[-28,46,-24,-25,-26,-27,46,-23,46,46,46,-11,-12,-13,-14,46,46,46,46,46,46,46,46,-29,46,46,]),'DIVIDE':([30,31,33,34,35,36,38,58,59,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,95,96,],[-28,47,-24,-25,-26,-27,47,-23,47,47,47,-11,-12,-13,-14,47,47,47,47,47,47,47,47,-29,47,47,]),'MOD':([30,31,33,34,35,36,38,58,59,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,95,96,],[-28,48,-24,-25,-26,-27,48,-23,48,48,48,-11,-12,-13,-14,48,48,48,48,48,48,48,48,-29,48,48,]),'POWER':([30,31,33,34,35,36,38,58,59,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,95,96,],[-28,49,-24,-25,-26,-27,49,-23,49,49,49,49,49,49,49,49,49,49,49,49,49,49,49,-29,49,49,]),'EQUAL':([30,31,33,34,35,36,38,58,59,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,95,96,],[-28,50,-24,-25,-26,-27,50,-23,50,-9,-10,-11,-12,-13,-14,-15,-16,-17,-18,-19,-20,50,50,-29,50,50,]),'NOT_EQUAL':([30,31,33,34,35,36,38,58,59,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,95,96,],[-28,51,-24,-25,-26,-27,51,-23,51,-9,-10,-11,-12,-13,-14,-15,-16,-17,-18,-19,-20,51,51,-29,51,51,]),'GREATER_THAN':([30,31,33,34,35,36,38,58,59,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,95,96,],[-28,52,-24,-25,-26,-27,52,-23,52,-9,-10,-11,-12,-13,-14,52,52,-17,-18,-19,-20,52,52,-29,52,52,]),'GREATER_THAN_EQUAL':([30,31,33,34,35,36,38,58,59,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,95,96,],[-28,53,-24,-25,-26,-27,53,-23,53,-9,-10,-11,-12,-13,-14,53,53,-17,-18,-19,-20,53,53,-29,53,53,]),'LESS_THAN':([30,31,33,34,35,36,38,58,59,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,95,96,],[-28,54,-24,-25,-26,-27,54,-23,54,-9,-10,-11,-12,-13,-14,54,54,-17,-18,-19,-20,54,54,-29,54,54,]),'LESS_THAN_EQUAL':([30,31,33,34,35,36,38,58,59,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,95,96,],[-28,55,-24,-25,-26,-27,55,-23,55,-9,-10,-11,-12,-13,-14,55,55,-17,-18,-19,-20,55,55,-29,55,55,]),'AND':([30,31,33,34,35,36,38,58,59,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,95,96,],[-28,56,-24,-25,-26,-27,56,-23,56,-9,-10,-11,-12,-13,-14,-15,-16,-17,-18,-19,-20,-21,56,-29,56,56,]),'OR':([30,31,33,34,35,36,38,58,59,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,95,96,],[-28,57,-24,-25,-26,-27,57,-23,57,-9,-10,-11,-12,-13,-14,-15,-16,-17,-18,-19,-20,-21,-22,-29,57,57,]),'RBRACE':([43,60,80,82,83,84,85,86,87,88,89,94,99,100,101,104,105,107,108,109,111,112,113,],[-30,-31,-49,93,-41,-43,-44,-45,-46,-47,-48,-49,-42,-49,-49,108,109,-38,-51,-52,-49,113,-50,]),'IF':([80,94,100,101,111,],[90,90,90,90,90,]),'WHILE':([80,94,100,101,111,],[91,91,91,91,91,]),'ELSE':([110,],[111,]),}
 
 _lr_action = {}
 for _k, _v in _lr_action_items.items():
@@ -17,7 +17,7 @@ for _k, _v in _lr_action_items.items():
       _lr_action[_x][_k] = _y
 del _lr_action_items
 
-_lr_goto_items = {'type':([0,],[1,]),}
+_lr_goto_items = {'start_block':([0,],[1,]),'constant_declaration':([0,80,94,100,101,111,],[2,85,85,85,85,85,]),'variable_declaration':([0,80,94,100,101,111,],[3,86,86,86,86,86,]),'function_declaration':([0,],[4,]),'type':([11,12,39,41,42,],[14,19,61,62,63,]),'function_param_list':([13,27,],[20,40,]),'parameter':([13,27,],[21,21,]),'expression':([24,25,32,37,44,45,46,47,48,49,50,51,52,53,54,55,56,57,90,91,],[31,38,58,59,64,65,66,67,68,69,70,71,72,73,74,75,76,77,95,96,]),'function_body':([80,],[82,]),'block_sequence':([80,94,],[83,99,]),'block':([80,94,100,101,111,],[84,84,104,105,112,]),'if_block':([80,94,100,101,111,],[87,87,87,87,87,]),'while_block':([80,94,100,101,111,],[88,88,88,88,88,]),'function_call':([80,94,100,101,111,],[89,89,89,89,89,]),'function_param_list_call':([92,102,],[98,106,]),}
 
 _lr_goto = {}
 for _k, _v in _lr_goto_items.items():
@@ -26,53 +26,57 @@ for _k, _v in _lr_goto_items.items():
        _lr_goto[_x][_k] = _y
 del _lr_goto_items
 _lr_productions = [
-  ("S' -> type","S'",1,None,None,None),
-  ('type -> INT_TYPE','type',1,'p_type','tokens.py',136),
-  ('type -> FLOAT_TYPE','type',1,'p_type','tokens.py',137),
-  ('type -> STRING_TYPE','type',1,'p_type','tokens.py',138),
-  ('type -> BOOL_TYPE','type',1,'p_type','tokens.py',139),
-  ('expression -> expression PLUS expression','expression',3,'p_expression','tokens.py',143),
-  ('expression -> expression MINUS expression','expression',3,'p_expression','tokens.py',144),
-  ('expression -> expression TIMES expression','expression',3,'p_expression','tokens.py',145),
-  ('expression -> expression DIVIDE expression','expression',3,'p_expression','tokens.py',146),
-  ('expression -> expression MOD expression','expression',3,'p_expression','tokens.py',147),
-  ('expression -> expression POWER expression','expression',3,'p_expression','tokens.py',148),
-  ('expression -> expression EQUAL expression','expression',3,'p_expression','tokens.py',149),
-  ('expression -> expression NOT_EQUAL expression','expression',3,'p_expression','tokens.py',150),
-  ('expression -> expression GREATER_THAN expression','expression',3,'p_expression','tokens.py',151),
-  ('expression -> expression GREATER_THAN_EQUAL expression','expression',3,'p_expression','tokens.py',152),
-  ('expression -> expression LESS_THAN expression','expression',3,'p_expression','tokens.py',153),
-  ('expression -> expression LESS_THAN_EQUAL expression','expression',3,'p_expression','tokens.py',154),
-  ('expression -> expression AND expression','expression',3,'p_expression','tokens.py',155),
-  ('expression -> expression OR expression','expression',3,'p_expression','tokens.py',156),
-  ('expression -> NOT expression','expression',2,'p_expression','tokens.py',157),
-  ('expression -> INTEGER_LITERAL','expression',1,'p_expression','tokens.py',158),
-  ('expression -> FLOAT_LITERAL','expression',1,'p_expression','tokens.py',159),
-  ('expression -> STRING_LITERAL','expression',1,'p_expression','tokens.py',160),
-  ('expression -> BOOL_LITERAL','expression',1,'p_expression','tokens.py',161),
-  ('expression -> ID','expression',1,'p_expression','tokens.py',162),
-  ('expression -> LPAREN expression RPAREN','expression',3,'p_expression','tokens.py',163),
-  ('constant_declaration -> VAL ID COLON type ASSIGN expression SEMICOLON','constant_declaration',7,'p_constant_declaration','tokens.py',199),
-  ('variable_declaration -> VAR ID COLON type ASSIGN expression SEMICOLON','variable_declaration',7,'p_variable_declaration','tokens.py',204),
-  ('function_declaration -> FUNCTION ID LPAREN function_param_list RPAREN COLON type SEMICOLON','function_declaration',8,'p_function_declaration','tokens.py',209),
-  ('function_declaration -> FUNCTION ID LPAREN function_param_list RPAREN COLON type LBRACE function_body RBRACE','function_declaration',10,'p_function_declaration','tokens.py',210),
-  ('function_param_list -> parameter COMMA function_param_list','function_param_list',3,'p_function_param_list','tokens.py',218),
-  ('function_param_list -> parameter','function_param_list',1,'p_function_param_list','tokens.py',219),
-  ('parameter -> VAL ID COLON type','parameter',4,'p_parameter','tokens.py',226),
-  ('parameter -> VAR ID COLON type','parameter',4,'p_parameter','tokens.py',227),
-  ('function_call -> ID LPAREN function_param_list_call RPAREN SEMICOLON','function_call',5,'p_function_call','tokens.py',232),
-  ('function_param_list_call -> ID COMMA function_param_list_call','function_param_list_call',3,'p_function_param_list_call','tokens.py',237),
-  ('function_param_list_call -> ID','function_param_list_call',1,'p_function_param_list_call','tokens.py',238),
-  ('function_body -> block_sequence','function_body',1,'p_function_body','tokens.py',246),
-  ('block_sequence -> block SEMICOLON block_sequence','block_sequence',3,'p_block_sequence','tokens.py',250),
-  ('block_sequence -> block','block_sequence',1,'p_block_sequence','tokens.py',251),
-  ('block -> constant_declaration','block',1,'p_block','tokens.py',258),
-  ('block -> variable_declaration','block',1,'p_block','tokens.py',259),
-  ('block -> if_block','block',1,'p_block','tokens.py',260),
-  ('block -> while_block','block',1,'p_block','tokens.py',261),
-  ('block -> function_call','block',1,'p_block','tokens.py',262),
-  ('block -> <empty>','block',0,'p_block','tokens.py',263),
-  ('if_block -> IF expression LBRACE block RBRACE LBRACE ELSE block RBRACE','if_block',9,'p_if_block','tokens.py',269),
-  ('if_block -> IF expression THEN block ELSE block','if_block',6,'p_if_block','tokens.py',270),
-  ('while_block -> WHILE expression LBRACE block RBRACE','while_block',5,'p_while_block','tokens.py',278),
+  ("S' -> start_block","S'",1,None,None,None),
+  ('start_block -> constant_declaration','start_block',1,'p_start_block','rules.py',21),
+  ('start_block -> variable_declaration','start_block',1,'p_start_block','rules.py',22),
+  ('start_block -> function_declaration','start_block',1,'p_start_block','rules.py',23),
+  ('start_block -> <empty>','start_block',0,'p_start_block','rules.py',24),
+  ('type -> INT_TYPE','type',1,'p_type','rules.py',30),
+  ('type -> FLOAT_TYPE','type',1,'p_type','rules.py',31),
+  ('type -> STRING_TYPE','type',1,'p_type','rules.py',32),
+  ('type -> BOOL_TYPE','type',1,'p_type','rules.py',33),
+  ('expression -> expression PLUS expression','expression',3,'p_expression','rules.py',37),
+  ('expression -> expression MINUS expression','expression',3,'p_expression','rules.py',38),
+  ('expression -> expression TIMES expression','expression',3,'p_expression','rules.py',39),
+  ('expression -> expression DIVIDE expression','expression',3,'p_expression','rules.py',40),
+  ('expression -> expression MOD expression','expression',3,'p_expression','rules.py',41),
+  ('expression -> expression POWER expression','expression',3,'p_expression','rules.py',42),
+  ('expression -> expression EQUAL expression','expression',3,'p_expression','rules.py',43),
+  ('expression -> expression NOT_EQUAL expression','expression',3,'p_expression','rules.py',44),
+  ('expression -> expression GREATER_THAN expression','expression',3,'p_expression','rules.py',45),
+  ('expression -> expression GREATER_THAN_EQUAL expression','expression',3,'p_expression','rules.py',46),
+  ('expression -> expression LESS_THAN expression','expression',3,'p_expression','rules.py',47),
+  ('expression -> expression LESS_THAN_EQUAL expression','expression',3,'p_expression','rules.py',48),
+  ('expression -> expression AND expression','expression',3,'p_expression','rules.py',49),
+  ('expression -> expression OR expression','expression',3,'p_expression','rules.py',50),
+  ('expression -> NOT expression','expression',2,'p_expression','rules.py',51),
+  ('expression -> INTEGER_LITERAL','expression',1,'p_expression','rules.py',52),
+  ('expression -> FLOAT_LITERAL','expression',1,'p_expression','rules.py',53),
+  ('expression -> STRING_LITERAL','expression',1,'p_expression','rules.py',54),
+  ('expression -> BOOL_LITERAL','expression',1,'p_expression','rules.py',55),
+  ('expression -> ID','expression',1,'p_expression','rules.py',56),
+  ('expression -> LPAREN expression RPAREN','expression',3,'p_expression','rules.py',57),
+  ('constant_declaration -> VAL ID COLON type ASSIGN expression SEMICOLON','constant_declaration',7,'p_constant_declaration','rules.py',93),
+  ('variable_declaration -> VAR ID COLON type ASSIGN expression SEMICOLON','variable_declaration',7,'p_variable_declaration','rules.py',98),
+  ('function_declaration -> FUNCTION ID LPAREN function_param_list RPAREN COLON type SEMICOLON','function_declaration',8,'p_function_declaration','rules.py',103),
+  ('function_declaration -> FUNCTION ID LPAREN function_param_list RPAREN COLON type LBRACE function_body RBRACE','function_declaration',10,'p_function_declaration','rules.py',104),
+  ('function_param_list -> parameter COMMA function_param_list','function_param_list',3,'p_function_param_list','rules.py',112),
+  ('function_param_list -> parameter','function_param_list',1,'p_function_param_list','rules.py',113),
+  ('parameter -> VAL ID COLON type','parameter',4,'p_parameter','rules.py',120),
+  ('parameter -> VAR ID COLON type','parameter',4,'p_parameter','rules.py',121),
+  ('function_call -> ID LPAREN function_param_list_call RPAREN SEMICOLON','function_call',5,'p_function_call','rules.py',126),
+  ('function_param_list_call -> ID COMMA function_param_list_call','function_param_list_call',3,'p_function_param_list_call','rules.py',131),
+  ('function_param_list_call -> ID','function_param_list_call',1,'p_function_param_list_call','rules.py',132),
+  ('function_body -> block_sequence','function_body',1,'p_function_body','rules.py',140),
+  ('block_sequence -> block SEMICOLON block_sequence','block_sequence',3,'p_block_sequence','rules.py',144),
+  ('block_sequence -> block','block_sequence',1,'p_block_sequence','rules.py',145),
+  ('block -> constant_declaration','block',1,'p_block','rules.py',152),
+  ('block -> variable_declaration','block',1,'p_block','rules.py',153),
+  ('block -> if_block','block',1,'p_block','rules.py',154),
+  ('block -> while_block','block',1,'p_block','rules.py',155),
+  ('block -> function_call','block',1,'p_block','rules.py',156),
+  ('block -> <empty>','block',0,'p_block','rules.py',157),
+  ('if_block -> IF expression LBRACE block RBRACE LBRACE ELSE block RBRACE','if_block',9,'p_if_block','rules.py',163),
+  ('if_block -> IF expression LBRACE block RBRACE','if_block',5,'p_if_block','rules.py',164),
+  ('while_block -> WHILE expression LBRACE block RBRACE','while_block',5,'p_while_block','rules.py',172),
 ]
