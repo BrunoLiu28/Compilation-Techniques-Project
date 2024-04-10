@@ -1,11 +1,11 @@
 tokens = (
-    'COMMENT', 'VAL', 'VAR', 'FUNCTION', 'ID'
+    'COMMENT', 'VAL', 'VAR', 'FUNCTION', 'ID',
     'INT_TYPE','FLOAT_TYPE','STRING_TYPE','VOID_TYPE', 'BOOL_TYPE',
     'INTEGER_LITERAL','FLOAT_LITERAL','STRING_LITERAL', 'BOOL_LITERAL',
     # 'ARRAY_TYPE',
     'AND','OR','EQUAL','NOT_EQUAL',
     'GREATER_THAN','GREATER_THAN_EQUAL','LESS_THAN_EQUAL','LESS_THAN',
-    'PLUS','MINUS','TIMES','DIVIDE','MOD', 'POWER'
+    'PLUS','MINUS','TIMES','DIVIDE','MOD', 'POWER',
     'ASSIGN','NOT',
     'LPAREN','RPAREN','LBRACE','RBRACE','LSQUARE','RSQUARE',
     'SEMICOLON','COMMA','COLON', 
@@ -15,7 +15,7 @@ tokens = (
 )
 
 # Reserved keywords
-reserved = {
+reserved_keywords = {
     'val': 'VAL',
     'var': 'VAR',
     'function': 'FUNCTION',
@@ -32,11 +32,8 @@ reserved = {
     'false': 'FALSE'
 }
 
-# Add reserved keywords to tokens
-tokens += list(reserved.values())
 # Tokens
 t_COMMENT = r'\#.*'
-t_ID = r'[a-zA-Z_][a-zA-Z0-9_]*'
 t_AND = r'&&'
 t_OR = r'\|\|'
 t_EQUAL = r'='
@@ -50,7 +47,7 @@ t_MINUS = r'-'
 t_TIMES = r'\*'
 t_DIVIDE = r'/'
 t_MOD = r'%'
-t_POWER = r'^'
+t_POWER = r'\^'
 t_ASSIGN = r':='
 t_NOT = r'!'
 t_LPAREN = r'\('
@@ -63,6 +60,12 @@ t_SEMICOLON = r';'
 t_COMMA = r','
 t_COLON = r':'
 # t_DOT = r'\.'
+
+def t_ID(t):
+    r'[a-zA-Z_][a-zA-Z0-9_]*'
+    t.type = reserved_keywords.get(t.value, 'ID')  # Check if it's a reserved keyword
+    return t
+
 
 def t_INTEGER_LITERAL(t):
     r'\d+(_\d+)*'
@@ -114,7 +117,6 @@ def t_error(t):
 # Build the lexer
 import ply.lex as lex
 lexer = lex.lex()
-
 
 precedence = (
     ('left', 'OR'),
@@ -272,7 +274,6 @@ def p_if_block(t):
 	"""if_block : IF expression LBRACE block RBRACE LBRACE ELSE block RBRACE
 	| IF expression THEN block ELSE block
 	"""
-	
 	if len(t) == 5:
 		t[0] = ('if',t[2],t[4])
 	else:
@@ -283,17 +284,18 @@ def p_while_block(t):
 	t[0] = ('while',t[2],t[4])
 
 
-
-
 def p_error(p):
     print("Syntax error in input!")
+    print(p)
 
 import ply.yacc as yacc
 parser = yacc.yacc()
+# parser.start = 'constant_declaration', 'variable_declaration', 'function_declaration'
+input_filename = 'test.pl'
 
-while True:
-    try:
-        s = input('calc > ')   # Use raw_input on Python 2
-    except EOFError:
-        break
-    parser.parse(s)
+with open(input_filename, 'r') as file:
+    for line in file:
+        try:
+            parser.parse(line)
+        except EOFError:
+            break
