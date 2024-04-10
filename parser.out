@@ -1,1 +1,2655 @@
 Created by PLY version 3.11 (http://www.dabeaz.com/ply)
+
+Unused terminals:
+
+    COMMENT
+    FALSE
+    LSQUARE
+    RSQUARE
+    THEN
+    TRUE
+    VOID_TYPE
+
+Grammar
+
+Rule 0     S' -> start_block
+Rule 1     start_block -> constant_declaration
+Rule 2     start_block -> variable_declaration
+Rule 3     start_block -> function_declaration
+Rule 4     start_block -> <empty>
+Rule 5     constant_declaration -> VAL ID COLON type ASSIGN expression SEMICOLON
+Rule 6     variable_declaration -> VAR ID COLON type ASSIGN expression SEMICOLON
+Rule 7     function_declaration -> FUNCTION ID LPAREN function_param_list RPAREN COLON type SEMICOLON
+Rule 8     function_declaration -> FUNCTION ID LPAREN function_param_list RPAREN COLON type LBRACE function_body RBRACE
+Rule 9     function_param_list -> parameter COMMA function_param_list
+Rule 10    function_param_list -> parameter
+Rule 11    parameter -> VAL ID COLON type
+Rule 12    parameter -> VAR ID COLON type
+Rule 13    function_call -> ID LPAREN function_param_list_call RPAREN SEMICOLON
+Rule 14    function_param_list_call -> ID COMMA function_param_list_call
+Rule 15    function_param_list_call -> ID
+Rule 16    function_body -> block_sequence
+Rule 17    block_sequence -> block SEMICOLON block_sequence
+Rule 18    block_sequence -> block
+Rule 19    block -> constant_declaration
+Rule 20    block -> variable_declaration
+Rule 21    block -> if_block
+Rule 22    block -> while_block
+Rule 23    block -> function_call
+Rule 24    block -> <empty>
+Rule 25    if_block -> IF expression LBRACE block RBRACE LBRACE ELSE block RBRACE
+Rule 26    if_block -> IF expression LBRACE block RBRACE
+Rule 27    while_block -> WHILE expression LBRACE block RBRACE
+Rule 28    type -> INT_TYPE
+Rule 29    type -> FLOAT_TYPE
+Rule 30    type -> STRING_TYPE
+Rule 31    type -> BOOL_TYPE
+Rule 32    expression -> expression PLUS expression
+Rule 33    expression -> expression MINUS expression
+Rule 34    expression -> expression TIMES expression
+Rule 35    expression -> expression DIVIDE expression
+Rule 36    expression -> expression MOD expression
+Rule 37    expression -> expression POWER expression
+Rule 38    expression -> expression EQUAL expression
+Rule 39    expression -> expression NOT_EQUAL expression
+Rule 40    expression -> expression GREATER_THAN expression
+Rule 41    expression -> expression GREATER_THAN_EQUAL expression
+Rule 42    expression -> expression LESS_THAN expression
+Rule 43    expression -> expression LESS_THAN_EQUAL expression
+Rule 44    expression -> expression AND expression
+Rule 45    expression -> expression OR expression
+Rule 46    expression -> NOT expression
+Rule 47    expression -> INTEGER_LITERAL
+Rule 48    expression -> FLOAT_LITERAL
+Rule 49    expression -> STRING_LITERAL
+Rule 50    expression -> BOOL_LITERAL
+Rule 51    expression -> ID
+Rule 52    expression -> LPAREN expression RPAREN
+
+Terminals, with rules where they appear
+
+AND                  : 44
+ASSIGN               : 5 6
+BOOL_LITERAL         : 50
+BOOL_TYPE            : 31
+COLON                : 5 6 7 8 11 12
+COMMA                : 9 14
+COMMENT              : 
+DIVIDE               : 35
+ELSE                 : 25
+EQUAL                : 38
+FALSE                : 
+FLOAT_LITERAL        : 48
+FLOAT_TYPE           : 29
+FUNCTION             : 7 8
+GREATER_THAN         : 40
+GREATER_THAN_EQUAL   : 41
+ID                   : 5 6 7 8 11 12 13 14 15 51
+IF                   : 25 26
+INTEGER_LITERAL      : 47
+INT_TYPE             : 28
+LBRACE               : 8 25 25 26 27
+LESS_THAN            : 42
+LESS_THAN_EQUAL      : 43
+LPAREN               : 7 8 13 52
+LSQUARE              : 
+MINUS                : 33
+MOD                  : 36
+NOT                  : 46
+NOT_EQUAL            : 39
+OR                   : 45
+PLUS                 : 32
+POWER                : 37
+RBRACE               : 8 25 25 26 27
+RPAREN               : 7 8 13 52
+RSQUARE              : 
+SEMICOLON            : 5 6 7 13 17
+STRING_LITERAL       : 49
+STRING_TYPE          : 30
+THEN                 : 
+TIMES                : 34
+TRUE                 : 
+VAL                  : 5 11
+VAR                  : 6 12
+VOID_TYPE            : 
+WHILE                : 27
+error                : 
+
+Nonterminals, with rules where they appear
+
+block                : 17 18 25 25 26 27
+block_sequence       : 16 17
+constant_declaration : 1 19
+expression           : 5 6 25 26 27 32 32 33 33 34 34 35 35 36 36 37 37 38 38 39 39 40 40 41 41 42 42 43 43 44 44 45 45 46 52
+function_body        : 8
+function_call        : 23
+function_declaration : 3
+function_param_list  : 7 8 9
+function_param_list_call : 13 14
+if_block             : 21
+parameter            : 9 10
+start_block          : 0
+type                 : 5 6 7 8 11 12
+variable_declaration : 2 20
+while_block          : 22
+
+Parsing method: LALR
+
+state 0
+
+    (0) S' -> . start_block
+    (1) start_block -> . constant_declaration
+    (2) start_block -> . variable_declaration
+    (3) start_block -> . function_declaration
+    (4) start_block -> .
+    (5) constant_declaration -> . VAL ID COLON type ASSIGN expression SEMICOLON
+    (6) variable_declaration -> . VAR ID COLON type ASSIGN expression SEMICOLON
+    (7) function_declaration -> . FUNCTION ID LPAREN function_param_list RPAREN COLON type SEMICOLON
+    (8) function_declaration -> . FUNCTION ID LPAREN function_param_list RPAREN COLON type LBRACE function_body RBRACE
+
+    $end            reduce using rule 4 (start_block -> .)
+    VAL             shift and go to state 5
+    VAR             shift and go to state 6
+    FUNCTION        shift and go to state 7
+
+    start_block                    shift and go to state 1
+    constant_declaration           shift and go to state 2
+    variable_declaration           shift and go to state 3
+    function_declaration           shift and go to state 4
+
+state 1
+
+    (0) S' -> start_block .
+
+
+
+state 2
+
+    (1) start_block -> constant_declaration .
+
+    $end            reduce using rule 1 (start_block -> constant_declaration .)
+
+
+state 3
+
+    (2) start_block -> variable_declaration .
+
+    $end            reduce using rule 2 (start_block -> variable_declaration .)
+
+
+state 4
+
+    (3) start_block -> function_declaration .
+
+    $end            reduce using rule 3 (start_block -> function_declaration .)
+
+
+state 5
+
+    (5) constant_declaration -> VAL . ID COLON type ASSIGN expression SEMICOLON
+
+    ID              shift and go to state 8
+
+
+state 6
+
+    (6) variable_declaration -> VAR . ID COLON type ASSIGN expression SEMICOLON
+
+    ID              shift and go to state 9
+
+
+state 7
+
+    (7) function_declaration -> FUNCTION . ID LPAREN function_param_list RPAREN COLON type SEMICOLON
+    (8) function_declaration -> FUNCTION . ID LPAREN function_param_list RPAREN COLON type LBRACE function_body RBRACE
+
+    ID              shift and go to state 10
+
+
+state 8
+
+    (5) constant_declaration -> VAL ID . COLON type ASSIGN expression SEMICOLON
+
+    COLON           shift and go to state 11
+
+
+state 9
+
+    (6) variable_declaration -> VAR ID . COLON type ASSIGN expression SEMICOLON
+
+    COLON           shift and go to state 12
+
+
+state 10
+
+    (7) function_declaration -> FUNCTION ID . LPAREN function_param_list RPAREN COLON type SEMICOLON
+    (8) function_declaration -> FUNCTION ID . LPAREN function_param_list RPAREN COLON type LBRACE function_body RBRACE
+
+    LPAREN          shift and go to state 13
+
+
+state 11
+
+    (5) constant_declaration -> VAL ID COLON . type ASSIGN expression SEMICOLON
+    (28) type -> . INT_TYPE
+    (29) type -> . FLOAT_TYPE
+    (30) type -> . STRING_TYPE
+    (31) type -> . BOOL_TYPE
+
+    INT_TYPE        shift and go to state 15
+    FLOAT_TYPE      shift and go to state 16
+    STRING_TYPE     shift and go to state 17
+    BOOL_TYPE       shift and go to state 18
+
+    type                           shift and go to state 14
+
+state 12
+
+    (6) variable_declaration -> VAR ID COLON . type ASSIGN expression SEMICOLON
+    (28) type -> . INT_TYPE
+    (29) type -> . FLOAT_TYPE
+    (30) type -> . STRING_TYPE
+    (31) type -> . BOOL_TYPE
+
+    INT_TYPE        shift and go to state 15
+    FLOAT_TYPE      shift and go to state 16
+    STRING_TYPE     shift and go to state 17
+    BOOL_TYPE       shift and go to state 18
+
+    type                           shift and go to state 19
+
+state 13
+
+    (7) function_declaration -> FUNCTION ID LPAREN . function_param_list RPAREN COLON type SEMICOLON
+    (8) function_declaration -> FUNCTION ID LPAREN . function_param_list RPAREN COLON type LBRACE function_body RBRACE
+    (9) function_param_list -> . parameter COMMA function_param_list
+    (10) function_param_list -> . parameter
+    (11) parameter -> . VAL ID COLON type
+    (12) parameter -> . VAR ID COLON type
+
+    VAL             shift and go to state 22
+    VAR             shift and go to state 23
+
+    function_param_list            shift and go to state 20
+    parameter                      shift and go to state 21
+
+state 14
+
+    (5) constant_declaration -> VAL ID COLON type . ASSIGN expression SEMICOLON
+
+    ASSIGN          shift and go to state 24
+
+
+state 15
+
+    (28) type -> INT_TYPE .
+
+    ASSIGN          reduce using rule 28 (type -> INT_TYPE .)
+    SEMICOLON       reduce using rule 28 (type -> INT_TYPE .)
+    LBRACE          reduce using rule 28 (type -> INT_TYPE .)
+    COMMA           reduce using rule 28 (type -> INT_TYPE .)
+    RPAREN          reduce using rule 28 (type -> INT_TYPE .)
+
+
+state 16
+
+    (29) type -> FLOAT_TYPE .
+
+    ASSIGN          reduce using rule 29 (type -> FLOAT_TYPE .)
+    SEMICOLON       reduce using rule 29 (type -> FLOAT_TYPE .)
+    LBRACE          reduce using rule 29 (type -> FLOAT_TYPE .)
+    COMMA           reduce using rule 29 (type -> FLOAT_TYPE .)
+    RPAREN          reduce using rule 29 (type -> FLOAT_TYPE .)
+
+
+state 17
+
+    (30) type -> STRING_TYPE .
+
+    ASSIGN          reduce using rule 30 (type -> STRING_TYPE .)
+    SEMICOLON       reduce using rule 30 (type -> STRING_TYPE .)
+    LBRACE          reduce using rule 30 (type -> STRING_TYPE .)
+    COMMA           reduce using rule 30 (type -> STRING_TYPE .)
+    RPAREN          reduce using rule 30 (type -> STRING_TYPE .)
+
+
+state 18
+
+    (31) type -> BOOL_TYPE .
+
+    ASSIGN          reduce using rule 31 (type -> BOOL_TYPE .)
+    SEMICOLON       reduce using rule 31 (type -> BOOL_TYPE .)
+    LBRACE          reduce using rule 31 (type -> BOOL_TYPE .)
+    COMMA           reduce using rule 31 (type -> BOOL_TYPE .)
+    RPAREN          reduce using rule 31 (type -> BOOL_TYPE .)
+
+
+state 19
+
+    (6) variable_declaration -> VAR ID COLON type . ASSIGN expression SEMICOLON
+
+    ASSIGN          shift and go to state 25
+
+
+state 20
+
+    (7) function_declaration -> FUNCTION ID LPAREN function_param_list . RPAREN COLON type SEMICOLON
+    (8) function_declaration -> FUNCTION ID LPAREN function_param_list . RPAREN COLON type LBRACE function_body RBRACE
+
+    RPAREN          shift and go to state 26
+
+
+state 21
+
+    (9) function_param_list -> parameter . COMMA function_param_list
+    (10) function_param_list -> parameter .
+
+    COMMA           shift and go to state 27
+    RPAREN          reduce using rule 10 (function_param_list -> parameter .)
+
+
+state 22
+
+    (11) parameter -> VAL . ID COLON type
+
+    ID              shift and go to state 28
+
+
+state 23
+
+    (12) parameter -> VAR . ID COLON type
+
+    ID              shift and go to state 29
+
+
+state 24
+
+    (5) constant_declaration -> VAL ID COLON type ASSIGN . expression SEMICOLON
+    (32) expression -> . expression PLUS expression
+    (33) expression -> . expression MINUS expression
+    (34) expression -> . expression TIMES expression
+    (35) expression -> . expression DIVIDE expression
+    (36) expression -> . expression MOD expression
+    (37) expression -> . expression POWER expression
+    (38) expression -> . expression EQUAL expression
+    (39) expression -> . expression NOT_EQUAL expression
+    (40) expression -> . expression GREATER_THAN expression
+    (41) expression -> . expression GREATER_THAN_EQUAL expression
+    (42) expression -> . expression LESS_THAN expression
+    (43) expression -> . expression LESS_THAN_EQUAL expression
+    (44) expression -> . expression AND expression
+    (45) expression -> . expression OR expression
+    (46) expression -> . NOT expression
+    (47) expression -> . INTEGER_LITERAL
+    (48) expression -> . FLOAT_LITERAL
+    (49) expression -> . STRING_LITERAL
+    (50) expression -> . BOOL_LITERAL
+    (51) expression -> . ID
+    (52) expression -> . LPAREN expression RPAREN
+
+    NOT             shift and go to state 32
+    INTEGER_LITERAL shift and go to state 33
+    FLOAT_LITERAL   shift and go to state 34
+    STRING_LITERAL  shift and go to state 35
+    BOOL_LITERAL    shift and go to state 36
+    ID              shift and go to state 30
+    LPAREN          shift and go to state 37
+
+    expression                     shift and go to state 31
+
+state 25
+
+    (6) variable_declaration -> VAR ID COLON type ASSIGN . expression SEMICOLON
+    (32) expression -> . expression PLUS expression
+    (33) expression -> . expression MINUS expression
+    (34) expression -> . expression TIMES expression
+    (35) expression -> . expression DIVIDE expression
+    (36) expression -> . expression MOD expression
+    (37) expression -> . expression POWER expression
+    (38) expression -> . expression EQUAL expression
+    (39) expression -> . expression NOT_EQUAL expression
+    (40) expression -> . expression GREATER_THAN expression
+    (41) expression -> . expression GREATER_THAN_EQUAL expression
+    (42) expression -> . expression LESS_THAN expression
+    (43) expression -> . expression LESS_THAN_EQUAL expression
+    (44) expression -> . expression AND expression
+    (45) expression -> . expression OR expression
+    (46) expression -> . NOT expression
+    (47) expression -> . INTEGER_LITERAL
+    (48) expression -> . FLOAT_LITERAL
+    (49) expression -> . STRING_LITERAL
+    (50) expression -> . BOOL_LITERAL
+    (51) expression -> . ID
+    (52) expression -> . LPAREN expression RPAREN
+
+    NOT             shift and go to state 32
+    INTEGER_LITERAL shift and go to state 33
+    FLOAT_LITERAL   shift and go to state 34
+    STRING_LITERAL  shift and go to state 35
+    BOOL_LITERAL    shift and go to state 36
+    ID              shift and go to state 30
+    LPAREN          shift and go to state 37
+
+    expression                     shift and go to state 38
+
+state 26
+
+    (7) function_declaration -> FUNCTION ID LPAREN function_param_list RPAREN . COLON type SEMICOLON
+    (8) function_declaration -> FUNCTION ID LPAREN function_param_list RPAREN . COLON type LBRACE function_body RBRACE
+
+    COLON           shift and go to state 39
+
+
+state 27
+
+    (9) function_param_list -> parameter COMMA . function_param_list
+    (9) function_param_list -> . parameter COMMA function_param_list
+    (10) function_param_list -> . parameter
+    (11) parameter -> . VAL ID COLON type
+    (12) parameter -> . VAR ID COLON type
+
+    VAL             shift and go to state 22
+    VAR             shift and go to state 23
+
+    parameter                      shift and go to state 21
+    function_param_list            shift and go to state 40
+
+state 28
+
+    (11) parameter -> VAL ID . COLON type
+
+    COLON           shift and go to state 41
+
+
+state 29
+
+    (12) parameter -> VAR ID . COLON type
+
+    COLON           shift and go to state 42
+
+
+state 30
+
+    (51) expression -> ID .
+
+    SEMICOLON       reduce using rule 51 (expression -> ID .)
+    PLUS            reduce using rule 51 (expression -> ID .)
+    MINUS           reduce using rule 51 (expression -> ID .)
+    TIMES           reduce using rule 51 (expression -> ID .)
+    DIVIDE          reduce using rule 51 (expression -> ID .)
+    MOD             reduce using rule 51 (expression -> ID .)
+    POWER           reduce using rule 51 (expression -> ID .)
+    EQUAL           reduce using rule 51 (expression -> ID .)
+    NOT_EQUAL       reduce using rule 51 (expression -> ID .)
+    GREATER_THAN    reduce using rule 51 (expression -> ID .)
+    GREATER_THAN_EQUAL reduce using rule 51 (expression -> ID .)
+    LESS_THAN       reduce using rule 51 (expression -> ID .)
+    LESS_THAN_EQUAL reduce using rule 51 (expression -> ID .)
+    AND             reduce using rule 51 (expression -> ID .)
+    OR              reduce using rule 51 (expression -> ID .)
+    RPAREN          reduce using rule 51 (expression -> ID .)
+    LBRACE          reduce using rule 51 (expression -> ID .)
+
+
+state 31
+
+    (5) constant_declaration -> VAL ID COLON type ASSIGN expression . SEMICOLON
+    (32) expression -> expression . PLUS expression
+    (33) expression -> expression . MINUS expression
+    (34) expression -> expression . TIMES expression
+    (35) expression -> expression . DIVIDE expression
+    (36) expression -> expression . MOD expression
+    (37) expression -> expression . POWER expression
+    (38) expression -> expression . EQUAL expression
+    (39) expression -> expression . NOT_EQUAL expression
+    (40) expression -> expression . GREATER_THAN expression
+    (41) expression -> expression . GREATER_THAN_EQUAL expression
+    (42) expression -> expression . LESS_THAN expression
+    (43) expression -> expression . LESS_THAN_EQUAL expression
+    (44) expression -> expression . AND expression
+    (45) expression -> expression . OR expression
+
+    SEMICOLON       shift and go to state 43
+    PLUS            shift and go to state 44
+    MINUS           shift and go to state 45
+    TIMES           shift and go to state 46
+    DIVIDE          shift and go to state 47
+    MOD             shift and go to state 48
+    POWER           shift and go to state 49
+    EQUAL           shift and go to state 50
+    NOT_EQUAL       shift and go to state 51
+    GREATER_THAN    shift and go to state 52
+    GREATER_THAN_EQUAL shift and go to state 53
+    LESS_THAN       shift and go to state 54
+    LESS_THAN_EQUAL shift and go to state 55
+    AND             shift and go to state 56
+    OR              shift and go to state 57
+
+
+state 32
+
+    (46) expression -> NOT . expression
+    (32) expression -> . expression PLUS expression
+    (33) expression -> . expression MINUS expression
+    (34) expression -> . expression TIMES expression
+    (35) expression -> . expression DIVIDE expression
+    (36) expression -> . expression MOD expression
+    (37) expression -> . expression POWER expression
+    (38) expression -> . expression EQUAL expression
+    (39) expression -> . expression NOT_EQUAL expression
+    (40) expression -> . expression GREATER_THAN expression
+    (41) expression -> . expression GREATER_THAN_EQUAL expression
+    (42) expression -> . expression LESS_THAN expression
+    (43) expression -> . expression LESS_THAN_EQUAL expression
+    (44) expression -> . expression AND expression
+    (45) expression -> . expression OR expression
+    (46) expression -> . NOT expression
+    (47) expression -> . INTEGER_LITERAL
+    (48) expression -> . FLOAT_LITERAL
+    (49) expression -> . STRING_LITERAL
+    (50) expression -> . BOOL_LITERAL
+    (51) expression -> . ID
+    (52) expression -> . LPAREN expression RPAREN
+
+    NOT             shift and go to state 32
+    INTEGER_LITERAL shift and go to state 33
+    FLOAT_LITERAL   shift and go to state 34
+    STRING_LITERAL  shift and go to state 35
+    BOOL_LITERAL    shift and go to state 36
+    ID              shift and go to state 30
+    LPAREN          shift and go to state 37
+
+    expression                     shift and go to state 58
+
+state 33
+
+    (47) expression -> INTEGER_LITERAL .
+
+    SEMICOLON       reduce using rule 47 (expression -> INTEGER_LITERAL .)
+    PLUS            reduce using rule 47 (expression -> INTEGER_LITERAL .)
+    MINUS           reduce using rule 47 (expression -> INTEGER_LITERAL .)
+    TIMES           reduce using rule 47 (expression -> INTEGER_LITERAL .)
+    DIVIDE          reduce using rule 47 (expression -> INTEGER_LITERAL .)
+    MOD             reduce using rule 47 (expression -> INTEGER_LITERAL .)
+    POWER           reduce using rule 47 (expression -> INTEGER_LITERAL .)
+    EQUAL           reduce using rule 47 (expression -> INTEGER_LITERAL .)
+    NOT_EQUAL       reduce using rule 47 (expression -> INTEGER_LITERAL .)
+    GREATER_THAN    reduce using rule 47 (expression -> INTEGER_LITERAL .)
+    GREATER_THAN_EQUAL reduce using rule 47 (expression -> INTEGER_LITERAL .)
+    LESS_THAN       reduce using rule 47 (expression -> INTEGER_LITERAL .)
+    LESS_THAN_EQUAL reduce using rule 47 (expression -> INTEGER_LITERAL .)
+    AND             reduce using rule 47 (expression -> INTEGER_LITERAL .)
+    OR              reduce using rule 47 (expression -> INTEGER_LITERAL .)
+    RPAREN          reduce using rule 47 (expression -> INTEGER_LITERAL .)
+    LBRACE          reduce using rule 47 (expression -> INTEGER_LITERAL .)
+
+
+state 34
+
+    (48) expression -> FLOAT_LITERAL .
+
+    SEMICOLON       reduce using rule 48 (expression -> FLOAT_LITERAL .)
+    PLUS            reduce using rule 48 (expression -> FLOAT_LITERAL .)
+    MINUS           reduce using rule 48 (expression -> FLOAT_LITERAL .)
+    TIMES           reduce using rule 48 (expression -> FLOAT_LITERAL .)
+    DIVIDE          reduce using rule 48 (expression -> FLOAT_LITERAL .)
+    MOD             reduce using rule 48 (expression -> FLOAT_LITERAL .)
+    POWER           reduce using rule 48 (expression -> FLOAT_LITERAL .)
+    EQUAL           reduce using rule 48 (expression -> FLOAT_LITERAL .)
+    NOT_EQUAL       reduce using rule 48 (expression -> FLOAT_LITERAL .)
+    GREATER_THAN    reduce using rule 48 (expression -> FLOAT_LITERAL .)
+    GREATER_THAN_EQUAL reduce using rule 48 (expression -> FLOAT_LITERAL .)
+    LESS_THAN       reduce using rule 48 (expression -> FLOAT_LITERAL .)
+    LESS_THAN_EQUAL reduce using rule 48 (expression -> FLOAT_LITERAL .)
+    AND             reduce using rule 48 (expression -> FLOAT_LITERAL .)
+    OR              reduce using rule 48 (expression -> FLOAT_LITERAL .)
+    RPAREN          reduce using rule 48 (expression -> FLOAT_LITERAL .)
+    LBRACE          reduce using rule 48 (expression -> FLOAT_LITERAL .)
+
+
+state 35
+
+    (49) expression -> STRING_LITERAL .
+
+    SEMICOLON       reduce using rule 49 (expression -> STRING_LITERAL .)
+    PLUS            reduce using rule 49 (expression -> STRING_LITERAL .)
+    MINUS           reduce using rule 49 (expression -> STRING_LITERAL .)
+    TIMES           reduce using rule 49 (expression -> STRING_LITERAL .)
+    DIVIDE          reduce using rule 49 (expression -> STRING_LITERAL .)
+    MOD             reduce using rule 49 (expression -> STRING_LITERAL .)
+    POWER           reduce using rule 49 (expression -> STRING_LITERAL .)
+    EQUAL           reduce using rule 49 (expression -> STRING_LITERAL .)
+    NOT_EQUAL       reduce using rule 49 (expression -> STRING_LITERAL .)
+    GREATER_THAN    reduce using rule 49 (expression -> STRING_LITERAL .)
+    GREATER_THAN_EQUAL reduce using rule 49 (expression -> STRING_LITERAL .)
+    LESS_THAN       reduce using rule 49 (expression -> STRING_LITERAL .)
+    LESS_THAN_EQUAL reduce using rule 49 (expression -> STRING_LITERAL .)
+    AND             reduce using rule 49 (expression -> STRING_LITERAL .)
+    OR              reduce using rule 49 (expression -> STRING_LITERAL .)
+    RPAREN          reduce using rule 49 (expression -> STRING_LITERAL .)
+    LBRACE          reduce using rule 49 (expression -> STRING_LITERAL .)
+
+
+state 36
+
+    (50) expression -> BOOL_LITERAL .
+
+    SEMICOLON       reduce using rule 50 (expression -> BOOL_LITERAL .)
+    PLUS            reduce using rule 50 (expression -> BOOL_LITERAL .)
+    MINUS           reduce using rule 50 (expression -> BOOL_LITERAL .)
+    TIMES           reduce using rule 50 (expression -> BOOL_LITERAL .)
+    DIVIDE          reduce using rule 50 (expression -> BOOL_LITERAL .)
+    MOD             reduce using rule 50 (expression -> BOOL_LITERAL .)
+    POWER           reduce using rule 50 (expression -> BOOL_LITERAL .)
+    EQUAL           reduce using rule 50 (expression -> BOOL_LITERAL .)
+    NOT_EQUAL       reduce using rule 50 (expression -> BOOL_LITERAL .)
+    GREATER_THAN    reduce using rule 50 (expression -> BOOL_LITERAL .)
+    GREATER_THAN_EQUAL reduce using rule 50 (expression -> BOOL_LITERAL .)
+    LESS_THAN       reduce using rule 50 (expression -> BOOL_LITERAL .)
+    LESS_THAN_EQUAL reduce using rule 50 (expression -> BOOL_LITERAL .)
+    AND             reduce using rule 50 (expression -> BOOL_LITERAL .)
+    OR              reduce using rule 50 (expression -> BOOL_LITERAL .)
+    RPAREN          reduce using rule 50 (expression -> BOOL_LITERAL .)
+    LBRACE          reduce using rule 50 (expression -> BOOL_LITERAL .)
+
+
+state 37
+
+    (52) expression -> LPAREN . expression RPAREN
+    (32) expression -> . expression PLUS expression
+    (33) expression -> . expression MINUS expression
+    (34) expression -> . expression TIMES expression
+    (35) expression -> . expression DIVIDE expression
+    (36) expression -> . expression MOD expression
+    (37) expression -> . expression POWER expression
+    (38) expression -> . expression EQUAL expression
+    (39) expression -> . expression NOT_EQUAL expression
+    (40) expression -> . expression GREATER_THAN expression
+    (41) expression -> . expression GREATER_THAN_EQUAL expression
+    (42) expression -> . expression LESS_THAN expression
+    (43) expression -> . expression LESS_THAN_EQUAL expression
+    (44) expression -> . expression AND expression
+    (45) expression -> . expression OR expression
+    (46) expression -> . NOT expression
+    (47) expression -> . INTEGER_LITERAL
+    (48) expression -> . FLOAT_LITERAL
+    (49) expression -> . STRING_LITERAL
+    (50) expression -> . BOOL_LITERAL
+    (51) expression -> . ID
+    (52) expression -> . LPAREN expression RPAREN
+
+    NOT             shift and go to state 32
+    INTEGER_LITERAL shift and go to state 33
+    FLOAT_LITERAL   shift and go to state 34
+    STRING_LITERAL  shift and go to state 35
+    BOOL_LITERAL    shift and go to state 36
+    ID              shift and go to state 30
+    LPAREN          shift and go to state 37
+
+    expression                     shift and go to state 59
+
+state 38
+
+    (6) variable_declaration -> VAR ID COLON type ASSIGN expression . SEMICOLON
+    (32) expression -> expression . PLUS expression
+    (33) expression -> expression . MINUS expression
+    (34) expression -> expression . TIMES expression
+    (35) expression -> expression . DIVIDE expression
+    (36) expression -> expression . MOD expression
+    (37) expression -> expression . POWER expression
+    (38) expression -> expression . EQUAL expression
+    (39) expression -> expression . NOT_EQUAL expression
+    (40) expression -> expression . GREATER_THAN expression
+    (41) expression -> expression . GREATER_THAN_EQUAL expression
+    (42) expression -> expression . LESS_THAN expression
+    (43) expression -> expression . LESS_THAN_EQUAL expression
+    (44) expression -> expression . AND expression
+    (45) expression -> expression . OR expression
+
+    SEMICOLON       shift and go to state 60
+    PLUS            shift and go to state 44
+    MINUS           shift and go to state 45
+    TIMES           shift and go to state 46
+    DIVIDE          shift and go to state 47
+    MOD             shift and go to state 48
+    POWER           shift and go to state 49
+    EQUAL           shift and go to state 50
+    NOT_EQUAL       shift and go to state 51
+    GREATER_THAN    shift and go to state 52
+    GREATER_THAN_EQUAL shift and go to state 53
+    LESS_THAN       shift and go to state 54
+    LESS_THAN_EQUAL shift and go to state 55
+    AND             shift and go to state 56
+    OR              shift and go to state 57
+
+
+state 39
+
+    (7) function_declaration -> FUNCTION ID LPAREN function_param_list RPAREN COLON . type SEMICOLON
+    (8) function_declaration -> FUNCTION ID LPAREN function_param_list RPAREN COLON . type LBRACE function_body RBRACE
+    (28) type -> . INT_TYPE
+    (29) type -> . FLOAT_TYPE
+    (30) type -> . STRING_TYPE
+    (31) type -> . BOOL_TYPE
+
+    INT_TYPE        shift and go to state 15
+    FLOAT_TYPE      shift and go to state 16
+    STRING_TYPE     shift and go to state 17
+    BOOL_TYPE       shift and go to state 18
+
+    type                           shift and go to state 61
+
+state 40
+
+    (9) function_param_list -> parameter COMMA function_param_list .
+
+    RPAREN          reduce using rule 9 (function_param_list -> parameter COMMA function_param_list .)
+
+
+state 41
+
+    (11) parameter -> VAL ID COLON . type
+    (28) type -> . INT_TYPE
+    (29) type -> . FLOAT_TYPE
+    (30) type -> . STRING_TYPE
+    (31) type -> . BOOL_TYPE
+
+    INT_TYPE        shift and go to state 15
+    FLOAT_TYPE      shift and go to state 16
+    STRING_TYPE     shift and go to state 17
+    BOOL_TYPE       shift and go to state 18
+
+    type                           shift and go to state 62
+
+state 42
+
+    (12) parameter -> VAR ID COLON . type
+    (28) type -> . INT_TYPE
+    (29) type -> . FLOAT_TYPE
+    (30) type -> . STRING_TYPE
+    (31) type -> . BOOL_TYPE
+
+    INT_TYPE        shift and go to state 15
+    FLOAT_TYPE      shift and go to state 16
+    STRING_TYPE     shift and go to state 17
+    BOOL_TYPE       shift and go to state 18
+
+    type                           shift and go to state 63
+
+state 43
+
+    (5) constant_declaration -> VAL ID COLON type ASSIGN expression SEMICOLON .
+
+    $end            reduce using rule 5 (constant_declaration -> VAL ID COLON type ASSIGN expression SEMICOLON .)
+    SEMICOLON       reduce using rule 5 (constant_declaration -> VAL ID COLON type ASSIGN expression SEMICOLON .)
+    RBRACE          reduce using rule 5 (constant_declaration -> VAL ID COLON type ASSIGN expression SEMICOLON .)
+
+
+state 44
+
+    (32) expression -> expression PLUS . expression
+    (32) expression -> . expression PLUS expression
+    (33) expression -> . expression MINUS expression
+    (34) expression -> . expression TIMES expression
+    (35) expression -> . expression DIVIDE expression
+    (36) expression -> . expression MOD expression
+    (37) expression -> . expression POWER expression
+    (38) expression -> . expression EQUAL expression
+    (39) expression -> . expression NOT_EQUAL expression
+    (40) expression -> . expression GREATER_THAN expression
+    (41) expression -> . expression GREATER_THAN_EQUAL expression
+    (42) expression -> . expression LESS_THAN expression
+    (43) expression -> . expression LESS_THAN_EQUAL expression
+    (44) expression -> . expression AND expression
+    (45) expression -> . expression OR expression
+    (46) expression -> . NOT expression
+    (47) expression -> . INTEGER_LITERAL
+    (48) expression -> . FLOAT_LITERAL
+    (49) expression -> . STRING_LITERAL
+    (50) expression -> . BOOL_LITERAL
+    (51) expression -> . ID
+    (52) expression -> . LPAREN expression RPAREN
+
+    NOT             shift and go to state 32
+    INTEGER_LITERAL shift and go to state 33
+    FLOAT_LITERAL   shift and go to state 34
+    STRING_LITERAL  shift and go to state 35
+    BOOL_LITERAL    shift and go to state 36
+    ID              shift and go to state 30
+    LPAREN          shift and go to state 37
+
+    expression                     shift and go to state 64
+
+state 45
+
+    (33) expression -> expression MINUS . expression
+    (32) expression -> . expression PLUS expression
+    (33) expression -> . expression MINUS expression
+    (34) expression -> . expression TIMES expression
+    (35) expression -> . expression DIVIDE expression
+    (36) expression -> . expression MOD expression
+    (37) expression -> . expression POWER expression
+    (38) expression -> . expression EQUAL expression
+    (39) expression -> . expression NOT_EQUAL expression
+    (40) expression -> . expression GREATER_THAN expression
+    (41) expression -> . expression GREATER_THAN_EQUAL expression
+    (42) expression -> . expression LESS_THAN expression
+    (43) expression -> . expression LESS_THAN_EQUAL expression
+    (44) expression -> . expression AND expression
+    (45) expression -> . expression OR expression
+    (46) expression -> . NOT expression
+    (47) expression -> . INTEGER_LITERAL
+    (48) expression -> . FLOAT_LITERAL
+    (49) expression -> . STRING_LITERAL
+    (50) expression -> . BOOL_LITERAL
+    (51) expression -> . ID
+    (52) expression -> . LPAREN expression RPAREN
+
+    NOT             shift and go to state 32
+    INTEGER_LITERAL shift and go to state 33
+    FLOAT_LITERAL   shift and go to state 34
+    STRING_LITERAL  shift and go to state 35
+    BOOL_LITERAL    shift and go to state 36
+    ID              shift and go to state 30
+    LPAREN          shift and go to state 37
+
+    expression                     shift and go to state 65
+
+state 46
+
+    (34) expression -> expression TIMES . expression
+    (32) expression -> . expression PLUS expression
+    (33) expression -> . expression MINUS expression
+    (34) expression -> . expression TIMES expression
+    (35) expression -> . expression DIVIDE expression
+    (36) expression -> . expression MOD expression
+    (37) expression -> . expression POWER expression
+    (38) expression -> . expression EQUAL expression
+    (39) expression -> . expression NOT_EQUAL expression
+    (40) expression -> . expression GREATER_THAN expression
+    (41) expression -> . expression GREATER_THAN_EQUAL expression
+    (42) expression -> . expression LESS_THAN expression
+    (43) expression -> . expression LESS_THAN_EQUAL expression
+    (44) expression -> . expression AND expression
+    (45) expression -> . expression OR expression
+    (46) expression -> . NOT expression
+    (47) expression -> . INTEGER_LITERAL
+    (48) expression -> . FLOAT_LITERAL
+    (49) expression -> . STRING_LITERAL
+    (50) expression -> . BOOL_LITERAL
+    (51) expression -> . ID
+    (52) expression -> . LPAREN expression RPAREN
+
+    NOT             shift and go to state 32
+    INTEGER_LITERAL shift and go to state 33
+    FLOAT_LITERAL   shift and go to state 34
+    STRING_LITERAL  shift and go to state 35
+    BOOL_LITERAL    shift and go to state 36
+    ID              shift and go to state 30
+    LPAREN          shift and go to state 37
+
+    expression                     shift and go to state 66
+
+state 47
+
+    (35) expression -> expression DIVIDE . expression
+    (32) expression -> . expression PLUS expression
+    (33) expression -> . expression MINUS expression
+    (34) expression -> . expression TIMES expression
+    (35) expression -> . expression DIVIDE expression
+    (36) expression -> . expression MOD expression
+    (37) expression -> . expression POWER expression
+    (38) expression -> . expression EQUAL expression
+    (39) expression -> . expression NOT_EQUAL expression
+    (40) expression -> . expression GREATER_THAN expression
+    (41) expression -> . expression GREATER_THAN_EQUAL expression
+    (42) expression -> . expression LESS_THAN expression
+    (43) expression -> . expression LESS_THAN_EQUAL expression
+    (44) expression -> . expression AND expression
+    (45) expression -> . expression OR expression
+    (46) expression -> . NOT expression
+    (47) expression -> . INTEGER_LITERAL
+    (48) expression -> . FLOAT_LITERAL
+    (49) expression -> . STRING_LITERAL
+    (50) expression -> . BOOL_LITERAL
+    (51) expression -> . ID
+    (52) expression -> . LPAREN expression RPAREN
+
+    NOT             shift and go to state 32
+    INTEGER_LITERAL shift and go to state 33
+    FLOAT_LITERAL   shift and go to state 34
+    STRING_LITERAL  shift and go to state 35
+    BOOL_LITERAL    shift and go to state 36
+    ID              shift and go to state 30
+    LPAREN          shift and go to state 37
+
+    expression                     shift and go to state 67
+
+state 48
+
+    (36) expression -> expression MOD . expression
+    (32) expression -> . expression PLUS expression
+    (33) expression -> . expression MINUS expression
+    (34) expression -> . expression TIMES expression
+    (35) expression -> . expression DIVIDE expression
+    (36) expression -> . expression MOD expression
+    (37) expression -> . expression POWER expression
+    (38) expression -> . expression EQUAL expression
+    (39) expression -> . expression NOT_EQUAL expression
+    (40) expression -> . expression GREATER_THAN expression
+    (41) expression -> . expression GREATER_THAN_EQUAL expression
+    (42) expression -> . expression LESS_THAN expression
+    (43) expression -> . expression LESS_THAN_EQUAL expression
+    (44) expression -> . expression AND expression
+    (45) expression -> . expression OR expression
+    (46) expression -> . NOT expression
+    (47) expression -> . INTEGER_LITERAL
+    (48) expression -> . FLOAT_LITERAL
+    (49) expression -> . STRING_LITERAL
+    (50) expression -> . BOOL_LITERAL
+    (51) expression -> . ID
+    (52) expression -> . LPAREN expression RPAREN
+
+    NOT             shift and go to state 32
+    INTEGER_LITERAL shift and go to state 33
+    FLOAT_LITERAL   shift and go to state 34
+    STRING_LITERAL  shift and go to state 35
+    BOOL_LITERAL    shift and go to state 36
+    ID              shift and go to state 30
+    LPAREN          shift and go to state 37
+
+    expression                     shift and go to state 68
+
+state 49
+
+    (37) expression -> expression POWER . expression
+    (32) expression -> . expression PLUS expression
+    (33) expression -> . expression MINUS expression
+    (34) expression -> . expression TIMES expression
+    (35) expression -> . expression DIVIDE expression
+    (36) expression -> . expression MOD expression
+    (37) expression -> . expression POWER expression
+    (38) expression -> . expression EQUAL expression
+    (39) expression -> . expression NOT_EQUAL expression
+    (40) expression -> . expression GREATER_THAN expression
+    (41) expression -> . expression GREATER_THAN_EQUAL expression
+    (42) expression -> . expression LESS_THAN expression
+    (43) expression -> . expression LESS_THAN_EQUAL expression
+    (44) expression -> . expression AND expression
+    (45) expression -> . expression OR expression
+    (46) expression -> . NOT expression
+    (47) expression -> . INTEGER_LITERAL
+    (48) expression -> . FLOAT_LITERAL
+    (49) expression -> . STRING_LITERAL
+    (50) expression -> . BOOL_LITERAL
+    (51) expression -> . ID
+    (52) expression -> . LPAREN expression RPAREN
+
+    NOT             shift and go to state 32
+    INTEGER_LITERAL shift and go to state 33
+    FLOAT_LITERAL   shift and go to state 34
+    STRING_LITERAL  shift and go to state 35
+    BOOL_LITERAL    shift and go to state 36
+    ID              shift and go to state 30
+    LPAREN          shift and go to state 37
+
+    expression                     shift and go to state 69
+
+state 50
+
+    (38) expression -> expression EQUAL . expression
+    (32) expression -> . expression PLUS expression
+    (33) expression -> . expression MINUS expression
+    (34) expression -> . expression TIMES expression
+    (35) expression -> . expression DIVIDE expression
+    (36) expression -> . expression MOD expression
+    (37) expression -> . expression POWER expression
+    (38) expression -> . expression EQUAL expression
+    (39) expression -> . expression NOT_EQUAL expression
+    (40) expression -> . expression GREATER_THAN expression
+    (41) expression -> . expression GREATER_THAN_EQUAL expression
+    (42) expression -> . expression LESS_THAN expression
+    (43) expression -> . expression LESS_THAN_EQUAL expression
+    (44) expression -> . expression AND expression
+    (45) expression -> . expression OR expression
+    (46) expression -> . NOT expression
+    (47) expression -> . INTEGER_LITERAL
+    (48) expression -> . FLOAT_LITERAL
+    (49) expression -> . STRING_LITERAL
+    (50) expression -> . BOOL_LITERAL
+    (51) expression -> . ID
+    (52) expression -> . LPAREN expression RPAREN
+
+    NOT             shift and go to state 32
+    INTEGER_LITERAL shift and go to state 33
+    FLOAT_LITERAL   shift and go to state 34
+    STRING_LITERAL  shift and go to state 35
+    BOOL_LITERAL    shift and go to state 36
+    ID              shift and go to state 30
+    LPAREN          shift and go to state 37
+
+    expression                     shift and go to state 70
+
+state 51
+
+    (39) expression -> expression NOT_EQUAL . expression
+    (32) expression -> . expression PLUS expression
+    (33) expression -> . expression MINUS expression
+    (34) expression -> . expression TIMES expression
+    (35) expression -> . expression DIVIDE expression
+    (36) expression -> . expression MOD expression
+    (37) expression -> . expression POWER expression
+    (38) expression -> . expression EQUAL expression
+    (39) expression -> . expression NOT_EQUAL expression
+    (40) expression -> . expression GREATER_THAN expression
+    (41) expression -> . expression GREATER_THAN_EQUAL expression
+    (42) expression -> . expression LESS_THAN expression
+    (43) expression -> . expression LESS_THAN_EQUAL expression
+    (44) expression -> . expression AND expression
+    (45) expression -> . expression OR expression
+    (46) expression -> . NOT expression
+    (47) expression -> . INTEGER_LITERAL
+    (48) expression -> . FLOAT_LITERAL
+    (49) expression -> . STRING_LITERAL
+    (50) expression -> . BOOL_LITERAL
+    (51) expression -> . ID
+    (52) expression -> . LPAREN expression RPAREN
+
+    NOT             shift and go to state 32
+    INTEGER_LITERAL shift and go to state 33
+    FLOAT_LITERAL   shift and go to state 34
+    STRING_LITERAL  shift and go to state 35
+    BOOL_LITERAL    shift and go to state 36
+    ID              shift and go to state 30
+    LPAREN          shift and go to state 37
+
+    expression                     shift and go to state 71
+
+state 52
+
+    (40) expression -> expression GREATER_THAN . expression
+    (32) expression -> . expression PLUS expression
+    (33) expression -> . expression MINUS expression
+    (34) expression -> . expression TIMES expression
+    (35) expression -> . expression DIVIDE expression
+    (36) expression -> . expression MOD expression
+    (37) expression -> . expression POWER expression
+    (38) expression -> . expression EQUAL expression
+    (39) expression -> . expression NOT_EQUAL expression
+    (40) expression -> . expression GREATER_THAN expression
+    (41) expression -> . expression GREATER_THAN_EQUAL expression
+    (42) expression -> . expression LESS_THAN expression
+    (43) expression -> . expression LESS_THAN_EQUAL expression
+    (44) expression -> . expression AND expression
+    (45) expression -> . expression OR expression
+    (46) expression -> . NOT expression
+    (47) expression -> . INTEGER_LITERAL
+    (48) expression -> . FLOAT_LITERAL
+    (49) expression -> . STRING_LITERAL
+    (50) expression -> . BOOL_LITERAL
+    (51) expression -> . ID
+    (52) expression -> . LPAREN expression RPAREN
+
+    NOT             shift and go to state 32
+    INTEGER_LITERAL shift and go to state 33
+    FLOAT_LITERAL   shift and go to state 34
+    STRING_LITERAL  shift and go to state 35
+    BOOL_LITERAL    shift and go to state 36
+    ID              shift and go to state 30
+    LPAREN          shift and go to state 37
+
+    expression                     shift and go to state 72
+
+state 53
+
+    (41) expression -> expression GREATER_THAN_EQUAL . expression
+    (32) expression -> . expression PLUS expression
+    (33) expression -> . expression MINUS expression
+    (34) expression -> . expression TIMES expression
+    (35) expression -> . expression DIVIDE expression
+    (36) expression -> . expression MOD expression
+    (37) expression -> . expression POWER expression
+    (38) expression -> . expression EQUAL expression
+    (39) expression -> . expression NOT_EQUAL expression
+    (40) expression -> . expression GREATER_THAN expression
+    (41) expression -> . expression GREATER_THAN_EQUAL expression
+    (42) expression -> . expression LESS_THAN expression
+    (43) expression -> . expression LESS_THAN_EQUAL expression
+    (44) expression -> . expression AND expression
+    (45) expression -> . expression OR expression
+    (46) expression -> . NOT expression
+    (47) expression -> . INTEGER_LITERAL
+    (48) expression -> . FLOAT_LITERAL
+    (49) expression -> . STRING_LITERAL
+    (50) expression -> . BOOL_LITERAL
+    (51) expression -> . ID
+    (52) expression -> . LPAREN expression RPAREN
+
+    NOT             shift and go to state 32
+    INTEGER_LITERAL shift and go to state 33
+    FLOAT_LITERAL   shift and go to state 34
+    STRING_LITERAL  shift and go to state 35
+    BOOL_LITERAL    shift and go to state 36
+    ID              shift and go to state 30
+    LPAREN          shift and go to state 37
+
+    expression                     shift and go to state 73
+
+state 54
+
+    (42) expression -> expression LESS_THAN . expression
+    (32) expression -> . expression PLUS expression
+    (33) expression -> . expression MINUS expression
+    (34) expression -> . expression TIMES expression
+    (35) expression -> . expression DIVIDE expression
+    (36) expression -> . expression MOD expression
+    (37) expression -> . expression POWER expression
+    (38) expression -> . expression EQUAL expression
+    (39) expression -> . expression NOT_EQUAL expression
+    (40) expression -> . expression GREATER_THAN expression
+    (41) expression -> . expression GREATER_THAN_EQUAL expression
+    (42) expression -> . expression LESS_THAN expression
+    (43) expression -> . expression LESS_THAN_EQUAL expression
+    (44) expression -> . expression AND expression
+    (45) expression -> . expression OR expression
+    (46) expression -> . NOT expression
+    (47) expression -> . INTEGER_LITERAL
+    (48) expression -> . FLOAT_LITERAL
+    (49) expression -> . STRING_LITERAL
+    (50) expression -> . BOOL_LITERAL
+    (51) expression -> . ID
+    (52) expression -> . LPAREN expression RPAREN
+
+    NOT             shift and go to state 32
+    INTEGER_LITERAL shift and go to state 33
+    FLOAT_LITERAL   shift and go to state 34
+    STRING_LITERAL  shift and go to state 35
+    BOOL_LITERAL    shift and go to state 36
+    ID              shift and go to state 30
+    LPAREN          shift and go to state 37
+
+    expression                     shift and go to state 74
+
+state 55
+
+    (43) expression -> expression LESS_THAN_EQUAL . expression
+    (32) expression -> . expression PLUS expression
+    (33) expression -> . expression MINUS expression
+    (34) expression -> . expression TIMES expression
+    (35) expression -> . expression DIVIDE expression
+    (36) expression -> . expression MOD expression
+    (37) expression -> . expression POWER expression
+    (38) expression -> . expression EQUAL expression
+    (39) expression -> . expression NOT_EQUAL expression
+    (40) expression -> . expression GREATER_THAN expression
+    (41) expression -> . expression GREATER_THAN_EQUAL expression
+    (42) expression -> . expression LESS_THAN expression
+    (43) expression -> . expression LESS_THAN_EQUAL expression
+    (44) expression -> . expression AND expression
+    (45) expression -> . expression OR expression
+    (46) expression -> . NOT expression
+    (47) expression -> . INTEGER_LITERAL
+    (48) expression -> . FLOAT_LITERAL
+    (49) expression -> . STRING_LITERAL
+    (50) expression -> . BOOL_LITERAL
+    (51) expression -> . ID
+    (52) expression -> . LPAREN expression RPAREN
+
+    NOT             shift and go to state 32
+    INTEGER_LITERAL shift and go to state 33
+    FLOAT_LITERAL   shift and go to state 34
+    STRING_LITERAL  shift and go to state 35
+    BOOL_LITERAL    shift and go to state 36
+    ID              shift and go to state 30
+    LPAREN          shift and go to state 37
+
+    expression                     shift and go to state 75
+
+state 56
+
+    (44) expression -> expression AND . expression
+    (32) expression -> . expression PLUS expression
+    (33) expression -> . expression MINUS expression
+    (34) expression -> . expression TIMES expression
+    (35) expression -> . expression DIVIDE expression
+    (36) expression -> . expression MOD expression
+    (37) expression -> . expression POWER expression
+    (38) expression -> . expression EQUAL expression
+    (39) expression -> . expression NOT_EQUAL expression
+    (40) expression -> . expression GREATER_THAN expression
+    (41) expression -> . expression GREATER_THAN_EQUAL expression
+    (42) expression -> . expression LESS_THAN expression
+    (43) expression -> . expression LESS_THAN_EQUAL expression
+    (44) expression -> . expression AND expression
+    (45) expression -> . expression OR expression
+    (46) expression -> . NOT expression
+    (47) expression -> . INTEGER_LITERAL
+    (48) expression -> . FLOAT_LITERAL
+    (49) expression -> . STRING_LITERAL
+    (50) expression -> . BOOL_LITERAL
+    (51) expression -> . ID
+    (52) expression -> . LPAREN expression RPAREN
+
+    NOT             shift and go to state 32
+    INTEGER_LITERAL shift and go to state 33
+    FLOAT_LITERAL   shift and go to state 34
+    STRING_LITERAL  shift and go to state 35
+    BOOL_LITERAL    shift and go to state 36
+    ID              shift and go to state 30
+    LPAREN          shift and go to state 37
+
+    expression                     shift and go to state 76
+
+state 57
+
+    (45) expression -> expression OR . expression
+    (32) expression -> . expression PLUS expression
+    (33) expression -> . expression MINUS expression
+    (34) expression -> . expression TIMES expression
+    (35) expression -> . expression DIVIDE expression
+    (36) expression -> . expression MOD expression
+    (37) expression -> . expression POWER expression
+    (38) expression -> . expression EQUAL expression
+    (39) expression -> . expression NOT_EQUAL expression
+    (40) expression -> . expression GREATER_THAN expression
+    (41) expression -> . expression GREATER_THAN_EQUAL expression
+    (42) expression -> . expression LESS_THAN expression
+    (43) expression -> . expression LESS_THAN_EQUAL expression
+    (44) expression -> . expression AND expression
+    (45) expression -> . expression OR expression
+    (46) expression -> . NOT expression
+    (47) expression -> . INTEGER_LITERAL
+    (48) expression -> . FLOAT_LITERAL
+    (49) expression -> . STRING_LITERAL
+    (50) expression -> . BOOL_LITERAL
+    (51) expression -> . ID
+    (52) expression -> . LPAREN expression RPAREN
+
+    NOT             shift and go to state 32
+    INTEGER_LITERAL shift and go to state 33
+    FLOAT_LITERAL   shift and go to state 34
+    STRING_LITERAL  shift and go to state 35
+    BOOL_LITERAL    shift and go to state 36
+    ID              shift and go to state 30
+    LPAREN          shift and go to state 37
+
+    expression                     shift and go to state 77
+
+state 58
+
+    (46) expression -> NOT expression .
+    (32) expression -> expression . PLUS expression
+    (33) expression -> expression . MINUS expression
+    (34) expression -> expression . TIMES expression
+    (35) expression -> expression . DIVIDE expression
+    (36) expression -> expression . MOD expression
+    (37) expression -> expression . POWER expression
+    (38) expression -> expression . EQUAL expression
+    (39) expression -> expression . NOT_EQUAL expression
+    (40) expression -> expression . GREATER_THAN expression
+    (41) expression -> expression . GREATER_THAN_EQUAL expression
+    (42) expression -> expression . LESS_THAN expression
+    (43) expression -> expression . LESS_THAN_EQUAL expression
+    (44) expression -> expression . AND expression
+    (45) expression -> expression . OR expression
+
+    SEMICOLON       reduce using rule 46 (expression -> NOT expression .)
+    PLUS            reduce using rule 46 (expression -> NOT expression .)
+    MINUS           reduce using rule 46 (expression -> NOT expression .)
+    TIMES           reduce using rule 46 (expression -> NOT expression .)
+    DIVIDE          reduce using rule 46 (expression -> NOT expression .)
+    MOD             reduce using rule 46 (expression -> NOT expression .)
+    POWER           reduce using rule 46 (expression -> NOT expression .)
+    EQUAL           reduce using rule 46 (expression -> NOT expression .)
+    NOT_EQUAL       reduce using rule 46 (expression -> NOT expression .)
+    GREATER_THAN    reduce using rule 46 (expression -> NOT expression .)
+    GREATER_THAN_EQUAL reduce using rule 46 (expression -> NOT expression .)
+    LESS_THAN       reduce using rule 46 (expression -> NOT expression .)
+    LESS_THAN_EQUAL reduce using rule 46 (expression -> NOT expression .)
+    AND             reduce using rule 46 (expression -> NOT expression .)
+    OR              reduce using rule 46 (expression -> NOT expression .)
+    RPAREN          reduce using rule 46 (expression -> NOT expression .)
+    LBRACE          reduce using rule 46 (expression -> NOT expression .)
+
+  ! PLUS            [ shift and go to state 44 ]
+  ! MINUS           [ shift and go to state 45 ]
+  ! TIMES           [ shift and go to state 46 ]
+  ! DIVIDE          [ shift and go to state 47 ]
+  ! MOD             [ shift and go to state 48 ]
+  ! POWER           [ shift and go to state 49 ]
+  ! EQUAL           [ shift and go to state 50 ]
+  ! NOT_EQUAL       [ shift and go to state 51 ]
+  ! GREATER_THAN    [ shift and go to state 52 ]
+  ! GREATER_THAN_EQUAL [ shift and go to state 53 ]
+  ! LESS_THAN       [ shift and go to state 54 ]
+  ! LESS_THAN_EQUAL [ shift and go to state 55 ]
+  ! AND             [ shift and go to state 56 ]
+  ! OR              [ shift and go to state 57 ]
+
+
+state 59
+
+    (52) expression -> LPAREN expression . RPAREN
+    (32) expression -> expression . PLUS expression
+    (33) expression -> expression . MINUS expression
+    (34) expression -> expression . TIMES expression
+    (35) expression -> expression . DIVIDE expression
+    (36) expression -> expression . MOD expression
+    (37) expression -> expression . POWER expression
+    (38) expression -> expression . EQUAL expression
+    (39) expression -> expression . NOT_EQUAL expression
+    (40) expression -> expression . GREATER_THAN expression
+    (41) expression -> expression . GREATER_THAN_EQUAL expression
+    (42) expression -> expression . LESS_THAN expression
+    (43) expression -> expression . LESS_THAN_EQUAL expression
+    (44) expression -> expression . AND expression
+    (45) expression -> expression . OR expression
+
+    RPAREN          shift and go to state 78
+    PLUS            shift and go to state 44
+    MINUS           shift and go to state 45
+    TIMES           shift and go to state 46
+    DIVIDE          shift and go to state 47
+    MOD             shift and go to state 48
+    POWER           shift and go to state 49
+    EQUAL           shift and go to state 50
+    NOT_EQUAL       shift and go to state 51
+    GREATER_THAN    shift and go to state 52
+    GREATER_THAN_EQUAL shift and go to state 53
+    LESS_THAN       shift and go to state 54
+    LESS_THAN_EQUAL shift and go to state 55
+    AND             shift and go to state 56
+    OR              shift and go to state 57
+
+
+state 60
+
+    (6) variable_declaration -> VAR ID COLON type ASSIGN expression SEMICOLON .
+
+    $end            reduce using rule 6 (variable_declaration -> VAR ID COLON type ASSIGN expression SEMICOLON .)
+    SEMICOLON       reduce using rule 6 (variable_declaration -> VAR ID COLON type ASSIGN expression SEMICOLON .)
+    RBRACE          reduce using rule 6 (variable_declaration -> VAR ID COLON type ASSIGN expression SEMICOLON .)
+
+
+state 61
+
+    (7) function_declaration -> FUNCTION ID LPAREN function_param_list RPAREN COLON type . SEMICOLON
+    (8) function_declaration -> FUNCTION ID LPAREN function_param_list RPAREN COLON type . LBRACE function_body RBRACE
+
+    SEMICOLON       shift and go to state 79
+    LBRACE          shift and go to state 80
+
+
+state 62
+
+    (11) parameter -> VAL ID COLON type .
+
+    COMMA           reduce using rule 11 (parameter -> VAL ID COLON type .)
+    RPAREN          reduce using rule 11 (parameter -> VAL ID COLON type .)
+
+
+state 63
+
+    (12) parameter -> VAR ID COLON type .
+
+    COMMA           reduce using rule 12 (parameter -> VAR ID COLON type .)
+    RPAREN          reduce using rule 12 (parameter -> VAR ID COLON type .)
+
+
+state 64
+
+    (32) expression -> expression PLUS expression .
+    (32) expression -> expression . PLUS expression
+    (33) expression -> expression . MINUS expression
+    (34) expression -> expression . TIMES expression
+    (35) expression -> expression . DIVIDE expression
+    (36) expression -> expression . MOD expression
+    (37) expression -> expression . POWER expression
+    (38) expression -> expression . EQUAL expression
+    (39) expression -> expression . NOT_EQUAL expression
+    (40) expression -> expression . GREATER_THAN expression
+    (41) expression -> expression . GREATER_THAN_EQUAL expression
+    (42) expression -> expression . LESS_THAN expression
+    (43) expression -> expression . LESS_THAN_EQUAL expression
+    (44) expression -> expression . AND expression
+    (45) expression -> expression . OR expression
+
+    SEMICOLON       reduce using rule 32 (expression -> expression PLUS expression .)
+    PLUS            reduce using rule 32 (expression -> expression PLUS expression .)
+    MINUS           reduce using rule 32 (expression -> expression PLUS expression .)
+    EQUAL           reduce using rule 32 (expression -> expression PLUS expression .)
+    NOT_EQUAL       reduce using rule 32 (expression -> expression PLUS expression .)
+    GREATER_THAN    reduce using rule 32 (expression -> expression PLUS expression .)
+    GREATER_THAN_EQUAL reduce using rule 32 (expression -> expression PLUS expression .)
+    LESS_THAN       reduce using rule 32 (expression -> expression PLUS expression .)
+    LESS_THAN_EQUAL reduce using rule 32 (expression -> expression PLUS expression .)
+    AND             reduce using rule 32 (expression -> expression PLUS expression .)
+    OR              reduce using rule 32 (expression -> expression PLUS expression .)
+    RPAREN          reduce using rule 32 (expression -> expression PLUS expression .)
+    LBRACE          reduce using rule 32 (expression -> expression PLUS expression .)
+    TIMES           shift and go to state 46
+    DIVIDE          shift and go to state 47
+    MOD             shift and go to state 48
+    POWER           shift and go to state 49
+
+  ! TIMES           [ reduce using rule 32 (expression -> expression PLUS expression .) ]
+  ! DIVIDE          [ reduce using rule 32 (expression -> expression PLUS expression .) ]
+  ! MOD             [ reduce using rule 32 (expression -> expression PLUS expression .) ]
+  ! POWER           [ reduce using rule 32 (expression -> expression PLUS expression .) ]
+  ! PLUS            [ shift and go to state 44 ]
+  ! MINUS           [ shift and go to state 45 ]
+  ! EQUAL           [ shift and go to state 50 ]
+  ! NOT_EQUAL       [ shift and go to state 51 ]
+  ! GREATER_THAN    [ shift and go to state 52 ]
+  ! GREATER_THAN_EQUAL [ shift and go to state 53 ]
+  ! LESS_THAN       [ shift and go to state 54 ]
+  ! LESS_THAN_EQUAL [ shift and go to state 55 ]
+  ! AND             [ shift and go to state 56 ]
+  ! OR              [ shift and go to state 57 ]
+
+
+state 65
+
+    (33) expression -> expression MINUS expression .
+    (32) expression -> expression . PLUS expression
+    (33) expression -> expression . MINUS expression
+    (34) expression -> expression . TIMES expression
+    (35) expression -> expression . DIVIDE expression
+    (36) expression -> expression . MOD expression
+    (37) expression -> expression . POWER expression
+    (38) expression -> expression . EQUAL expression
+    (39) expression -> expression . NOT_EQUAL expression
+    (40) expression -> expression . GREATER_THAN expression
+    (41) expression -> expression . GREATER_THAN_EQUAL expression
+    (42) expression -> expression . LESS_THAN expression
+    (43) expression -> expression . LESS_THAN_EQUAL expression
+    (44) expression -> expression . AND expression
+    (45) expression -> expression . OR expression
+
+    SEMICOLON       reduce using rule 33 (expression -> expression MINUS expression .)
+    PLUS            reduce using rule 33 (expression -> expression MINUS expression .)
+    MINUS           reduce using rule 33 (expression -> expression MINUS expression .)
+    EQUAL           reduce using rule 33 (expression -> expression MINUS expression .)
+    NOT_EQUAL       reduce using rule 33 (expression -> expression MINUS expression .)
+    GREATER_THAN    reduce using rule 33 (expression -> expression MINUS expression .)
+    GREATER_THAN_EQUAL reduce using rule 33 (expression -> expression MINUS expression .)
+    LESS_THAN       reduce using rule 33 (expression -> expression MINUS expression .)
+    LESS_THAN_EQUAL reduce using rule 33 (expression -> expression MINUS expression .)
+    AND             reduce using rule 33 (expression -> expression MINUS expression .)
+    OR              reduce using rule 33 (expression -> expression MINUS expression .)
+    RPAREN          reduce using rule 33 (expression -> expression MINUS expression .)
+    LBRACE          reduce using rule 33 (expression -> expression MINUS expression .)
+    TIMES           shift and go to state 46
+    DIVIDE          shift and go to state 47
+    MOD             shift and go to state 48
+    POWER           shift and go to state 49
+
+  ! TIMES           [ reduce using rule 33 (expression -> expression MINUS expression .) ]
+  ! DIVIDE          [ reduce using rule 33 (expression -> expression MINUS expression .) ]
+  ! MOD             [ reduce using rule 33 (expression -> expression MINUS expression .) ]
+  ! POWER           [ reduce using rule 33 (expression -> expression MINUS expression .) ]
+  ! PLUS            [ shift and go to state 44 ]
+  ! MINUS           [ shift and go to state 45 ]
+  ! EQUAL           [ shift and go to state 50 ]
+  ! NOT_EQUAL       [ shift and go to state 51 ]
+  ! GREATER_THAN    [ shift and go to state 52 ]
+  ! GREATER_THAN_EQUAL [ shift and go to state 53 ]
+  ! LESS_THAN       [ shift and go to state 54 ]
+  ! LESS_THAN_EQUAL [ shift and go to state 55 ]
+  ! AND             [ shift and go to state 56 ]
+  ! OR              [ shift and go to state 57 ]
+
+
+state 66
+
+    (34) expression -> expression TIMES expression .
+    (32) expression -> expression . PLUS expression
+    (33) expression -> expression . MINUS expression
+    (34) expression -> expression . TIMES expression
+    (35) expression -> expression . DIVIDE expression
+    (36) expression -> expression . MOD expression
+    (37) expression -> expression . POWER expression
+    (38) expression -> expression . EQUAL expression
+    (39) expression -> expression . NOT_EQUAL expression
+    (40) expression -> expression . GREATER_THAN expression
+    (41) expression -> expression . GREATER_THAN_EQUAL expression
+    (42) expression -> expression . LESS_THAN expression
+    (43) expression -> expression . LESS_THAN_EQUAL expression
+    (44) expression -> expression . AND expression
+    (45) expression -> expression . OR expression
+
+    SEMICOLON       reduce using rule 34 (expression -> expression TIMES expression .)
+    PLUS            reduce using rule 34 (expression -> expression TIMES expression .)
+    MINUS           reduce using rule 34 (expression -> expression TIMES expression .)
+    TIMES           reduce using rule 34 (expression -> expression TIMES expression .)
+    DIVIDE          reduce using rule 34 (expression -> expression TIMES expression .)
+    MOD             reduce using rule 34 (expression -> expression TIMES expression .)
+    EQUAL           reduce using rule 34 (expression -> expression TIMES expression .)
+    NOT_EQUAL       reduce using rule 34 (expression -> expression TIMES expression .)
+    GREATER_THAN    reduce using rule 34 (expression -> expression TIMES expression .)
+    GREATER_THAN_EQUAL reduce using rule 34 (expression -> expression TIMES expression .)
+    LESS_THAN       reduce using rule 34 (expression -> expression TIMES expression .)
+    LESS_THAN_EQUAL reduce using rule 34 (expression -> expression TIMES expression .)
+    AND             reduce using rule 34 (expression -> expression TIMES expression .)
+    OR              reduce using rule 34 (expression -> expression TIMES expression .)
+    RPAREN          reduce using rule 34 (expression -> expression TIMES expression .)
+    LBRACE          reduce using rule 34 (expression -> expression TIMES expression .)
+    POWER           shift and go to state 49
+
+  ! POWER           [ reduce using rule 34 (expression -> expression TIMES expression .) ]
+  ! PLUS            [ shift and go to state 44 ]
+  ! MINUS           [ shift and go to state 45 ]
+  ! TIMES           [ shift and go to state 46 ]
+  ! DIVIDE          [ shift and go to state 47 ]
+  ! MOD             [ shift and go to state 48 ]
+  ! EQUAL           [ shift and go to state 50 ]
+  ! NOT_EQUAL       [ shift and go to state 51 ]
+  ! GREATER_THAN    [ shift and go to state 52 ]
+  ! GREATER_THAN_EQUAL [ shift and go to state 53 ]
+  ! LESS_THAN       [ shift and go to state 54 ]
+  ! LESS_THAN_EQUAL [ shift and go to state 55 ]
+  ! AND             [ shift and go to state 56 ]
+  ! OR              [ shift and go to state 57 ]
+
+
+state 67
+
+    (35) expression -> expression DIVIDE expression .
+    (32) expression -> expression . PLUS expression
+    (33) expression -> expression . MINUS expression
+    (34) expression -> expression . TIMES expression
+    (35) expression -> expression . DIVIDE expression
+    (36) expression -> expression . MOD expression
+    (37) expression -> expression . POWER expression
+    (38) expression -> expression . EQUAL expression
+    (39) expression -> expression . NOT_EQUAL expression
+    (40) expression -> expression . GREATER_THAN expression
+    (41) expression -> expression . GREATER_THAN_EQUAL expression
+    (42) expression -> expression . LESS_THAN expression
+    (43) expression -> expression . LESS_THAN_EQUAL expression
+    (44) expression -> expression . AND expression
+    (45) expression -> expression . OR expression
+
+    SEMICOLON       reduce using rule 35 (expression -> expression DIVIDE expression .)
+    PLUS            reduce using rule 35 (expression -> expression DIVIDE expression .)
+    MINUS           reduce using rule 35 (expression -> expression DIVIDE expression .)
+    TIMES           reduce using rule 35 (expression -> expression DIVIDE expression .)
+    DIVIDE          reduce using rule 35 (expression -> expression DIVIDE expression .)
+    MOD             reduce using rule 35 (expression -> expression DIVIDE expression .)
+    EQUAL           reduce using rule 35 (expression -> expression DIVIDE expression .)
+    NOT_EQUAL       reduce using rule 35 (expression -> expression DIVIDE expression .)
+    GREATER_THAN    reduce using rule 35 (expression -> expression DIVIDE expression .)
+    GREATER_THAN_EQUAL reduce using rule 35 (expression -> expression DIVIDE expression .)
+    LESS_THAN       reduce using rule 35 (expression -> expression DIVIDE expression .)
+    LESS_THAN_EQUAL reduce using rule 35 (expression -> expression DIVIDE expression .)
+    AND             reduce using rule 35 (expression -> expression DIVIDE expression .)
+    OR              reduce using rule 35 (expression -> expression DIVIDE expression .)
+    RPAREN          reduce using rule 35 (expression -> expression DIVIDE expression .)
+    LBRACE          reduce using rule 35 (expression -> expression DIVIDE expression .)
+    POWER           shift and go to state 49
+
+  ! POWER           [ reduce using rule 35 (expression -> expression DIVIDE expression .) ]
+  ! PLUS            [ shift and go to state 44 ]
+  ! MINUS           [ shift and go to state 45 ]
+  ! TIMES           [ shift and go to state 46 ]
+  ! DIVIDE          [ shift and go to state 47 ]
+  ! MOD             [ shift and go to state 48 ]
+  ! EQUAL           [ shift and go to state 50 ]
+  ! NOT_EQUAL       [ shift and go to state 51 ]
+  ! GREATER_THAN    [ shift and go to state 52 ]
+  ! GREATER_THAN_EQUAL [ shift and go to state 53 ]
+  ! LESS_THAN       [ shift and go to state 54 ]
+  ! LESS_THAN_EQUAL [ shift and go to state 55 ]
+  ! AND             [ shift and go to state 56 ]
+  ! OR              [ shift and go to state 57 ]
+
+
+state 68
+
+    (36) expression -> expression MOD expression .
+    (32) expression -> expression . PLUS expression
+    (33) expression -> expression . MINUS expression
+    (34) expression -> expression . TIMES expression
+    (35) expression -> expression . DIVIDE expression
+    (36) expression -> expression . MOD expression
+    (37) expression -> expression . POWER expression
+    (38) expression -> expression . EQUAL expression
+    (39) expression -> expression . NOT_EQUAL expression
+    (40) expression -> expression . GREATER_THAN expression
+    (41) expression -> expression . GREATER_THAN_EQUAL expression
+    (42) expression -> expression . LESS_THAN expression
+    (43) expression -> expression . LESS_THAN_EQUAL expression
+    (44) expression -> expression . AND expression
+    (45) expression -> expression . OR expression
+
+    SEMICOLON       reduce using rule 36 (expression -> expression MOD expression .)
+    PLUS            reduce using rule 36 (expression -> expression MOD expression .)
+    MINUS           reduce using rule 36 (expression -> expression MOD expression .)
+    TIMES           reduce using rule 36 (expression -> expression MOD expression .)
+    DIVIDE          reduce using rule 36 (expression -> expression MOD expression .)
+    MOD             reduce using rule 36 (expression -> expression MOD expression .)
+    EQUAL           reduce using rule 36 (expression -> expression MOD expression .)
+    NOT_EQUAL       reduce using rule 36 (expression -> expression MOD expression .)
+    GREATER_THAN    reduce using rule 36 (expression -> expression MOD expression .)
+    GREATER_THAN_EQUAL reduce using rule 36 (expression -> expression MOD expression .)
+    LESS_THAN       reduce using rule 36 (expression -> expression MOD expression .)
+    LESS_THAN_EQUAL reduce using rule 36 (expression -> expression MOD expression .)
+    AND             reduce using rule 36 (expression -> expression MOD expression .)
+    OR              reduce using rule 36 (expression -> expression MOD expression .)
+    RPAREN          reduce using rule 36 (expression -> expression MOD expression .)
+    LBRACE          reduce using rule 36 (expression -> expression MOD expression .)
+    POWER           shift and go to state 49
+
+  ! POWER           [ reduce using rule 36 (expression -> expression MOD expression .) ]
+  ! PLUS            [ shift and go to state 44 ]
+  ! MINUS           [ shift and go to state 45 ]
+  ! TIMES           [ shift and go to state 46 ]
+  ! DIVIDE          [ shift and go to state 47 ]
+  ! MOD             [ shift and go to state 48 ]
+  ! EQUAL           [ shift and go to state 50 ]
+  ! NOT_EQUAL       [ shift and go to state 51 ]
+  ! GREATER_THAN    [ shift and go to state 52 ]
+  ! GREATER_THAN_EQUAL [ shift and go to state 53 ]
+  ! LESS_THAN       [ shift and go to state 54 ]
+  ! LESS_THAN_EQUAL [ shift and go to state 55 ]
+  ! AND             [ shift and go to state 56 ]
+  ! OR              [ shift and go to state 57 ]
+
+
+state 69
+
+    (37) expression -> expression POWER expression .
+    (32) expression -> expression . PLUS expression
+    (33) expression -> expression . MINUS expression
+    (34) expression -> expression . TIMES expression
+    (35) expression -> expression . DIVIDE expression
+    (36) expression -> expression . MOD expression
+    (37) expression -> expression . POWER expression
+    (38) expression -> expression . EQUAL expression
+    (39) expression -> expression . NOT_EQUAL expression
+    (40) expression -> expression . GREATER_THAN expression
+    (41) expression -> expression . GREATER_THAN_EQUAL expression
+    (42) expression -> expression . LESS_THAN expression
+    (43) expression -> expression . LESS_THAN_EQUAL expression
+    (44) expression -> expression . AND expression
+    (45) expression -> expression . OR expression
+
+    SEMICOLON       reduce using rule 37 (expression -> expression POWER expression .)
+    PLUS            reduce using rule 37 (expression -> expression POWER expression .)
+    MINUS           reduce using rule 37 (expression -> expression POWER expression .)
+    TIMES           reduce using rule 37 (expression -> expression POWER expression .)
+    DIVIDE          reduce using rule 37 (expression -> expression POWER expression .)
+    MOD             reduce using rule 37 (expression -> expression POWER expression .)
+    EQUAL           reduce using rule 37 (expression -> expression POWER expression .)
+    NOT_EQUAL       reduce using rule 37 (expression -> expression POWER expression .)
+    GREATER_THAN    reduce using rule 37 (expression -> expression POWER expression .)
+    GREATER_THAN_EQUAL reduce using rule 37 (expression -> expression POWER expression .)
+    LESS_THAN       reduce using rule 37 (expression -> expression POWER expression .)
+    LESS_THAN_EQUAL reduce using rule 37 (expression -> expression POWER expression .)
+    AND             reduce using rule 37 (expression -> expression POWER expression .)
+    OR              reduce using rule 37 (expression -> expression POWER expression .)
+    RPAREN          reduce using rule 37 (expression -> expression POWER expression .)
+    LBRACE          reduce using rule 37 (expression -> expression POWER expression .)
+    POWER           shift and go to state 49
+
+  ! POWER           [ reduce using rule 37 (expression -> expression POWER expression .) ]
+  ! PLUS            [ shift and go to state 44 ]
+  ! MINUS           [ shift and go to state 45 ]
+  ! TIMES           [ shift and go to state 46 ]
+  ! DIVIDE          [ shift and go to state 47 ]
+  ! MOD             [ shift and go to state 48 ]
+  ! EQUAL           [ shift and go to state 50 ]
+  ! NOT_EQUAL       [ shift and go to state 51 ]
+  ! GREATER_THAN    [ shift and go to state 52 ]
+  ! GREATER_THAN_EQUAL [ shift and go to state 53 ]
+  ! LESS_THAN       [ shift and go to state 54 ]
+  ! LESS_THAN_EQUAL [ shift and go to state 55 ]
+  ! AND             [ shift and go to state 56 ]
+  ! OR              [ shift and go to state 57 ]
+
+
+state 70
+
+    (38) expression -> expression EQUAL expression .
+    (32) expression -> expression . PLUS expression
+    (33) expression -> expression . MINUS expression
+    (34) expression -> expression . TIMES expression
+    (35) expression -> expression . DIVIDE expression
+    (36) expression -> expression . MOD expression
+    (37) expression -> expression . POWER expression
+    (38) expression -> expression . EQUAL expression
+    (39) expression -> expression . NOT_EQUAL expression
+    (40) expression -> expression . GREATER_THAN expression
+    (41) expression -> expression . GREATER_THAN_EQUAL expression
+    (42) expression -> expression . LESS_THAN expression
+    (43) expression -> expression . LESS_THAN_EQUAL expression
+    (44) expression -> expression . AND expression
+    (45) expression -> expression . OR expression
+
+    SEMICOLON       reduce using rule 38 (expression -> expression EQUAL expression .)
+    EQUAL           reduce using rule 38 (expression -> expression EQUAL expression .)
+    NOT_EQUAL       reduce using rule 38 (expression -> expression EQUAL expression .)
+    AND             reduce using rule 38 (expression -> expression EQUAL expression .)
+    OR              reduce using rule 38 (expression -> expression EQUAL expression .)
+    RPAREN          reduce using rule 38 (expression -> expression EQUAL expression .)
+    LBRACE          reduce using rule 38 (expression -> expression EQUAL expression .)
+    PLUS            shift and go to state 44
+    MINUS           shift and go to state 45
+    TIMES           shift and go to state 46
+    DIVIDE          shift and go to state 47
+    MOD             shift and go to state 48
+    POWER           shift and go to state 49
+    GREATER_THAN    shift and go to state 52
+    GREATER_THAN_EQUAL shift and go to state 53
+    LESS_THAN       shift and go to state 54
+    LESS_THAN_EQUAL shift and go to state 55
+
+  ! PLUS            [ reduce using rule 38 (expression -> expression EQUAL expression .) ]
+  ! MINUS           [ reduce using rule 38 (expression -> expression EQUAL expression .) ]
+  ! TIMES           [ reduce using rule 38 (expression -> expression EQUAL expression .) ]
+  ! DIVIDE          [ reduce using rule 38 (expression -> expression EQUAL expression .) ]
+  ! MOD             [ reduce using rule 38 (expression -> expression EQUAL expression .) ]
+  ! POWER           [ reduce using rule 38 (expression -> expression EQUAL expression .) ]
+  ! GREATER_THAN    [ reduce using rule 38 (expression -> expression EQUAL expression .) ]
+  ! GREATER_THAN_EQUAL [ reduce using rule 38 (expression -> expression EQUAL expression .) ]
+  ! LESS_THAN       [ reduce using rule 38 (expression -> expression EQUAL expression .) ]
+  ! LESS_THAN_EQUAL [ reduce using rule 38 (expression -> expression EQUAL expression .) ]
+  ! EQUAL           [ shift and go to state 50 ]
+  ! NOT_EQUAL       [ shift and go to state 51 ]
+  ! AND             [ shift and go to state 56 ]
+  ! OR              [ shift and go to state 57 ]
+
+
+state 71
+
+    (39) expression -> expression NOT_EQUAL expression .
+    (32) expression -> expression . PLUS expression
+    (33) expression -> expression . MINUS expression
+    (34) expression -> expression . TIMES expression
+    (35) expression -> expression . DIVIDE expression
+    (36) expression -> expression . MOD expression
+    (37) expression -> expression . POWER expression
+    (38) expression -> expression . EQUAL expression
+    (39) expression -> expression . NOT_EQUAL expression
+    (40) expression -> expression . GREATER_THAN expression
+    (41) expression -> expression . GREATER_THAN_EQUAL expression
+    (42) expression -> expression . LESS_THAN expression
+    (43) expression -> expression . LESS_THAN_EQUAL expression
+    (44) expression -> expression . AND expression
+    (45) expression -> expression . OR expression
+
+    SEMICOLON       reduce using rule 39 (expression -> expression NOT_EQUAL expression .)
+    EQUAL           reduce using rule 39 (expression -> expression NOT_EQUAL expression .)
+    NOT_EQUAL       reduce using rule 39 (expression -> expression NOT_EQUAL expression .)
+    AND             reduce using rule 39 (expression -> expression NOT_EQUAL expression .)
+    OR              reduce using rule 39 (expression -> expression NOT_EQUAL expression .)
+    RPAREN          reduce using rule 39 (expression -> expression NOT_EQUAL expression .)
+    LBRACE          reduce using rule 39 (expression -> expression NOT_EQUAL expression .)
+    PLUS            shift and go to state 44
+    MINUS           shift and go to state 45
+    TIMES           shift and go to state 46
+    DIVIDE          shift and go to state 47
+    MOD             shift and go to state 48
+    POWER           shift and go to state 49
+    GREATER_THAN    shift and go to state 52
+    GREATER_THAN_EQUAL shift and go to state 53
+    LESS_THAN       shift and go to state 54
+    LESS_THAN_EQUAL shift and go to state 55
+
+  ! PLUS            [ reduce using rule 39 (expression -> expression NOT_EQUAL expression .) ]
+  ! MINUS           [ reduce using rule 39 (expression -> expression NOT_EQUAL expression .) ]
+  ! TIMES           [ reduce using rule 39 (expression -> expression NOT_EQUAL expression .) ]
+  ! DIVIDE          [ reduce using rule 39 (expression -> expression NOT_EQUAL expression .) ]
+  ! MOD             [ reduce using rule 39 (expression -> expression NOT_EQUAL expression .) ]
+  ! POWER           [ reduce using rule 39 (expression -> expression NOT_EQUAL expression .) ]
+  ! GREATER_THAN    [ reduce using rule 39 (expression -> expression NOT_EQUAL expression .) ]
+  ! GREATER_THAN_EQUAL [ reduce using rule 39 (expression -> expression NOT_EQUAL expression .) ]
+  ! LESS_THAN       [ reduce using rule 39 (expression -> expression NOT_EQUAL expression .) ]
+  ! LESS_THAN_EQUAL [ reduce using rule 39 (expression -> expression NOT_EQUAL expression .) ]
+  ! EQUAL           [ shift and go to state 50 ]
+  ! NOT_EQUAL       [ shift and go to state 51 ]
+  ! AND             [ shift and go to state 56 ]
+  ! OR              [ shift and go to state 57 ]
+
+
+state 72
+
+    (40) expression -> expression GREATER_THAN expression .
+    (32) expression -> expression . PLUS expression
+    (33) expression -> expression . MINUS expression
+    (34) expression -> expression . TIMES expression
+    (35) expression -> expression . DIVIDE expression
+    (36) expression -> expression . MOD expression
+    (37) expression -> expression . POWER expression
+    (38) expression -> expression . EQUAL expression
+    (39) expression -> expression . NOT_EQUAL expression
+    (40) expression -> expression . GREATER_THAN expression
+    (41) expression -> expression . GREATER_THAN_EQUAL expression
+    (42) expression -> expression . LESS_THAN expression
+    (43) expression -> expression . LESS_THAN_EQUAL expression
+    (44) expression -> expression . AND expression
+    (45) expression -> expression . OR expression
+
+    SEMICOLON       reduce using rule 40 (expression -> expression GREATER_THAN expression .)
+    EQUAL           reduce using rule 40 (expression -> expression GREATER_THAN expression .)
+    NOT_EQUAL       reduce using rule 40 (expression -> expression GREATER_THAN expression .)
+    GREATER_THAN    reduce using rule 40 (expression -> expression GREATER_THAN expression .)
+    GREATER_THAN_EQUAL reduce using rule 40 (expression -> expression GREATER_THAN expression .)
+    LESS_THAN       reduce using rule 40 (expression -> expression GREATER_THAN expression .)
+    LESS_THAN_EQUAL reduce using rule 40 (expression -> expression GREATER_THAN expression .)
+    AND             reduce using rule 40 (expression -> expression GREATER_THAN expression .)
+    OR              reduce using rule 40 (expression -> expression GREATER_THAN expression .)
+    RPAREN          reduce using rule 40 (expression -> expression GREATER_THAN expression .)
+    LBRACE          reduce using rule 40 (expression -> expression GREATER_THAN expression .)
+    PLUS            shift and go to state 44
+    MINUS           shift and go to state 45
+    TIMES           shift and go to state 46
+    DIVIDE          shift and go to state 47
+    MOD             shift and go to state 48
+    POWER           shift and go to state 49
+
+  ! PLUS            [ reduce using rule 40 (expression -> expression GREATER_THAN expression .) ]
+  ! MINUS           [ reduce using rule 40 (expression -> expression GREATER_THAN expression .) ]
+  ! TIMES           [ reduce using rule 40 (expression -> expression GREATER_THAN expression .) ]
+  ! DIVIDE          [ reduce using rule 40 (expression -> expression GREATER_THAN expression .) ]
+  ! MOD             [ reduce using rule 40 (expression -> expression GREATER_THAN expression .) ]
+  ! POWER           [ reduce using rule 40 (expression -> expression GREATER_THAN expression .) ]
+  ! EQUAL           [ shift and go to state 50 ]
+  ! NOT_EQUAL       [ shift and go to state 51 ]
+  ! GREATER_THAN    [ shift and go to state 52 ]
+  ! GREATER_THAN_EQUAL [ shift and go to state 53 ]
+  ! LESS_THAN       [ shift and go to state 54 ]
+  ! LESS_THAN_EQUAL [ shift and go to state 55 ]
+  ! AND             [ shift and go to state 56 ]
+  ! OR              [ shift and go to state 57 ]
+
+
+state 73
+
+    (41) expression -> expression GREATER_THAN_EQUAL expression .
+    (32) expression -> expression . PLUS expression
+    (33) expression -> expression . MINUS expression
+    (34) expression -> expression . TIMES expression
+    (35) expression -> expression . DIVIDE expression
+    (36) expression -> expression . MOD expression
+    (37) expression -> expression . POWER expression
+    (38) expression -> expression . EQUAL expression
+    (39) expression -> expression . NOT_EQUAL expression
+    (40) expression -> expression . GREATER_THAN expression
+    (41) expression -> expression . GREATER_THAN_EQUAL expression
+    (42) expression -> expression . LESS_THAN expression
+    (43) expression -> expression . LESS_THAN_EQUAL expression
+    (44) expression -> expression . AND expression
+    (45) expression -> expression . OR expression
+
+    SEMICOLON       reduce using rule 41 (expression -> expression GREATER_THAN_EQUAL expression .)
+    EQUAL           reduce using rule 41 (expression -> expression GREATER_THAN_EQUAL expression .)
+    NOT_EQUAL       reduce using rule 41 (expression -> expression GREATER_THAN_EQUAL expression .)
+    GREATER_THAN    reduce using rule 41 (expression -> expression GREATER_THAN_EQUAL expression .)
+    GREATER_THAN_EQUAL reduce using rule 41 (expression -> expression GREATER_THAN_EQUAL expression .)
+    LESS_THAN       reduce using rule 41 (expression -> expression GREATER_THAN_EQUAL expression .)
+    LESS_THAN_EQUAL reduce using rule 41 (expression -> expression GREATER_THAN_EQUAL expression .)
+    AND             reduce using rule 41 (expression -> expression GREATER_THAN_EQUAL expression .)
+    OR              reduce using rule 41 (expression -> expression GREATER_THAN_EQUAL expression .)
+    RPAREN          reduce using rule 41 (expression -> expression GREATER_THAN_EQUAL expression .)
+    LBRACE          reduce using rule 41 (expression -> expression GREATER_THAN_EQUAL expression .)
+    PLUS            shift and go to state 44
+    MINUS           shift and go to state 45
+    TIMES           shift and go to state 46
+    DIVIDE          shift and go to state 47
+    MOD             shift and go to state 48
+    POWER           shift and go to state 49
+
+  ! PLUS            [ reduce using rule 41 (expression -> expression GREATER_THAN_EQUAL expression .) ]
+  ! MINUS           [ reduce using rule 41 (expression -> expression GREATER_THAN_EQUAL expression .) ]
+  ! TIMES           [ reduce using rule 41 (expression -> expression GREATER_THAN_EQUAL expression .) ]
+  ! DIVIDE          [ reduce using rule 41 (expression -> expression GREATER_THAN_EQUAL expression .) ]
+  ! MOD             [ reduce using rule 41 (expression -> expression GREATER_THAN_EQUAL expression .) ]
+  ! POWER           [ reduce using rule 41 (expression -> expression GREATER_THAN_EQUAL expression .) ]
+  ! EQUAL           [ shift and go to state 50 ]
+  ! NOT_EQUAL       [ shift and go to state 51 ]
+  ! GREATER_THAN    [ shift and go to state 52 ]
+  ! GREATER_THAN_EQUAL [ shift and go to state 53 ]
+  ! LESS_THAN       [ shift and go to state 54 ]
+  ! LESS_THAN_EQUAL [ shift and go to state 55 ]
+  ! AND             [ shift and go to state 56 ]
+  ! OR              [ shift and go to state 57 ]
+
+
+state 74
+
+    (42) expression -> expression LESS_THAN expression .
+    (32) expression -> expression . PLUS expression
+    (33) expression -> expression . MINUS expression
+    (34) expression -> expression . TIMES expression
+    (35) expression -> expression . DIVIDE expression
+    (36) expression -> expression . MOD expression
+    (37) expression -> expression . POWER expression
+    (38) expression -> expression . EQUAL expression
+    (39) expression -> expression . NOT_EQUAL expression
+    (40) expression -> expression . GREATER_THAN expression
+    (41) expression -> expression . GREATER_THAN_EQUAL expression
+    (42) expression -> expression . LESS_THAN expression
+    (43) expression -> expression . LESS_THAN_EQUAL expression
+    (44) expression -> expression . AND expression
+    (45) expression -> expression . OR expression
+
+    SEMICOLON       reduce using rule 42 (expression -> expression LESS_THAN expression .)
+    EQUAL           reduce using rule 42 (expression -> expression LESS_THAN expression .)
+    NOT_EQUAL       reduce using rule 42 (expression -> expression LESS_THAN expression .)
+    GREATER_THAN    reduce using rule 42 (expression -> expression LESS_THAN expression .)
+    GREATER_THAN_EQUAL reduce using rule 42 (expression -> expression LESS_THAN expression .)
+    LESS_THAN       reduce using rule 42 (expression -> expression LESS_THAN expression .)
+    LESS_THAN_EQUAL reduce using rule 42 (expression -> expression LESS_THAN expression .)
+    AND             reduce using rule 42 (expression -> expression LESS_THAN expression .)
+    OR              reduce using rule 42 (expression -> expression LESS_THAN expression .)
+    RPAREN          reduce using rule 42 (expression -> expression LESS_THAN expression .)
+    LBRACE          reduce using rule 42 (expression -> expression LESS_THAN expression .)
+    PLUS            shift and go to state 44
+    MINUS           shift and go to state 45
+    TIMES           shift and go to state 46
+    DIVIDE          shift and go to state 47
+    MOD             shift and go to state 48
+    POWER           shift and go to state 49
+
+  ! PLUS            [ reduce using rule 42 (expression -> expression LESS_THAN expression .) ]
+  ! MINUS           [ reduce using rule 42 (expression -> expression LESS_THAN expression .) ]
+  ! TIMES           [ reduce using rule 42 (expression -> expression LESS_THAN expression .) ]
+  ! DIVIDE          [ reduce using rule 42 (expression -> expression LESS_THAN expression .) ]
+  ! MOD             [ reduce using rule 42 (expression -> expression LESS_THAN expression .) ]
+  ! POWER           [ reduce using rule 42 (expression -> expression LESS_THAN expression .) ]
+  ! EQUAL           [ shift and go to state 50 ]
+  ! NOT_EQUAL       [ shift and go to state 51 ]
+  ! GREATER_THAN    [ shift and go to state 52 ]
+  ! GREATER_THAN_EQUAL [ shift and go to state 53 ]
+  ! LESS_THAN       [ shift and go to state 54 ]
+  ! LESS_THAN_EQUAL [ shift and go to state 55 ]
+  ! AND             [ shift and go to state 56 ]
+  ! OR              [ shift and go to state 57 ]
+
+
+state 75
+
+    (43) expression -> expression LESS_THAN_EQUAL expression .
+    (32) expression -> expression . PLUS expression
+    (33) expression -> expression . MINUS expression
+    (34) expression -> expression . TIMES expression
+    (35) expression -> expression . DIVIDE expression
+    (36) expression -> expression . MOD expression
+    (37) expression -> expression . POWER expression
+    (38) expression -> expression . EQUAL expression
+    (39) expression -> expression . NOT_EQUAL expression
+    (40) expression -> expression . GREATER_THAN expression
+    (41) expression -> expression . GREATER_THAN_EQUAL expression
+    (42) expression -> expression . LESS_THAN expression
+    (43) expression -> expression . LESS_THAN_EQUAL expression
+    (44) expression -> expression . AND expression
+    (45) expression -> expression . OR expression
+
+    SEMICOLON       reduce using rule 43 (expression -> expression LESS_THAN_EQUAL expression .)
+    EQUAL           reduce using rule 43 (expression -> expression LESS_THAN_EQUAL expression .)
+    NOT_EQUAL       reduce using rule 43 (expression -> expression LESS_THAN_EQUAL expression .)
+    GREATER_THAN    reduce using rule 43 (expression -> expression LESS_THAN_EQUAL expression .)
+    GREATER_THAN_EQUAL reduce using rule 43 (expression -> expression LESS_THAN_EQUAL expression .)
+    LESS_THAN       reduce using rule 43 (expression -> expression LESS_THAN_EQUAL expression .)
+    LESS_THAN_EQUAL reduce using rule 43 (expression -> expression LESS_THAN_EQUAL expression .)
+    AND             reduce using rule 43 (expression -> expression LESS_THAN_EQUAL expression .)
+    OR              reduce using rule 43 (expression -> expression LESS_THAN_EQUAL expression .)
+    RPAREN          reduce using rule 43 (expression -> expression LESS_THAN_EQUAL expression .)
+    LBRACE          reduce using rule 43 (expression -> expression LESS_THAN_EQUAL expression .)
+    PLUS            shift and go to state 44
+    MINUS           shift and go to state 45
+    TIMES           shift and go to state 46
+    DIVIDE          shift and go to state 47
+    MOD             shift and go to state 48
+    POWER           shift and go to state 49
+
+  ! PLUS            [ reduce using rule 43 (expression -> expression LESS_THAN_EQUAL expression .) ]
+  ! MINUS           [ reduce using rule 43 (expression -> expression LESS_THAN_EQUAL expression .) ]
+  ! TIMES           [ reduce using rule 43 (expression -> expression LESS_THAN_EQUAL expression .) ]
+  ! DIVIDE          [ reduce using rule 43 (expression -> expression LESS_THAN_EQUAL expression .) ]
+  ! MOD             [ reduce using rule 43 (expression -> expression LESS_THAN_EQUAL expression .) ]
+  ! POWER           [ reduce using rule 43 (expression -> expression LESS_THAN_EQUAL expression .) ]
+  ! EQUAL           [ shift and go to state 50 ]
+  ! NOT_EQUAL       [ shift and go to state 51 ]
+  ! GREATER_THAN    [ shift and go to state 52 ]
+  ! GREATER_THAN_EQUAL [ shift and go to state 53 ]
+  ! LESS_THAN       [ shift and go to state 54 ]
+  ! LESS_THAN_EQUAL [ shift and go to state 55 ]
+  ! AND             [ shift and go to state 56 ]
+  ! OR              [ shift and go to state 57 ]
+
+
+state 76
+
+    (44) expression -> expression AND expression .
+    (32) expression -> expression . PLUS expression
+    (33) expression -> expression . MINUS expression
+    (34) expression -> expression . TIMES expression
+    (35) expression -> expression . DIVIDE expression
+    (36) expression -> expression . MOD expression
+    (37) expression -> expression . POWER expression
+    (38) expression -> expression . EQUAL expression
+    (39) expression -> expression . NOT_EQUAL expression
+    (40) expression -> expression . GREATER_THAN expression
+    (41) expression -> expression . GREATER_THAN_EQUAL expression
+    (42) expression -> expression . LESS_THAN expression
+    (43) expression -> expression . LESS_THAN_EQUAL expression
+    (44) expression -> expression . AND expression
+    (45) expression -> expression . OR expression
+
+    SEMICOLON       reduce using rule 44 (expression -> expression AND expression .)
+    AND             reduce using rule 44 (expression -> expression AND expression .)
+    OR              reduce using rule 44 (expression -> expression AND expression .)
+    RPAREN          reduce using rule 44 (expression -> expression AND expression .)
+    LBRACE          reduce using rule 44 (expression -> expression AND expression .)
+    PLUS            shift and go to state 44
+    MINUS           shift and go to state 45
+    TIMES           shift and go to state 46
+    DIVIDE          shift and go to state 47
+    MOD             shift and go to state 48
+    POWER           shift and go to state 49
+    EQUAL           shift and go to state 50
+    NOT_EQUAL       shift and go to state 51
+    GREATER_THAN    shift and go to state 52
+    GREATER_THAN_EQUAL shift and go to state 53
+    LESS_THAN       shift and go to state 54
+    LESS_THAN_EQUAL shift and go to state 55
+
+  ! PLUS            [ reduce using rule 44 (expression -> expression AND expression .) ]
+  ! MINUS           [ reduce using rule 44 (expression -> expression AND expression .) ]
+  ! TIMES           [ reduce using rule 44 (expression -> expression AND expression .) ]
+  ! DIVIDE          [ reduce using rule 44 (expression -> expression AND expression .) ]
+  ! MOD             [ reduce using rule 44 (expression -> expression AND expression .) ]
+  ! POWER           [ reduce using rule 44 (expression -> expression AND expression .) ]
+  ! EQUAL           [ reduce using rule 44 (expression -> expression AND expression .) ]
+  ! NOT_EQUAL       [ reduce using rule 44 (expression -> expression AND expression .) ]
+  ! GREATER_THAN    [ reduce using rule 44 (expression -> expression AND expression .) ]
+  ! GREATER_THAN_EQUAL [ reduce using rule 44 (expression -> expression AND expression .) ]
+  ! LESS_THAN       [ reduce using rule 44 (expression -> expression AND expression .) ]
+  ! LESS_THAN_EQUAL [ reduce using rule 44 (expression -> expression AND expression .) ]
+  ! AND             [ shift and go to state 56 ]
+  ! OR              [ shift and go to state 57 ]
+
+
+state 77
+
+    (45) expression -> expression OR expression .
+    (32) expression -> expression . PLUS expression
+    (33) expression -> expression . MINUS expression
+    (34) expression -> expression . TIMES expression
+    (35) expression -> expression . DIVIDE expression
+    (36) expression -> expression . MOD expression
+    (37) expression -> expression . POWER expression
+    (38) expression -> expression . EQUAL expression
+    (39) expression -> expression . NOT_EQUAL expression
+    (40) expression -> expression . GREATER_THAN expression
+    (41) expression -> expression . GREATER_THAN_EQUAL expression
+    (42) expression -> expression . LESS_THAN expression
+    (43) expression -> expression . LESS_THAN_EQUAL expression
+    (44) expression -> expression . AND expression
+    (45) expression -> expression . OR expression
+
+    SEMICOLON       reduce using rule 45 (expression -> expression OR expression .)
+    OR              reduce using rule 45 (expression -> expression OR expression .)
+    RPAREN          reduce using rule 45 (expression -> expression OR expression .)
+    LBRACE          reduce using rule 45 (expression -> expression OR expression .)
+    PLUS            shift and go to state 44
+    MINUS           shift and go to state 45
+    TIMES           shift and go to state 46
+    DIVIDE          shift and go to state 47
+    MOD             shift and go to state 48
+    POWER           shift and go to state 49
+    EQUAL           shift and go to state 50
+    NOT_EQUAL       shift and go to state 51
+    GREATER_THAN    shift and go to state 52
+    GREATER_THAN_EQUAL shift and go to state 53
+    LESS_THAN       shift and go to state 54
+    LESS_THAN_EQUAL shift and go to state 55
+    AND             shift and go to state 56
+
+  ! PLUS            [ reduce using rule 45 (expression -> expression OR expression .) ]
+  ! MINUS           [ reduce using rule 45 (expression -> expression OR expression .) ]
+  ! TIMES           [ reduce using rule 45 (expression -> expression OR expression .) ]
+  ! DIVIDE          [ reduce using rule 45 (expression -> expression OR expression .) ]
+  ! MOD             [ reduce using rule 45 (expression -> expression OR expression .) ]
+  ! POWER           [ reduce using rule 45 (expression -> expression OR expression .) ]
+  ! EQUAL           [ reduce using rule 45 (expression -> expression OR expression .) ]
+  ! NOT_EQUAL       [ reduce using rule 45 (expression -> expression OR expression .) ]
+  ! GREATER_THAN    [ reduce using rule 45 (expression -> expression OR expression .) ]
+  ! GREATER_THAN_EQUAL [ reduce using rule 45 (expression -> expression OR expression .) ]
+  ! LESS_THAN       [ reduce using rule 45 (expression -> expression OR expression .) ]
+  ! LESS_THAN_EQUAL [ reduce using rule 45 (expression -> expression OR expression .) ]
+  ! AND             [ reduce using rule 45 (expression -> expression OR expression .) ]
+  ! OR              [ shift and go to state 57 ]
+
+
+state 78
+
+    (52) expression -> LPAREN expression RPAREN .
+
+    SEMICOLON       reduce using rule 52 (expression -> LPAREN expression RPAREN .)
+    PLUS            reduce using rule 52 (expression -> LPAREN expression RPAREN .)
+    MINUS           reduce using rule 52 (expression -> LPAREN expression RPAREN .)
+    TIMES           reduce using rule 52 (expression -> LPAREN expression RPAREN .)
+    DIVIDE          reduce using rule 52 (expression -> LPAREN expression RPAREN .)
+    MOD             reduce using rule 52 (expression -> LPAREN expression RPAREN .)
+    POWER           reduce using rule 52 (expression -> LPAREN expression RPAREN .)
+    EQUAL           reduce using rule 52 (expression -> LPAREN expression RPAREN .)
+    NOT_EQUAL       reduce using rule 52 (expression -> LPAREN expression RPAREN .)
+    GREATER_THAN    reduce using rule 52 (expression -> LPAREN expression RPAREN .)
+    GREATER_THAN_EQUAL reduce using rule 52 (expression -> LPAREN expression RPAREN .)
+    LESS_THAN       reduce using rule 52 (expression -> LPAREN expression RPAREN .)
+    LESS_THAN_EQUAL reduce using rule 52 (expression -> LPAREN expression RPAREN .)
+    AND             reduce using rule 52 (expression -> LPAREN expression RPAREN .)
+    OR              reduce using rule 52 (expression -> LPAREN expression RPAREN .)
+    RPAREN          reduce using rule 52 (expression -> LPAREN expression RPAREN .)
+    LBRACE          reduce using rule 52 (expression -> LPAREN expression RPAREN .)
+
+
+state 79
+
+    (7) function_declaration -> FUNCTION ID LPAREN function_param_list RPAREN COLON type SEMICOLON .
+
+    $end            reduce using rule 7 (function_declaration -> FUNCTION ID LPAREN function_param_list RPAREN COLON type SEMICOLON .)
+
+
+state 80
+
+    (8) function_declaration -> FUNCTION ID LPAREN function_param_list RPAREN COLON type LBRACE . function_body RBRACE
+    (16) function_body -> . block_sequence
+    (17) block_sequence -> . block SEMICOLON block_sequence
+    (18) block_sequence -> . block
+    (19) block -> . constant_declaration
+    (20) block -> . variable_declaration
+    (21) block -> . if_block
+    (22) block -> . while_block
+    (23) block -> . function_call
+    (24) block -> .
+    (5) constant_declaration -> . VAL ID COLON type ASSIGN expression SEMICOLON
+    (6) variable_declaration -> . VAR ID COLON type ASSIGN expression SEMICOLON
+    (25) if_block -> . IF expression LBRACE block RBRACE LBRACE ELSE block RBRACE
+    (26) if_block -> . IF expression LBRACE block RBRACE
+    (27) while_block -> . WHILE expression LBRACE block RBRACE
+    (13) function_call -> . ID LPAREN function_param_list_call RPAREN SEMICOLON
+
+    SEMICOLON       reduce using rule 24 (block -> .)
+    RBRACE          reduce using rule 24 (block -> .)
+    VAL             shift and go to state 5
+    VAR             shift and go to state 6
+    IF              shift and go to state 90
+    WHILE           shift and go to state 91
+    ID              shift and go to state 81
+
+    function_body                  shift and go to state 82
+    block_sequence                 shift and go to state 83
+    block                          shift and go to state 84
+    constant_declaration           shift and go to state 85
+    variable_declaration           shift and go to state 86
+    if_block                       shift and go to state 87
+    while_block                    shift and go to state 88
+    function_call                  shift and go to state 89
+
+state 81
+
+    (13) function_call -> ID . LPAREN function_param_list_call RPAREN SEMICOLON
+
+    LPAREN          shift and go to state 92
+
+
+state 82
+
+    (8) function_declaration -> FUNCTION ID LPAREN function_param_list RPAREN COLON type LBRACE function_body . RBRACE
+
+    RBRACE          shift and go to state 93
+
+
+state 83
+
+    (16) function_body -> block_sequence .
+
+    RBRACE          reduce using rule 16 (function_body -> block_sequence .)
+
+
+state 84
+
+    (17) block_sequence -> block . SEMICOLON block_sequence
+    (18) block_sequence -> block .
+
+    SEMICOLON       shift and go to state 94
+    RBRACE          reduce using rule 18 (block_sequence -> block .)
+
+
+state 85
+
+    (19) block -> constant_declaration .
+
+    SEMICOLON       reduce using rule 19 (block -> constant_declaration .)
+    RBRACE          reduce using rule 19 (block -> constant_declaration .)
+
+
+state 86
+
+    (20) block -> variable_declaration .
+
+    SEMICOLON       reduce using rule 20 (block -> variable_declaration .)
+    RBRACE          reduce using rule 20 (block -> variable_declaration .)
+
+
+state 87
+
+    (21) block -> if_block .
+
+    SEMICOLON       reduce using rule 21 (block -> if_block .)
+    RBRACE          reduce using rule 21 (block -> if_block .)
+
+
+state 88
+
+    (22) block -> while_block .
+
+    SEMICOLON       reduce using rule 22 (block -> while_block .)
+    RBRACE          reduce using rule 22 (block -> while_block .)
+
+
+state 89
+
+    (23) block -> function_call .
+
+    SEMICOLON       reduce using rule 23 (block -> function_call .)
+    RBRACE          reduce using rule 23 (block -> function_call .)
+
+
+state 90
+
+    (25) if_block -> IF . expression LBRACE block RBRACE LBRACE ELSE block RBRACE
+    (26) if_block -> IF . expression LBRACE block RBRACE
+    (32) expression -> . expression PLUS expression
+    (33) expression -> . expression MINUS expression
+    (34) expression -> . expression TIMES expression
+    (35) expression -> . expression DIVIDE expression
+    (36) expression -> . expression MOD expression
+    (37) expression -> . expression POWER expression
+    (38) expression -> . expression EQUAL expression
+    (39) expression -> . expression NOT_EQUAL expression
+    (40) expression -> . expression GREATER_THAN expression
+    (41) expression -> . expression GREATER_THAN_EQUAL expression
+    (42) expression -> . expression LESS_THAN expression
+    (43) expression -> . expression LESS_THAN_EQUAL expression
+    (44) expression -> . expression AND expression
+    (45) expression -> . expression OR expression
+    (46) expression -> . NOT expression
+    (47) expression -> . INTEGER_LITERAL
+    (48) expression -> . FLOAT_LITERAL
+    (49) expression -> . STRING_LITERAL
+    (50) expression -> . BOOL_LITERAL
+    (51) expression -> . ID
+    (52) expression -> . LPAREN expression RPAREN
+
+    NOT             shift and go to state 32
+    INTEGER_LITERAL shift and go to state 33
+    FLOAT_LITERAL   shift and go to state 34
+    STRING_LITERAL  shift and go to state 35
+    BOOL_LITERAL    shift and go to state 36
+    ID              shift and go to state 30
+    LPAREN          shift and go to state 37
+
+    expression                     shift and go to state 95
+
+state 91
+
+    (27) while_block -> WHILE . expression LBRACE block RBRACE
+    (32) expression -> . expression PLUS expression
+    (33) expression -> . expression MINUS expression
+    (34) expression -> . expression TIMES expression
+    (35) expression -> . expression DIVIDE expression
+    (36) expression -> . expression MOD expression
+    (37) expression -> . expression POWER expression
+    (38) expression -> . expression EQUAL expression
+    (39) expression -> . expression NOT_EQUAL expression
+    (40) expression -> . expression GREATER_THAN expression
+    (41) expression -> . expression GREATER_THAN_EQUAL expression
+    (42) expression -> . expression LESS_THAN expression
+    (43) expression -> . expression LESS_THAN_EQUAL expression
+    (44) expression -> . expression AND expression
+    (45) expression -> . expression OR expression
+    (46) expression -> . NOT expression
+    (47) expression -> . INTEGER_LITERAL
+    (48) expression -> . FLOAT_LITERAL
+    (49) expression -> . STRING_LITERAL
+    (50) expression -> . BOOL_LITERAL
+    (51) expression -> . ID
+    (52) expression -> . LPAREN expression RPAREN
+
+    NOT             shift and go to state 32
+    INTEGER_LITERAL shift and go to state 33
+    FLOAT_LITERAL   shift and go to state 34
+    STRING_LITERAL  shift and go to state 35
+    BOOL_LITERAL    shift and go to state 36
+    ID              shift and go to state 30
+    LPAREN          shift and go to state 37
+
+    expression                     shift and go to state 96
+
+state 92
+
+    (13) function_call -> ID LPAREN . function_param_list_call RPAREN SEMICOLON
+    (14) function_param_list_call -> . ID COMMA function_param_list_call
+    (15) function_param_list_call -> . ID
+
+    ID              shift and go to state 97
+
+    function_param_list_call       shift and go to state 98
+
+state 93
+
+    (8) function_declaration -> FUNCTION ID LPAREN function_param_list RPAREN COLON type LBRACE function_body RBRACE .
+
+    $end            reduce using rule 8 (function_declaration -> FUNCTION ID LPAREN function_param_list RPAREN COLON type LBRACE function_body RBRACE .)
+
+
+state 94
+
+    (17) block_sequence -> block SEMICOLON . block_sequence
+    (17) block_sequence -> . block SEMICOLON block_sequence
+    (18) block_sequence -> . block
+    (19) block -> . constant_declaration
+    (20) block -> . variable_declaration
+    (21) block -> . if_block
+    (22) block -> . while_block
+    (23) block -> . function_call
+    (24) block -> .
+    (5) constant_declaration -> . VAL ID COLON type ASSIGN expression SEMICOLON
+    (6) variable_declaration -> . VAR ID COLON type ASSIGN expression SEMICOLON
+    (25) if_block -> . IF expression LBRACE block RBRACE LBRACE ELSE block RBRACE
+    (26) if_block -> . IF expression LBRACE block RBRACE
+    (27) while_block -> . WHILE expression LBRACE block RBRACE
+    (13) function_call -> . ID LPAREN function_param_list_call RPAREN SEMICOLON
+
+    SEMICOLON       reduce using rule 24 (block -> .)
+    RBRACE          reduce using rule 24 (block -> .)
+    VAL             shift and go to state 5
+    VAR             shift and go to state 6
+    IF              shift and go to state 90
+    WHILE           shift and go to state 91
+    ID              shift and go to state 81
+
+    block                          shift and go to state 84
+    block_sequence                 shift and go to state 99
+    constant_declaration           shift and go to state 85
+    variable_declaration           shift and go to state 86
+    if_block                       shift and go to state 87
+    while_block                    shift and go to state 88
+    function_call                  shift and go to state 89
+
+state 95
+
+    (25) if_block -> IF expression . LBRACE block RBRACE LBRACE ELSE block RBRACE
+    (26) if_block -> IF expression . LBRACE block RBRACE
+    (32) expression -> expression . PLUS expression
+    (33) expression -> expression . MINUS expression
+    (34) expression -> expression . TIMES expression
+    (35) expression -> expression . DIVIDE expression
+    (36) expression -> expression . MOD expression
+    (37) expression -> expression . POWER expression
+    (38) expression -> expression . EQUAL expression
+    (39) expression -> expression . NOT_EQUAL expression
+    (40) expression -> expression . GREATER_THAN expression
+    (41) expression -> expression . GREATER_THAN_EQUAL expression
+    (42) expression -> expression . LESS_THAN expression
+    (43) expression -> expression . LESS_THAN_EQUAL expression
+    (44) expression -> expression . AND expression
+    (45) expression -> expression . OR expression
+
+    LBRACE          shift and go to state 100
+    PLUS            shift and go to state 44
+    MINUS           shift and go to state 45
+    TIMES           shift and go to state 46
+    DIVIDE          shift and go to state 47
+    MOD             shift and go to state 48
+    POWER           shift and go to state 49
+    EQUAL           shift and go to state 50
+    NOT_EQUAL       shift and go to state 51
+    GREATER_THAN    shift and go to state 52
+    GREATER_THAN_EQUAL shift and go to state 53
+    LESS_THAN       shift and go to state 54
+    LESS_THAN_EQUAL shift and go to state 55
+    AND             shift and go to state 56
+    OR              shift and go to state 57
+
+
+state 96
+
+    (27) while_block -> WHILE expression . LBRACE block RBRACE
+    (32) expression -> expression . PLUS expression
+    (33) expression -> expression . MINUS expression
+    (34) expression -> expression . TIMES expression
+    (35) expression -> expression . DIVIDE expression
+    (36) expression -> expression . MOD expression
+    (37) expression -> expression . POWER expression
+    (38) expression -> expression . EQUAL expression
+    (39) expression -> expression . NOT_EQUAL expression
+    (40) expression -> expression . GREATER_THAN expression
+    (41) expression -> expression . GREATER_THAN_EQUAL expression
+    (42) expression -> expression . LESS_THAN expression
+    (43) expression -> expression . LESS_THAN_EQUAL expression
+    (44) expression -> expression . AND expression
+    (45) expression -> expression . OR expression
+
+    LBRACE          shift and go to state 101
+    PLUS            shift and go to state 44
+    MINUS           shift and go to state 45
+    TIMES           shift and go to state 46
+    DIVIDE          shift and go to state 47
+    MOD             shift and go to state 48
+    POWER           shift and go to state 49
+    EQUAL           shift and go to state 50
+    NOT_EQUAL       shift and go to state 51
+    GREATER_THAN    shift and go to state 52
+    GREATER_THAN_EQUAL shift and go to state 53
+    LESS_THAN       shift and go to state 54
+    LESS_THAN_EQUAL shift and go to state 55
+    AND             shift and go to state 56
+    OR              shift and go to state 57
+
+
+state 97
+
+    (14) function_param_list_call -> ID . COMMA function_param_list_call
+    (15) function_param_list_call -> ID .
+
+    COMMA           shift and go to state 102
+    RPAREN          reduce using rule 15 (function_param_list_call -> ID .)
+
+
+state 98
+
+    (13) function_call -> ID LPAREN function_param_list_call . RPAREN SEMICOLON
+
+    RPAREN          shift and go to state 103
+
+
+state 99
+
+    (17) block_sequence -> block SEMICOLON block_sequence .
+
+    RBRACE          reduce using rule 17 (block_sequence -> block SEMICOLON block_sequence .)
+
+
+state 100
+
+    (25) if_block -> IF expression LBRACE . block RBRACE LBRACE ELSE block RBRACE
+    (26) if_block -> IF expression LBRACE . block RBRACE
+    (19) block -> . constant_declaration
+    (20) block -> . variable_declaration
+    (21) block -> . if_block
+    (22) block -> . while_block
+    (23) block -> . function_call
+    (24) block -> .
+    (5) constant_declaration -> . VAL ID COLON type ASSIGN expression SEMICOLON
+    (6) variable_declaration -> . VAR ID COLON type ASSIGN expression SEMICOLON
+    (25) if_block -> . IF expression LBRACE block RBRACE LBRACE ELSE block RBRACE
+    (26) if_block -> . IF expression LBRACE block RBRACE
+    (27) while_block -> . WHILE expression LBRACE block RBRACE
+    (13) function_call -> . ID LPAREN function_param_list_call RPAREN SEMICOLON
+
+    RBRACE          reduce using rule 24 (block -> .)
+    VAL             shift and go to state 5
+    VAR             shift and go to state 6
+    IF              shift and go to state 90
+    WHILE           shift and go to state 91
+    ID              shift and go to state 81
+
+    block                          shift and go to state 104
+    constant_declaration           shift and go to state 85
+    variable_declaration           shift and go to state 86
+    if_block                       shift and go to state 87
+    while_block                    shift and go to state 88
+    function_call                  shift and go to state 89
+
+state 101
+
+    (27) while_block -> WHILE expression LBRACE . block RBRACE
+    (19) block -> . constant_declaration
+    (20) block -> . variable_declaration
+    (21) block -> . if_block
+    (22) block -> . while_block
+    (23) block -> . function_call
+    (24) block -> .
+    (5) constant_declaration -> . VAL ID COLON type ASSIGN expression SEMICOLON
+    (6) variable_declaration -> . VAR ID COLON type ASSIGN expression SEMICOLON
+    (25) if_block -> . IF expression LBRACE block RBRACE LBRACE ELSE block RBRACE
+    (26) if_block -> . IF expression LBRACE block RBRACE
+    (27) while_block -> . WHILE expression LBRACE block RBRACE
+    (13) function_call -> . ID LPAREN function_param_list_call RPAREN SEMICOLON
+
+    RBRACE          reduce using rule 24 (block -> .)
+    VAL             shift and go to state 5
+    VAR             shift and go to state 6
+    IF              shift and go to state 90
+    WHILE           shift and go to state 91
+    ID              shift and go to state 81
+
+    block                          shift and go to state 105
+    constant_declaration           shift and go to state 85
+    variable_declaration           shift and go to state 86
+    if_block                       shift and go to state 87
+    while_block                    shift and go to state 88
+    function_call                  shift and go to state 89
+
+state 102
+
+    (14) function_param_list_call -> ID COMMA . function_param_list_call
+    (14) function_param_list_call -> . ID COMMA function_param_list_call
+    (15) function_param_list_call -> . ID
+
+    ID              shift and go to state 97
+
+    function_param_list_call       shift and go to state 106
+
+state 103
+
+    (13) function_call -> ID LPAREN function_param_list_call RPAREN . SEMICOLON
+
+    SEMICOLON       shift and go to state 107
+
+
+state 104
+
+    (25) if_block -> IF expression LBRACE block . RBRACE LBRACE ELSE block RBRACE
+    (26) if_block -> IF expression LBRACE block . RBRACE
+
+    RBRACE          shift and go to state 108
+
+
+state 105
+
+    (27) while_block -> WHILE expression LBRACE block . RBRACE
+
+    RBRACE          shift and go to state 109
+
+
+state 106
+
+    (14) function_param_list_call -> ID COMMA function_param_list_call .
+
+    RPAREN          reduce using rule 14 (function_param_list_call -> ID COMMA function_param_list_call .)
+
+
+state 107
+
+    (13) function_call -> ID LPAREN function_param_list_call RPAREN SEMICOLON .
+
+    SEMICOLON       reduce using rule 13 (function_call -> ID LPAREN function_param_list_call RPAREN SEMICOLON .)
+    RBRACE          reduce using rule 13 (function_call -> ID LPAREN function_param_list_call RPAREN SEMICOLON .)
+
+
+state 108
+
+    (25) if_block -> IF expression LBRACE block RBRACE . LBRACE ELSE block RBRACE
+    (26) if_block -> IF expression LBRACE block RBRACE .
+
+    LBRACE          shift and go to state 110
+    SEMICOLON       reduce using rule 26 (if_block -> IF expression LBRACE block RBRACE .)
+    RBRACE          reduce using rule 26 (if_block -> IF expression LBRACE block RBRACE .)
+
+
+state 109
+
+    (27) while_block -> WHILE expression LBRACE block RBRACE .
+
+    SEMICOLON       reduce using rule 27 (while_block -> WHILE expression LBRACE block RBRACE .)
+    RBRACE          reduce using rule 27 (while_block -> WHILE expression LBRACE block RBRACE .)
+
+
+state 110
+
+    (25) if_block -> IF expression LBRACE block RBRACE LBRACE . ELSE block RBRACE
+
+    ELSE            shift and go to state 111
+
+
+state 111
+
+    (25) if_block -> IF expression LBRACE block RBRACE LBRACE ELSE . block RBRACE
+    (19) block -> . constant_declaration
+    (20) block -> . variable_declaration
+    (21) block -> . if_block
+    (22) block -> . while_block
+    (23) block -> . function_call
+    (24) block -> .
+    (5) constant_declaration -> . VAL ID COLON type ASSIGN expression SEMICOLON
+    (6) variable_declaration -> . VAR ID COLON type ASSIGN expression SEMICOLON
+    (25) if_block -> . IF expression LBRACE block RBRACE LBRACE ELSE block RBRACE
+    (26) if_block -> . IF expression LBRACE block RBRACE
+    (27) while_block -> . WHILE expression LBRACE block RBRACE
+    (13) function_call -> . ID LPAREN function_param_list_call RPAREN SEMICOLON
+
+    RBRACE          reduce using rule 24 (block -> .)
+    VAL             shift and go to state 5
+    VAR             shift and go to state 6
+    IF              shift and go to state 90
+    WHILE           shift and go to state 91
+    ID              shift and go to state 81
+
+    block                          shift and go to state 112
+    constant_declaration           shift and go to state 85
+    variable_declaration           shift and go to state 86
+    if_block                       shift and go to state 87
+    while_block                    shift and go to state 88
+    function_call                  shift and go to state 89
+
+state 112
+
+    (25) if_block -> IF expression LBRACE block RBRACE LBRACE ELSE block . RBRACE
+
+    RBRACE          shift and go to state 113
+
+
+state 113
+
+    (25) if_block -> IF expression LBRACE block RBRACE LBRACE ELSE block RBRACE .
+
+    SEMICOLON       reduce using rule 25 (if_block -> IF expression LBRACE block RBRACE LBRACE ELSE block RBRACE .)
+    RBRACE          reduce using rule 25 (if_block -> IF expression LBRACE block RBRACE LBRACE ELSE block RBRACE .)
+
