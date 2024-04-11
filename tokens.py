@@ -68,7 +68,7 @@ def t_ID(t):
 
 
 def t_INTEGER_LITERAL(t):
-    r'\d+(_\d+)*'
+    r'(\-)*[0-9]+(_[0-9]+)*'
     try:
         t.value = int(t.value.replace('_', ''))
     except ValueError:
@@ -77,7 +77,7 @@ def t_INTEGER_LITERAL(t):
     return t
 
 def t_FLOAT_LITERAL(t):
-    r'\d*\.\d+'
+    r'(\-)*[0-9]+\.[0-9]+'
     try:
         t.value = float(t.value)
     except ValueError:

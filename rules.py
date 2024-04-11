@@ -1,4 +1,4 @@
-start = 'start_block'
+start = 'main_block_sequence'
 
 precedence = (
     ('left', 'OR'),
@@ -18,28 +18,48 @@ precedence = (
 names = { }
 
 
-def p_start_block(t):
-    """start_block : constant_declaration
-            | variable_declaration
-            | function_declaration
-            | """
-    if len(t) == 2:
-        t[0] = t[1]
+#MAIN BODY OF THE PROGRAM
+# def p_start_block(t):
+#     """start_block : main_block start_block
+#                     | main_block """
+#     if len(t) == 2:
+#         t[0] = t[1]
+#     else:
+#         t[0] = ('START_BLOCK',t[1],t[2])
+
+def p_main_block_sequence(t):
+	"""main_block_sequence : main_block main_block_sequence
+	 | main_block"""
+	if len(t) == 2:
+		t[0] = t[1]
+	else:
+		t[0] = ('MAIN_BLOCK_SEQUENCE',t[1],t[2])
+
+def p_main_block(t):
+	"""main_block : constant_declaration
+     | variable_declaration 
+	 | function_declaration 
+	 |
+	"""
+	if len(t) > 1:
+		t[0] = t[1]
     
 #VAL DECLARATION
 def p_constant_declaration(t):
-    """constant_declaration : VAL ID COLON type ASSIGN expression SEMICOLON"""
+    """constant_declaration : VAL ID COLON defaulttype ASSIGN expression SEMICOLON
+                            | VAL ID COLON arraytype ASSIGN expression SEMICOLON"""
     t[0] = ('CONSTANT_DECLARATION', t[2], t[4], t[6])
 
 #VAR DECLARATION
 def p_variable_declaration(t):
-    """variable_declaration : VAR ID COLON type ASSIGN expression SEMICOLON"""
-    t[0] = ('VARIABLE_DECLARATION', t[1], t[4], t[6])
+    """variable_declaration : VAR ID COLON defaulttype ASSIGN expression SEMICOLON
+                            | VAR ID COLON arraytype ASSIGN expression SEMICOLON"""
+    t[0] = ('VARIABLE_DECLARATION', t[2], t[4], t[6])
 
 #FUNCTION DECLARATION
 def p_function_declaration(t):
-    """function_declaration : FUNCTION ID LPAREN function_param_list RPAREN COLON type SEMICOLON
-    |  FUNCTION ID LPAREN function_param_list RPAREN COLON type LBRACE function_body RBRACE"""
+    """function_declaration : FUNCTION ID LPAREN function_param_list RPAREN COLON types SEMICOLON
+    |  FUNCTION ID LPAREN function_param_list RPAREN COLON types LBRACE function_body RBRACE"""
     if len(t) == 9:
         t[0] = ('FUNCTION_DECLARATION', t[2], t[4], t[7])
     else:
@@ -55,9 +75,14 @@ def p_function_param_list(t):
         t[0] = t[1]
 
 def p_parameter(t):
-	""" parameter : VAL ID COLON type
-    | VAR ID COLON type"""
-	t[0] = ("PARAMETER", t[2], t[4])
+    """ parameter : VAL ID COLON defaulttype
+                    | VAR ID COLON defaulttype
+                    | VAL ID COLON arraytype
+                    | VAR ID COLON arraytype"""
+    if t[1] == 'var':
+        t[0] = ("VAR", t[2], t[4])
+    else:
+        t[0] = ("VAL", t[2], t[4])
 
 #FUNCTION CALL
 def p_function_call(t):
@@ -69,7 +94,7 @@ def p_function_param_list_call(t):
     """function_param_list_call : ID COMMA function_param_list_call
     | ID"""
     if len(t) == 4:
-        t[0] = ("function_param_list_call", t[1], t[3])
+        t[0] = ("FUNCTION_PARAM_LIST_CALL", t[1], t[3])
     else:
         t[0] = t[1]
 
@@ -79,19 +104,19 @@ def p_function_body(t):
     t[0] = ('FUNCTION_BODY', t[1])
 
 def p_block_sequence(t):
-	"""block_sequence : block SEMICOLON block_sequence
+	"""block_sequence : block block_sequence
 	 | block"""
 	if len(t) == 2:
 		t[0] = t[1]
 	else:
-		t[0] = ('BLOCK__LIST',t[1],t[3])
+		t[0] = ('BLOCK_SEQUENCE',t[1],t[2])
 
 def p_block(t):
 	"""block : constant_declaration
-     | variable_declaration
+     | variable_declaration 
 	 | if_block
 	 | while_block
-	 | function_call
+	 | function_call 
 	 |
 	"""
 	if len(t) > 1:
@@ -112,12 +137,76 @@ def p_while_block(t):
 
 
 #FALTA OS ARRAYS E SE CALHAR INCLUIR O CHAR
-def p_type(t):
-    """type : INT_TYPE
+def p_types(t):
+    """types : defaulttype
+            | arraytype"""
+    t[0] = t[1]
+
+def p_defaultype(t):
+    """defaulttype : INT_TYPE
+            | FLOAT_TYPE
+            | STRING_TYPE
+            | BOOL_TYPE
+            | VOID_TYPE"""
+    t[0] = t[1]
+
+def p_arraytype(t):
+    """arraytype : LSQUARE arraytype RSQUARE
+            | INT_TYPE
             | FLOAT_TYPE
             | STRING_TYPE
             | BOOL_TYPE"""
+    if len(t)>2:
+        t[0] = ('ARRAY', t[2])
+    else:
+        t[0] = t[1]
+
+def p_typeliterals(t):
+    """typeliterals : INTEGER_LITERAL
+                  | FLOAT_LITERAL
+                  | STRING_LITERAL
+                  | BOOL_LITERAL"""
     t[0] = t[1]
+
+def p_arrayliterals(t):
+    """arrayliterals : LSQUARE int_array RSQUARE
+            | LSQUARE float_array RSQUARE
+            | LSQUARE string_array RSQUARE
+            | LSQUARE bool_array RSQUARE"""
+    t[0] = t[1]
+
+def p_int_array(t):
+    """int_array : INTEGER_LITERAL
+                | INTEGER_LITERAL COMMA int_array"""
+    if len(t) == 2:
+        t[0] = ('INT_ARRAY', t[1])
+    else:
+        t[0] = ('INT_ARRAY', t[1], t[3])
+
+def p_float_array(t):
+    """float_array : FLOAT_LITERAL
+                | FLOAT_LITERAL COMMA float_array"""
+    if len(t) == 2:
+        t[0] = ('FLOAT_ARRAY', t[1])
+    else:
+        t[0] = ('FLOAT_ARRAY', t[1], t[3])
+
+def p_string_array(t):
+    """string_array : STRING_LITERAL
+                | STRING_LITERAL COMMA string_array"""
+    if len(t) == 2:
+        t[0] = ('STRING_ARRAY', t[1])
+    else:
+        t[0] = ('STRING_ARRAY', t[1], t[3])
+
+def p_bool_array(t):
+    """bool_array : BOOL_LITERAL
+                | BOOL_LITERAL COMMA bool_array"""
+    if len(t) == 2:
+        t[0] = ('BOOL_ARRAY', t[1])
+    else:
+        t[0] = ('BOOL_ARRAY', t[1], t[3])
+
 
 def p_expression(t):
     '''expression : expression PLUS expression
@@ -135,10 +224,8 @@ def p_expression(t):
                   | expression AND expression
                   | expression OR expression
                   | NOT expression
-                  | INTEGER_LITERAL
-                  | FLOAT_LITERAL
-                  | STRING_LITERAL
-                  | BOOL_LITERAL
+                  | typeliterals
+                  | arrayliterals
                   | ID
                   | LPAREN expression RPAREN'''
     if len(t) == 2:

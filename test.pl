@@ -1,1 +1,1 @@
-var actual_max : int := 7;
+val actual_min : int := -9;
