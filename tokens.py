@@ -66,6 +66,14 @@ def t_ID(t):
     t.type = reserved_keywords.get(t.value, 'ID')  # Check if it's a reserved keyword
     return t
 
+def t_FLOAT_LITERAL(t):
+    r'(\-)*[0-9]+\.[0-9]+'
+    try:
+        t.value = float(t.value)
+    except ValueError:
+        print("Invalid float value %d", t.value)
+        t.value = 0
+    return t
 
 def t_INTEGER_LITERAL(t):
     r'(\-)*[0-9]+(_[0-9]+)*'
@@ -73,15 +81,6 @@ def t_INTEGER_LITERAL(t):
         t.value = int(t.value.replace('_', ''))
     except ValueError:
         print("Invalid integer value: %d", t.value)
-        t.value = 0
-    return t
-
-def t_FLOAT_LITERAL(t):
-    r'(\-)*[0-9]+\.[0-9]+'
-    try:
-        t.value = float(t.value)
-    except ValueError:
-        print("Invalid float value %d", t.value)
         t.value = 0
     return t
 

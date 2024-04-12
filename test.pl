@@ -1,7 +1,10 @@
-val actual_min : [[[[int]]]] := [2,3,4,5];
+val num : int := 1_0;
 
-from dataclasse improt dataclass
-
-@dataclass
-class nomeDaclass(param):
-    parametros;
+function fibonacci(val n : int) : int {
+    if n <= 1 {
+        fibonacci := n;
+    } else {
+        fibonacci := fibonacci(n - 1);
+    }
+    fibonacci := fibonacci;
+}

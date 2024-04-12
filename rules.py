@@ -1,3 +1,6 @@
+from dataclasses import dataclass
+
+
 start = 'main_block_sequence'
 
 precedence = (
@@ -17,82 +20,148 @@ precedence = (
 # dictionary of names
 names = { }
 
+#ACEDER A UM ARRAY
+@dataclass
+class Expression():
+     pass
 
-#MAIN BODY OF THE PROGRAM
-# def p_start_block(t):
-#     """start_block : main_block start_block
-#                     | main_block """
-#     if len(t) == 2:
-#         t[0] = t[1]
-#     else:
-#         t[0] = ('START_BLOCK',t[1],t[2])
+@dataclass
+class BinaryOperators():
+    operator: str
+    left_operand: Expression
+    right_operand: Expression
+
+@dataclass
+class UnaryOperators():
+    operator: str
+    operand: Expression
+
+@dataclass
+class TypeClass():
+    type: str
+
+@dataclass
+class ArrayLiterals():
+    elements: list
+
+@dataclass
+class ArrayType():
+    type: str
+
+@dataclass
+class Declaration(): #FOR VARIABLE, CONSTANT OR FFI DECLARATION
+    declaration_type: str
+    id: str  
+    type_specifier: str
+    expression: Expression   
+
+@dataclass
+class FunctionDeclaration():
+    declaration_type: str
+    id: str
+    param_list: list
+    return_type: str
+    body: str
+
+@dataclass
+class FunctionParamList():
+    lista: list
+
+@dataclass
+class Parameter():
+    declaration_type: str
+    id: str  
+    type_specifier: str
+
+@dataclass
+class FunctionBody():
+    body: str
+
+@dataclass
+class BlockSequence():
+    block_seq: list
+
+@dataclass
+class WhileStatement():
+    condition: Expression
+    block_seq: list
+
+@dataclass
+class IfStatement():
+    condition: Expression
+    thenBlock: list
+    elseBlock: list
+
 
 def p_main_block_sequence(t):
 	"""main_block_sequence : main_block main_block_sequence
-	 | main_block"""
+	                        | main_block"""
 	if len(t) == 2:
 		t[0] = t[1]
 	else:
-		t[0] = ('MAIN_BLOCK_SEQUENCE',t[1],t[2])
+		t[0] = (t[1],t[2])
 
 def p_main_block(t):
 	"""main_block : constant_declaration
      | variable_declaration 
+     | var_const_update
 	 | function_declaration 
-	 |
+	 | 
 	"""
 	if len(t) > 1:
 		t[0] = t[1]
     
 #VAL DECLARATION
 def p_constant_declaration(t):
-    """constant_declaration : VAL ID COLON defaulttype ASSIGN expression SEMICOLON
-                            | VAL ID COLON arraytype ASSIGN expression SEMICOLON"""
-    t[0] = ('CONSTANT_DECLARATION', t[2], t[4], t[6])
+    """constant_declaration : VAL ID COLON types ASSIGN expression SEMICOLON"""
+    t[0] = Declaration(declaration_type=t[1], id= t[2], type_specifier= t[4], expression= t[6])
 
 #VAR DECLARATION
 def p_variable_declaration(t):
-    """variable_declaration : VAR ID COLON defaulttype ASSIGN expression SEMICOLON
-                            | VAR ID COLON arraytype ASSIGN expression SEMICOLON"""
-    t[0] = ('VARIABLE_DECLARATION', t[2], t[4], t[6])
+    """variable_declaration : VAR ID COLON types ASSIGN expression SEMICOLON"""
+    t[0] = Declaration(declaration_type=t[1], id= t[2], type_specifier= t[4], expression= t[6])
+
+#VAR CONST UPDATE
+def p_var_const_update(t):
+    """var_const_update :  ID ASSIGN expression SEMICOLON"""
+    t[0] = Declaration(declaration_type="update", id= t[1], type_specifier= None, expression= t[3])
 
 #FUNCTION DECLARATION
 def p_function_declaration(t):
     """function_declaration : FUNCTION ID LPAREN function_param_list RPAREN COLON types SEMICOLON
     |  FUNCTION ID LPAREN function_param_list RPAREN COLON types LBRACE function_body RBRACE"""
     if len(t) == 9:
-        t[0] = ('FUNCTION_DECLARATION', t[2], t[4], t[7])
+        t[0] = FunctionDeclaration(declaration_type="ffi", id= t[2], param_list= t[4], return_type= t[7], body="")
     else:
-        t[0] = ('FUNCTION_DECLARATION', t[2], t[4], t[7], t[9])
+        t[0] = FunctionDeclaration(declaration_type="function", id= t[2], param_list= t[4], return_type= t[7], body=t[9])
     
 
 def p_function_param_list(t):
     """function_param_list : parameter COMMA function_param_list
     | parameter"""
     if len(t) == 4:
-        t[0] = ("FUNCTION_PARAM_LIST", t[1], t[3])
+        t[0] = FunctionParamList(lista=[t[1], t[3]])
     else:
         t[0] = t[1]
 
 def p_parameter(t):
-    """ parameter : VAL ID COLON defaulttype
-                    | VAR ID COLON defaulttype
-                    | VAL ID COLON arraytype
-                    | VAR ID COLON arraytype"""
+    """ parameter : VAL ID COLON types
+                    | VAR ID COLON types"""
     if t[1] == 'var':
-        t[0] = ("VAR", t[2], t[4])
+        t[0] = Parameter(declaration_type=t[1], id= t[2], type_specifier = t[4])
     else:
-        t[0] = ("VAL", t[2], t[4])
+
+        t[0] = Parameter(declaration_type=t[1], id= t[2], type_specifier = t[4])
 
 #FUNCTION CALL
 def p_function_call(t):
-    """function_call : ID LPAREN function_param_list_call RPAREN SEMICOLON
+    """function_call : ID LPAREN function_param_list_call RPAREN 
     """
     t[0] = ('FUNCTION_CALL', t[1], t[3])
 
 def p_function_param_list_call(t):
-    """function_param_list_call : ID COMMA function_param_list_call
-    | ID"""
+    """function_param_list_call : expression COMMA function_param_list_call
+    | expression"""
     if len(t) == 4:
         t[0] = ("FUNCTION_PARAM_LIST_CALL", t[1], t[3])
     else:
@@ -101,7 +170,8 @@ def p_function_param_list_call(t):
 #TO GET THE FUNCTION BODY
 def p_function_body(t):
     """function_body : block_sequence"""
-    t[0] = ('FUNCTION_BODY', t[1])
+    t[0] = FunctionBody(body=t[1])
+    
 
 def p_block_sequence(t):
 	"""block_sequence : block block_sequence
@@ -109,31 +179,31 @@ def p_block_sequence(t):
 	if len(t) == 2:
 		t[0] = t[1]
 	else:
-		t[0] = ('BLOCK_SEQUENCE',t[1],t[2])
+		t[0] = BlockSequence(block_seq=[t[1],t[2]])
 
 def p_block(t):
 	"""block : constant_declaration
      | variable_declaration 
+     | var_const_update
 	 | if_block
 	 | while_block
-	 | function_call 
-	 |
+	 | function_call SEMICOLON
 	"""
 	if len(t) > 1:
 		t[0] = t[1]
 
 def p_if_block(t):
-	"""if_block : IF expression LBRACE block RBRACE LBRACE ELSE block RBRACE
-	| IF expression LBRACE block RBRACE 
+    """if_block : IF expression LBRACE block_sequence RBRACE ELSE LBRACE block_sequence RBRACE
+	| IF expression LBRACE block_sequence RBRACE 
 	"""
-	if len(t) == 6:
-		t[0] = ('if',t[2],t[4])
-	else:
-		t[0] = ('if',t[2],t[4],t[6])
+    if len(t) == 10:
+        t[0] = IfStatement(condition=t[2], thenBlock= t[4], elseBlock=t[8])
+    else:
+        t[0] = IfStatement(condition=t[2], thenBlock= t[4], elseBlock=None)
 	
 def p_while_block(t):
-	"""while_block : WHILE expression LBRACE block RBRACE"""
-	t[0] = ('WHILE',t[2],t[4])
+    """while_block : WHILE expression LBRACE block_sequence RBRACE"""
+    t[0] = WhileStatement(condition= t[2], block_seq=t[4])
 
 
 #FALTA OS ARRAYS E SE CALHAR INCLUIR O CHAR
@@ -152,12 +222,10 @@ def p_defaultype(t):
 
 def p_arraytype(t):
     """arraytype : LSQUARE arraytype RSQUARE
-            | INT_TYPE
-            | FLOAT_TYPE
-            | STRING_TYPE
-            | BOOL_TYPE"""
+            | defaulttype
+            """
     if len(t)>2:
-        t[0] = ('ARRAY', t[2])
+        t[0] = ArrayType(type= t[2])
     else:
         t[0] = t[1]
 
@@ -168,45 +236,18 @@ def p_typeliterals(t):
                   | BOOL_LITERAL"""
     t[0] = t[1]
 
+
 def p_arrayliterals(t):
-    """arrayliterals : LSQUARE int_array RSQUARE
-            | LSQUARE float_array RSQUARE
-            | LSQUARE string_array RSQUARE
-            | LSQUARE bool_array RSQUARE"""
-    t[0] = t[1]
+    """arrayliterals : LSQUARE array_values RSQUARE"""
+    t[0] = ArrayLiterals(elements=t[2])
 
-def p_int_array(t):
-    """int_array : INTEGER_LITERAL
-                | INTEGER_LITERAL COMMA int_array"""
-    if len(t) == 2:
-        t[0] = ('INT_ARRAY', t[1])
+def p_array_values(t):
+    """array_values : array_values COMMA expression
+                    | expression"""
+    if len(t) > 2:
+        t[0] = t[1] + [t[3]]
     else:
-        t[0] = ('INT_ARRAY', t[1], t[3])
-
-def p_float_array(t):
-    """float_array : FLOAT_LITERAL
-                | FLOAT_LITERAL COMMA float_array"""
-    if len(t) == 2:
-        t[0] = ('FLOAT_ARRAY', t[1])
-    else:
-        t[0] = ('FLOAT_ARRAY', t[1], t[3])
-
-def p_string_array(t):
-    """string_array : STRING_LITERAL
-                | STRING_LITERAL COMMA string_array"""
-    if len(t) == 2:
-        t[0] = ('STRING_ARRAY', t[1])
-    else:
-        t[0] = ('STRING_ARRAY', t[1], t[3])
-
-def p_bool_array(t):
-    """bool_array : BOOL_LITERAL
-                | BOOL_LITERAL COMMA bool_array"""
-    if len(t) == 2:
-        t[0] = ('BOOL_ARRAY', t[1])
-    else:
-        t[0] = ('BOOL_ARRAY', t[1], t[3])
-
+        t[0] = [t[1]]
 
 def p_expression(t):
     '''expression : expression PLUS expression
@@ -226,40 +267,41 @@ def p_expression(t):
                   | NOT expression
                   | typeliterals
                   | arrayliterals
+                  | function_call
                   | ID
                   | LPAREN expression RPAREN'''
     if len(t) == 2:
         t[0] = t[1]
     elif t[2] == '+':
-        t[0] = ('PLUS',t[1],t[3])
+        t[0]  = BinaryOperators(operator='+', left_operand=t[1], right_operand=t[3])
     elif t[2] == '-':
-        t[0] = ('MINUS',t[1],t[3])
+        t[0]  = BinaryOperators(operator='-', left_operand=t[1], right_operand=t[3])
     elif t[2] == '*':
-        t[0] = ('TIMES',t[1],t[3])
+        t[0]  = BinaryOperators(operator='*', left_operand=t[1], right_operand=t[3])
     elif t[2] == '/':
-        t[0] = ('DIV',t[1],t[3])
+        t[0]  = BinaryOperators(operator='/', left_operand=t[1], right_operand=t[3])
     elif t[2] == '%':
-        t[0] = ('MOD',t[1],t[3])
+        t[0]  = BinaryOperators(operator='%', left_operand=t[1], right_operand=t[3])
     elif t[2] == '^':
-        t[0] = ('POWER',t[1],t[3])
+        t[0]  = BinaryOperators(operator='^', left_operand=t[1], right_operand=t[3])
     elif t[2] == '=':
-        t[0] = ('EQUAL',t[1],t[3])
+        t[0]  = BinaryOperators(operator='=', left_operand=t[1], right_operand=t[3])
     elif t[2] == '!=':
-        t[0] = ('NOT_EQUAL',t[1],t[3])
+        t[0]  = BinaryOperators(operator='!=', left_operand=t[1], right_operand=t[3])
     elif t[2] == '>':
-        t[0] = ('GREATER_THAN',t[1],t[3])
+        t[0]  = BinaryOperators(operator='>', left_operand=t[1], right_operand=t[3])
     elif t[2] == '>=':
-        t[0] = ('GREATER_THAN_EQUAL',t[1],t[3])
+        t[0]  = BinaryOperators(operator='>=', left_operand=t[1], right_operand=t[3])
     elif t[2] == '<':
-        t[0] = ('LESS_THAN',t[1],t[3])
+        t[0]  = BinaryOperators(operator='<', left_operand=t[1], right_operand=t[3])
     elif t[2] == '<=':
-        t[0] = ('LESS_THAN_EQUAL',t[1],t[3])
+        t[0]  = BinaryOperators(operator='<=', left_operand=t[1], right_operand=t[3])
     elif t[2] == '&&':
-        t[0] = ('AND',t[1],t[3])
+        t[0]  = BinaryOperators(operator='&&', left_operand=t[1], right_operand=t[3])
     elif t[2] == '||':
-        t[0] = ('OR',t[1],t[3])
+        t[0]  = BinaryOperators(operator='||', left_operand=t[1], right_operand=t[3])
     elif t[1] == '!':
-        t[0] = ('NOT',t[1],t[3])
+        t[0]  = UnaryOperators(operator='!', operand=t[2])
 
 
 def p_error(p):
