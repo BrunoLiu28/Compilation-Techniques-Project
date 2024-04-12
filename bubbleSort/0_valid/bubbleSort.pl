@@ -1,10 +1,10 @@
-val unsorted : [double] := [5.5, 3.3, 8.8, 2.2, 1.1, 9.9];
+val unsorted : [float] := [5.5, 3.3, 8.8, 2.2, 1.1, 9.9];
 
-function double_array_length(val arr : [double]) : int;
+function float_array_length(val arr : [float]) : int;
 
-function bubble_sort(val arr : [double]) : [double] {
-    var sorted : [double] := arr; 
-    var n : int := double_array_length(sorted);
+function bubble_sort(val arr : [float]) : [float] {
+    var sorted : [float] := arr; 
+    var n : int := float_array_length(sorted);
     var swapped : bool := true;
 
     while swapped {
@@ -12,7 +12,7 @@ function bubble_sort(val arr : [double]) : [double] {
         var i : int := 0;
         while i < n - 1 {
             if sorted[i] > sorted[i + 1] {
-                var temp : double := sorted[i];
+                var temp : float := sorted[i];
                 sorted[i] := sorted[i + 1];
                 sorted[i + 1] := temp;
                 swapped := true;
@@ -22,20 +22,20 @@ function bubble_sort(val arr : [double]) : [double] {
         n := n - 1;
     }
 
-    bubble_sort = sorted;
+    bubble_sort := sorted;
 }
 
 function main(val args:[string]) {
-	val sorted : [double] := bubble_sort(unsorted);
-    var i : int := double_array_length(sorted) - 1;
+	val sorted : [float] := bubble_sort(unsorted);
+    var i : int := float_array_length(sorted) - 1;
     while i >= 0 {
-        print_double(sorted[i]);
+        print_float(sorted[i]);
         i := i - 1;
     }
 }
 
 # c implementation to get the size of the array
-int double_array_length(double arr[]) {
+int float_array_length(float arr[]) {
     int length = 0;
     while (!isnan(arr[length])) {
         length++;

@@ -22,7 +22,7 @@ function bubble_sort(val arr : [double]) : [double] {
         n := n - 1;
     }
 
-    bubble_sort = sorted;
+    bubble_sort := sorted;
 }
 
 function main(val args:[string]) {
