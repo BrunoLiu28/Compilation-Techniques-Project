@@ -6,6 +6,9 @@ from ply import yacc,lex
 from tokens import *
 from rules import *
 
+parser = yacc.yacc()
+
+
 def get_input(file=False):
 	if file:
 		f = open(file,"r")

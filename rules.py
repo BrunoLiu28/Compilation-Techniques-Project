@@ -45,6 +45,11 @@ class ArrayLiterals():
     elements: list
 
 @dataclass
+class ArrayAccess():
+    ID: str
+    index: str
+
+@dataclass
 class ArrayType():
     type: str
 
@@ -64,6 +69,10 @@ class FunctionDeclaration():
     body: str
 
 @dataclass
+class MainFunction():
+    body: str
+
+@dataclass
 class FunctionParamList():
     lista: list
 
@@ -75,7 +84,7 @@ class Parameter():
 
 @dataclass
 class FunctionBody():
-    body: str
+    body: list
 
 @dataclass
 class BlockSequence():
@@ -92,21 +101,31 @@ class IfStatement():
     thenBlock: list
     elseBlock: list
 
+@dataclass
+class Comment():
+    comment: str
+
 
 def p_main_block_sequence(t):
 	"""main_block_sequence : main_block main_block_sequence
 	                        | main_block"""
 	if len(t) == 2:
-		t[0] = t[1]
+		t[0] = [t[1]]
 	else:
-		t[0] = (t[1],t[2])
+		t[0] = [t[1]],t[2]
+
+def p_comment(t):
+    """comment : COMMENT STRING_LITERAL"""
+    t[0] = Comment(comment=t[2])
+
 
 def p_main_block(t):
 	"""main_block : constant_declaration
      | variable_declaration 
      | var_const_update
 	 | function_declaration 
-	 | 
+     | main_function
+     | comment
 	"""
 	if len(t) > 1:
 		t[0] = t[1]
@@ -123,7 +142,8 @@ def p_variable_declaration(t):
 
 #VAR CONST UPDATE
 def p_var_const_update(t):
-    """var_const_update :  ID ASSIGN expression SEMICOLON"""
+    """var_const_update :  ID ASSIGN expression SEMICOLON
+                        | arrayaccess ASSIGN expression SEMICOLON"""
     t[0] = Declaration(declaration_type="update", id= t[1], type_specifier= None, expression= t[3])
 
 #FUNCTION DECLARATION
@@ -131,10 +151,13 @@ def p_function_declaration(t):
     """function_declaration : FUNCTION ID LPAREN function_param_list RPAREN COLON types SEMICOLON
     |  FUNCTION ID LPAREN function_param_list RPAREN COLON types LBRACE function_body RBRACE"""
     if len(t) == 9:
-        t[0] = FunctionDeclaration(declaration_type="ffi", id= t[2], param_list= t[4], return_type= t[7], body="")
+        t[0] = FunctionDeclaration(declaration_type="ffi", id= t[2], param_list= t[4], return_type= t[7], body=None)
     else:
         t[0] = FunctionDeclaration(declaration_type="function", id= t[2], param_list= t[4], return_type= t[7], body=t[9])
     
+def p_main_function(t):
+    """main_function : FUNCTION MAIN LPAREN function_param_list RPAREN LBRACE function_body RBRACE"""
+    t[0] = MainFunction(body=t[7])
 
 def p_function_param_list(t):
     """function_param_list : parameter COMMA function_param_list
@@ -170,16 +193,16 @@ def p_function_param_list_call(t):
 #TO GET THE FUNCTION BODY
 def p_function_body(t):
     """function_body : block_sequence"""
-    t[0] = FunctionBody(body=t[1])
+    t[0] = FunctionBody(body=BlockSequence(block_seq=t[1]))
     
 
 def p_block_sequence(t):
 	"""block_sequence : block block_sequence
 	 | block"""
 	if len(t) == 2:
-		t[0] = t[1]
+		t[0] = [t[1]]
 	else:
-		t[0] = BlockSequence(block_seq=[t[1],t[2]])
+		t[0] = [t[1]] + t[2]
 
 def p_block(t):
 	"""block : constant_declaration
@@ -188,6 +211,7 @@ def p_block(t):
 	 | if_block
 	 | while_block
 	 | function_call SEMICOLON
+     | comment
 	"""
 	if len(t) > 1:
 		t[0] = t[1]
@@ -249,6 +273,20 @@ def p_array_values(t):
     else:
         t[0] = [t[1]]
 
+# def p_arrayaccess(t):
+#     """arrayaccess : LSQUARE arrayaccess RSQUARE
+#             | expression
+#             """
+#     if len(t)>2:
+#         t[0] = t[2]
+#     else:
+#         t[0] = t[1]
+        
+def p_arrayaccess(t):
+    '''arrayaccess : ID LSQUARE expression RSQUARE
+                    | function_call LSQUARE expression RSQUARE'''
+    t[0] = ArrayAccess(ID=t[1], index=t[3])
+
 def p_expression(t):
     '''expression : expression PLUS expression
                   | expression MINUS expression
@@ -265,8 +303,10 @@ def p_expression(t):
                   | expression AND expression
                   | expression OR expression
                   | NOT expression
+                  | MINUS expression
                   | typeliterals
                   | arrayliterals
+                  | arrayaccess
                   | function_call
                   | ID
                   | LPAREN expression RPAREN'''
@@ -302,6 +342,9 @@ def p_expression(t):
         t[0]  = BinaryOperators(operator='||', left_operand=t[1], right_operand=t[3])
     elif t[1] == '!':
         t[0]  = UnaryOperators(operator='!', operand=t[2])
+    elif t[1] == '-':
+        t[0]  = UnaryOperators(operator='-', operand=t[2])
+
 
 
 def p_error(p):

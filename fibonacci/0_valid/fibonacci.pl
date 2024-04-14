@@ -9,3 +9,7 @@ function fibonacci(val n : int) : int {
     fibonacci := fibonacci;
 }
 
+function main(val args:[string]) {
+	val result : int := fibonacci(num);
+	print_int(result);
+}

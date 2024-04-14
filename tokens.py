@@ -10,8 +10,9 @@ tokens = (
     'LPAREN','RPAREN','LBRACE','RBRACE','LSQUARE','RSQUARE',
     'SEMICOLON','COMMA','COLON', 
     #'DOT'
-    'IF','THEN','ELSE','WHILE',
-    'TRUE','FALSE'
+    'IF','ELSE','WHILE',
+    # 'TRUE','FALSE',
+    'MAIN'
 )
 
 # Reserved keywords
@@ -25,11 +26,11 @@ reserved_keywords = {
     'void': 'VOID_TYPE',
     'bool': 'BOOL_TYPE',
     'if': 'IF',
-    'then': 'THEN',
     'else': 'ELSE',
     'while': 'WHILE',
-    'true': 'TRUE',
-    'false': 'FALSE'
+    'true': 'BOOL_LITERAL',
+    'false': 'BOOL_LITERAL',
+    'main': 'MAIN'
 }
 
 # Tokens
@@ -67,7 +68,7 @@ def t_ID(t):
     return t
 
 def t_FLOAT_LITERAL(t):
-    r'(\-)*[0-9]+\.[0-9]+'
+    r'[0-9]*\.[0-9]+'
     try:
         t.value = float(t.value)
     except ValueError:
@@ -76,12 +77,21 @@ def t_FLOAT_LITERAL(t):
     return t
 
 def t_INTEGER_LITERAL(t):
-    r'(\-)*[0-9]+(_[0-9]+)*'
+    r'[0-9]+(_[0-9]+)*'
     try:
         t.value = int(t.value.replace('_', ''))
     except ValueError:
         print("Invalid integer value: %d", t.value)
         t.value = 0
+    return t
+
+def t_BOOL_LITERAL(t):
+    r'true|false'
+    try:
+        t.value = True if t.value == 'true' else False
+    except ValueError:
+        print("Invalid boolean value")
+        t.value = False  
     return t
 
 def t_STRING_LITERAL(t):
@@ -93,14 +103,6 @@ def t_STRING_LITERAL(t):
         t.value = ""
     return t
 
-def t_BOOL_LITERAL(t):
-    r'true|false'
-    try:
-        t.value = True if t.value == 'true' else False
-    except ValueError:
-        print("Invalid boolean value")
-        t.value = False  
-    return t
 
 # Ignored characters
 t_ignore = " \t"
