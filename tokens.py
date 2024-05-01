@@ -1,7 +1,7 @@
 tokens = (
     'COMMENT', 'VAL', 'VAR', 'FUNCTION', 'ID',
-    'INT_TYPE','FLOAT_TYPE','STRING_TYPE','VOID_TYPE', 'BOOL_TYPE',
-    'INTEGER_LITERAL','FLOAT_LITERAL','STRING_LITERAL', 'BOOL_LITERAL',
+    'INT_TYPE','FLOAT_TYPE','STRING_TYPE','VOID_TYPE', 'BOOL_TYPE', 'CHAR_TYPE',
+    'INTEGER_LITERAL','FLOAT_LITERAL','STRING_LITERAL', 'BOOL_LITERAL', 'CHAR_LITERAL',
     # 'ARRAY_TYPE',
     'AND','OR','EQUAL','NOT_EQUAL',
     'GREATER_THAN','GREATER_THAN_EQUAL','LESS_THAN_EQUAL','LESS_THAN',
@@ -9,7 +9,6 @@ tokens = (
     'ASSIGN','NOT',
     'LPAREN','RPAREN','LBRACE','RBRACE','LSQUARE','RSQUARE',
     'SEMICOLON','COMMA','COLON', 
-    #'DOT'
     'IF','ELSE','WHILE',
     # 'TRUE','FALSE',
     'MAIN'
@@ -23,6 +22,7 @@ reserved_keywords = {
     'int': 'INT_TYPE',
     'float': 'FLOAT_TYPE',
     'string': 'STRING_TYPE',
+    'char': 'CHAR_TYPE',
     'void': 'VOID_TYPE',
     'bool': 'BOOL_TYPE',
     'if': 'IF',
@@ -103,7 +103,9 @@ def t_STRING_LITERAL(t):
         t.value = ""
     return t
 
-
+def t_CHAR_LITERAL(t):
+	r"(\'([^\\\'])\')|(\"([^\\\"])\")"
+	return t
 # Ignored characters
 t_ignore = " \t"
 

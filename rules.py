@@ -1,15 +1,13 @@
 from dataclasses import dataclass
 
 
-start = 'main_block_sequence'
+start = 'program'
 
 precedence = (
     ('left', 'OR'),
     ('left', 'AND'),
-    # ('nonassoc', 'EQUAL', 'NOT_EQUAL'),
-    # ('nonassoc', 'GREATER_THAN', 'GREATER_THAN_EQUAL', 'LESS_THAN', 'LESS_THAN_EQUAL'),
-    ('left', 'EQUAL', 'NOT_EQUAL'),
-    ('left', 'GREATER_THAN', 'GREATER_THAN_EQUAL', 'LESS_THAN', 'LESS_THAN_EQUAL'),
+    ('nonassoc', 'EQUAL', 'NOT_EQUAL'),
+    ('nonassoc', 'GREATER_THAN', 'GREATER_THAN_EQUAL', 'LESS_THAN', 'LESS_THAN_EQUAL'),
     ('left', 'PLUS', 'MINUS'),
     ('left', 'TIMES', 'DIVIDE', 'MOD'),
     ('right', 'POWER'),
@@ -66,11 +64,11 @@ class FunctionDeclaration():
     id: str
     param_list: list
     return_type: str
-    body: str
+    body: list
 
 @dataclass
 class MainFunction():
-    body: str
+    body: list
 
 @dataclass
 class FunctionParamList():
@@ -82,14 +80,12 @@ class Parameter():
     id: str  
     type_specifier: str
 
-@dataclass
-class FunctionBody():
-    body: list
 
 @dataclass
-class BlockSequence():
-    block_seq: list
-
+class FunctionCall():
+    id: str 
+    param_list: list
+    
 @dataclass
 class WhileStatement():
     condition: Expression
@@ -105,14 +101,22 @@ class IfStatement():
 class Comment():
     comment: str
 
+@dataclass
+class Program():
+    main_block_sequence: list
+
+def p_program(t):
+    """program : main_block_sequence """
+    if len(t) == 2:
+        t[0] = Program(main_block_sequence=t[1])
 
 def p_main_block_sequence(t):
 	"""main_block_sequence : main_block main_block_sequence
 	                        | main_block"""
 	if len(t) == 2:
-		t[0] = [t[1]]
+		t[0] = t[1]
 	else:
-		t[0] = [t[1]],t[2]
+		t[0] = t[1] + t[2]
 
 def p_comment(t):
     """comment : COMMENT STRING_LITERAL"""
@@ -128,7 +132,7 @@ def p_main_block(t):
      | comment
 	"""
 	if len(t) > 1:
-		t[0] = t[1]
+		t[0] = [t[1]]
     
 #VAL DECLARATION
 def p_constant_declaration(t):
@@ -179,21 +183,29 @@ def p_parameter(t):
 #FUNCTION CALL
 def p_function_call(t):
     """function_call : ID LPAREN function_param_list_call RPAREN 
+                     | ID LPAREN RPAREN 
     """
-    t[0] = ('FUNCTION_CALL', t[1], t[3])
+    if len(t) == 5:
+        t[0] = FunctionCall(id = t[1], param_list = t[3]) 
+    else:
+        t[0] = FunctionCall(id = t[1], param_list = None)
+
 
 def p_function_param_list_call(t):
     """function_param_list_call : expression COMMA function_param_list_call
     | expression"""
     if len(t) == 4:
-        t[0] = ("FUNCTION_PARAM_LIST_CALL", t[1], t[3])
+        if isinstance(t[3], list):
+            t[0] = [t[1]] + t[3]
+        else:
+            t[0] = [t[1], t[3]]
     else:
-        t[0] = t[1]
+        t[0] = [t[1]]
 
 #TO GET THE FUNCTION BODY
 def p_function_body(t):
     """function_body : block_sequence"""
-    t[0] = FunctionBody(body=BlockSequence(block_seq=t[1]))
+    t[0] = t[1]
     
 
 def p_block_sequence(t):
@@ -234,14 +246,18 @@ def p_while_block(t):
 def p_types(t):
     """types : defaulttype
             | LSQUARE arraytype RSQUARE"""
-    t[0] = t[1]
+    if len(t) == 2:
+        t[0] = t[1]
+    else:
+        t[0] = t[1] + t[2] + t[3]
 
 def p_defaultype(t):
     """defaulttype : INT_TYPE
             | FLOAT_TYPE
             | STRING_TYPE
             | BOOL_TYPE
-            | VOID_TYPE"""
+            | VOID_TYPE
+            | CHAR_TYPE"""
     t[0] = t[1]
 
 def p_arraytype(t):
@@ -262,31 +278,10 @@ def p_typeliterals(t):
     """typeliterals : INTEGER_LITERAL
                   | FLOAT_LITERAL
                   | STRING_LITERAL
-                  | BOOL_LITERAL"""
+                  | BOOL_LITERAL
+                  | CHAR_LITERAL"""
     t[0] = t[1]
 
-
-# def p_arrayliterals(t):
-#     """arrayliterals : LSQUARE array_values RSQUARE"""
-#     t[0] = ArrayLiterals(elements=t[2])
-
-# def p_array_values(t):
-#     """array_values : array_values COMMA expression
-#                     | expression"""
-#     if len(t) > 2:
-#         t[0] = t[1] + [t[3]]
-#     else:
-#         t[0] = [t[1]]
-
-# def p_arrayaccess(t):
-#     """arrayaccess : LSQUARE arrayaccess RSQUARE
-#             | expression
-#             """
-#     if len(t)>2:
-#         t[0] = t[2]
-#     else:
-#         t[0] = t[1]
-        
 def p_arrayaccess(t):
     '''arrayaccess : ID LSQUARE expression RSQUARE
                     | function_call LSQUARE expression RSQUARE'''
@@ -315,7 +310,6 @@ def p_expression(t):
                   | ID
                   | LPAREN expression RPAREN'''
     
-                    #   | arrayliterals
     if len(t) == 2:
         t[0] = t[1]
     elif t[2] == '+':
