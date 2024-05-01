@@ -1,8 +1,8 @@
-function main(val args:[string]) {
-	val sorted : [float] := bubble_sort(unsorted,1,teste);
-    var i : int := float_array_length(sorted) - 1;
-    while i >= 0 {
-        print_float(sorted[i]);
-        i := i - 1;
-    }
-}
+var a : [float] := arr; 
+var b : int := float_array_length(sorted);
+var c : bool := true;
+var d : int := arr; 
+var e : string := true;
+var f : char := arr; 
+var g : float := true;
+var g : string := true;
