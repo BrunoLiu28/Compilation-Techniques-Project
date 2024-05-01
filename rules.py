@@ -233,7 +233,7 @@ def p_while_block(t):
 #FALTA OS ARRAYS E SE CALHAR INCLUIR O CHAR
 def p_types(t):
     """types : defaulttype
-            | arraytype"""
+            | LSQUARE arraytype RSQUARE"""
     t[0] = t[1]
 
 def p_defaultype(t):
@@ -246,12 +246,17 @@ def p_defaultype(t):
 
 def p_arraytype(t):
     """arraytype : LSQUARE arraytype RSQUARE
-            | defaulttype
+            | INT_TYPE
+            | FLOAT_TYPE
+            | STRING_TYPE
+            | BOOL_TYPE
+            | VOID_TYPE
             """
     if len(t)>2:
         t[0] = ArrayType(type= t[2])
     else:
         t[0] = t[1]
+        
 
 def p_typeliterals(t):
     """typeliterals : INTEGER_LITERAL
@@ -261,17 +266,17 @@ def p_typeliterals(t):
     t[0] = t[1]
 
 
-def p_arrayliterals(t):
-    """arrayliterals : LSQUARE array_values RSQUARE"""
-    t[0] = ArrayLiterals(elements=t[2])
+# def p_arrayliterals(t):
+#     """arrayliterals : LSQUARE array_values RSQUARE"""
+#     t[0] = ArrayLiterals(elements=t[2])
 
-def p_array_values(t):
-    """array_values : array_values COMMA expression
-                    | expression"""
-    if len(t) > 2:
-        t[0] = t[1] + [t[3]]
-    else:
-        t[0] = [t[1]]
+# def p_array_values(t):
+#     """array_values : array_values COMMA expression
+#                     | expression"""
+#     if len(t) > 2:
+#         t[0] = t[1] + [t[3]]
+#     else:
+#         t[0] = [t[1]]
 
 # def p_arrayaccess(t):
 #     """arrayaccess : LSQUARE arrayaccess RSQUARE
@@ -305,11 +310,12 @@ def p_expression(t):
                   | NOT expression
                   | MINUS expression
                   | typeliterals
-                  | arrayliterals
                   | arrayaccess
                   | function_call
                   | ID
                   | LPAREN expression RPAREN'''
+    
+                    #   | arrayliterals
     if len(t) == 2:
         t[0] = t[1]
     elif t[2] == '+':

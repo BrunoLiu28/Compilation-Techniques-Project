@@ -1,4 +1,6 @@
-val unsorted : [float] := [5.5, 3.3, 8.8, 2.2, 1.1, 9.9];
+# val unsorted : [float] := [5.5, 3.3, 8.8, 2.2, 1.1, 9.9];
+
+val unsorted : [float] := getArrayRandomFloats();
 
 function float_array_length(val arr : [float]) : int;
 
@@ -35,11 +37,11 @@ function main(val args:[string]) {
 }
 
 # c implementation to get the size of the array
-int float_array_length(float arr[]) {
-    int length = 0;
-    while (!isnan(arr[length])) {
-        length++;
-    }
-    return length;
-}
+# int float_array_length(float arr[]) {
+#     int length = 0;
+#     while (!isnan(arr[length])) {
+#         length++;
+#     }
+#     return length;
+# }
 
