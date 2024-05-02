@@ -43,9 +43,9 @@ def verify(varCtx: Context, funcCtx: Context, node):
     #     pass
     elif isinstance(node, FunctionDeclaration):
         name = node.id
-        name = node.id
+        type = node.declaration_type
         if funcCtx.has_var(name):
-            raise TypeError("Variable %s already declared" % name)
+            raise TypeError("function %s already declared" % name)
         funcCtx.set_var(name, node.type_specifier)
         for expr in node.body:
             verify(varCtx, funcCtx, expr)
