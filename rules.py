@@ -167,9 +167,12 @@ def p_function_param_list(t):
     """function_param_list : parameter COMMA function_param_list
     | parameter"""
     if len(t) == 4:
-        t[0] = FunctionParamList(lista=[t[1], t[3]])
+        if isinstance(t[3], list):
+            t[0] = [t[1]] + t[3]
+        else:
+            t[0] = [t[1], t[3]]
     else:
-        t[0] = t[1]
+        t[0] = [t[1]]
 
 def p_parameter(t):
     """ parameter : VAL ID COLON types
