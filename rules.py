@@ -105,6 +105,10 @@ class Comment():
 class Program():
     main_block_sequence: list
 
+@dataclass
+class Identifier():
+    id: str
+
 def p_program(t):
     """program : main_block_sequence """
     if len(t) == 2:
@@ -290,6 +294,10 @@ def p_arrayaccess(t):
                     | function_call LSQUARE expression RSQUARE'''
     t[0] = ArrayAccess(ID=t[1], index=t[3])
 
+def p_identifier(t):
+    '''expression : ID '''
+    t[0] = Identifier(id=t[1])
+
 def p_expression(t):
     '''expression : expression PLUS expression
                   | expression MINUS expression
@@ -310,7 +318,6 @@ def p_expression(t):
                   | typeliterals
                   | arrayaccess
                   | function_call
-                  | ID
                   | LPAREN expression RPAREN'''
     
     if len(t) == 2:

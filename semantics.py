@@ -14,10 +14,10 @@ class Any(object):
 
 class Context(object):
 	def __init__(self,name=None):
-		self.variables = {}
-		self.var_count = {}
-		self.name = name
+		self.variables = [{}]
+		self.functions = {}
 	
+
 	def has_var(self,name):
 		return name in self.variables
 	
@@ -25,7 +25,7 @@ class Context(object):
 		return self.variables[name]
 	
 	def set_var(self,name,typ):
-		self.variables[name] = typ
+		self.variables[-1][name] = (typ,)
 		self.var_count[name] = 0
 
 contexts = []
