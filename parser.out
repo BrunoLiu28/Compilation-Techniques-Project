@@ -2180,6 +2180,9 @@ state 75
     SEMICOLON       reduce using rule 76 (expression -> MINUS expression .)
     PLUS            reduce using rule 76 (expression -> MINUS expression .)
     MINUS           reduce using rule 76 (expression -> MINUS expression .)
+    TIMES           reduce using rule 76 (expression -> MINUS expression .)
+    DIVIDE          reduce using rule 76 (expression -> MINUS expression .)
+    MOD             reduce using rule 76 (expression -> MINUS expression .)
     EQUAL           reduce using rule 76 (expression -> MINUS expression .)
     NOT_EQUAL       reduce using rule 76 (expression -> MINUS expression .)
     GREATER_THAN    reduce using rule 76 (expression -> MINUS expression .)
@@ -2192,17 +2195,14 @@ state 75
     COMMA           reduce using rule 76 (expression -> MINUS expression .)
     RPAREN          reduce using rule 76 (expression -> MINUS expression .)
     LBRACE          reduce using rule 76 (expression -> MINUS expression .)
-    TIMES           shift and go to state 63
-    DIVIDE          shift and go to state 64
-    MOD             shift and go to state 65
     POWER           shift and go to state 66
 
-  ! TIMES           [ reduce using rule 76 (expression -> MINUS expression .) ]
-  ! DIVIDE          [ reduce using rule 76 (expression -> MINUS expression .) ]
-  ! MOD             [ reduce using rule 76 (expression -> MINUS expression .) ]
   ! POWER           [ reduce using rule 76 (expression -> MINUS expression .) ]
   ! PLUS            [ shift and go to state 61 ]
   ! MINUS           [ shift and go to state 62 ]
+  ! TIMES           [ shift and go to state 63 ]
+  ! DIVIDE          [ shift and go to state 64 ]
+  ! MOD             [ shift and go to state 65 ]
   ! EQUAL           [ shift and go to state 67 ]
   ! NOT_EQUAL       [ shift and go to state 68 ]
   ! GREATER_THAN    [ shift and go to state 69 ]

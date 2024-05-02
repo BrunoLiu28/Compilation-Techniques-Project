@@ -4,12 +4,15 @@ from dataclasses import dataclass
 start = 'program'
 
 precedence = (
+    ('left', 'COMMA'),
+    ('right', 'ASSIGN'),
     ('left', 'OR'),
     ('left', 'AND'),
     ('nonassoc', 'EQUAL', 'NOT_EQUAL'),
     ('nonassoc', 'GREATER_THAN', 'GREATER_THAN_EQUAL', 'LESS_THAN', 'LESS_THAN_EQUAL'),
     ('left', 'PLUS', 'MINUS'),
     ('left', 'TIMES', 'DIVIDE', 'MOD'),
+    ('right', 'UMINUS'),
     ('right', 'POWER'),
     ('right', 'NOT'),
     ('left', 'LPAREN', 'RPAREN'),  # Parentheses
@@ -314,7 +317,7 @@ def p_expression(t):
                   | expression AND expression
                   | expression OR expression
                   | NOT expression
-                  | MINUS expression
+                  | MINUS expression %prec UMINUS
                   | typeliterals
                   | arrayaccess
                   | function_call
@@ -353,7 +356,7 @@ def p_expression(t):
     elif t[1] == '!':
         t[0]  = UnaryOperators(operator='!', operand=t[2])
     elif t[1] == '-':
-        t[0]  = UnaryOperators(operator='-', operand=t[2])
+        t[0]  = -t[2]
 
 
 

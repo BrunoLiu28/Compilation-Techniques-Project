@@ -60,7 +60,6 @@ t_RSQUARE = r'\]'
 t_SEMICOLON = r';'
 t_COMMA = r','
 t_COLON = r':'
-# t_DOT = r'\.'
 
 def t_ID(t):
     r'[a-zA-Z_][a-zA-Z0-9_]*'

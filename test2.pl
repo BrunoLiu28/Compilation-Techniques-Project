@@ -4,5 +4,5 @@ var c : bool := true;
 var d : int := arr; 
 var e : string := true;
 var f : char := arr; 
-var g : float := true;
-var g : string := true;
+var g : float := 'd';
+var g : string := "sda";
