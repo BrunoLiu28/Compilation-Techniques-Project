@@ -222,6 +222,7 @@ def check(node):
 				
 			if op in ['=','<=','>=','>','<','<>']:
 				return 'boolean'
+                
 			else:
 				return vt1	
 			
