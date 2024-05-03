@@ -3,6 +3,7 @@ from subprocess import Popen, PIPE
 
 from ply import yacc,lex
 
+from semantic import Context, verify
 from tokens import *
 from rules import *
 
@@ -34,6 +35,9 @@ def main(options={},filename=False):
 	data = get_input(input_filename) 
 	ast =  yacc.parse(data,lexer = lex.lex(nowarn=1)) 
 	print(ast)
+	print("----------------------------------------------------------------------------------------------------")
+	verify(Context(),  ast)
+	print("OK!")
 	
 if __name__ == '__main__':
 	main()

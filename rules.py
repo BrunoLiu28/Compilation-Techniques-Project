@@ -18,8 +18,6 @@ precedence = (
     ('left', 'LPAREN', 'RPAREN'),  # Parentheses
 )
 
-# dictionary of names
-names = { }
 
 #ACEDER A UM ARRAY
 @dataclass
@@ -55,7 +53,7 @@ class ArrayType():
     type: str
 
 @dataclass
-class Declaration(): #FOR VARIABLE, CONSTANT OR FFI DECLARATION
+class Declaration(): 
     declaration_type: str
     id: str  
     type_specifier: str
@@ -111,6 +109,11 @@ class Program():
 @dataclass
 class Identifier():
     id: str
+
+@dataclass
+class Literal():
+    type: str
+    value: str
 
 def p_program(t):
     """program : main_block_sequence """
@@ -284,13 +287,6 @@ def p_arraytype(t):
         t[0] = t[1]
         
 
-def p_typeliterals(t):
-    """typeliterals : INTEGER_LITERAL
-                  | FLOAT_LITERAL
-                  | STRING_LITERAL
-                  | BOOL_LITERAL
-                  | CHAR_LITERAL"""
-    t[0] = t[1]
 
 def p_arrayaccess(t):
     '''arrayaccess : ID LSQUARE expression RSQUARE
@@ -300,6 +296,33 @@ def p_arrayaccess(t):
 def p_identifier(t):
     '''expression : ID '''
     t[0] = Identifier(id=t[1])
+
+# def p_typeliterals(t):
+#     """expression : INTEGER_LITERAL
+#                   | FLOAT_LITERAL
+#                   | STRING_LITERAL
+#                   | BOOL_LITERAL
+#                   | CHAR_LITERAL"""
+#     t[0] = t[1]
+def p_integer_literal(t):
+    """expression : INTEGER_LITERAL"""
+    t[0] = Literal(type='int', value=t[1])
+    
+def p_float_literal(t):
+    """expression : FLOAT_LITERAL"""
+    t[0] = Literal(type='float', value=t[1])
+
+def p_string_literal(t):
+    """expression : STRING_LITERAL"""
+    t[0] = Literal(type='string', value=t[1])
+
+def p_bool_literal(t):
+    """expression : BOOL_LITERAL"""
+    t[0] = Literal(type='bool', value=t[1])
+
+def p_char_literal(t):
+    """expression : CHAR_LITERAL"""
+    t[0] = Literal(type='char', value=t[1])
 
 def p_expression(t):
     '''expression : expression PLUS expression
@@ -318,7 +341,6 @@ def p_expression(t):
                   | expression OR expression
                   | NOT expression
                   | MINUS expression %prec UMINUS
-                  | typeliterals
                   | arrayaccess
                   | function_call
                   | LPAREN expression RPAREN'''

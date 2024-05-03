@@ -1,12 +1,6 @@
-from inspect import Parameter
-from rules import ArrayAccess, BinaryOperators, Declaration, FunctionCall, FunctionDeclaration, Identifier, IfStatement, MainFunction, Program, UnaryOperators, WhileStatement
+from rules import ArrayAccess, BinaryOperators, Declaration, FunctionCall, FunctionDeclaration, Identifier, IfStatement, Literal, MainFunction, Parameter, Program, UnaryOperators, WhileStatement
 
-ast = Program(main_block_sequence=[Declaration(declaration_type='var', id='a', type_specifier='[float]', expression='arr'), Declaration(declaration_type='var', id='b', type_specifier='int', expression=FunctionCall(id='float_array_length', param_list=['sorted'])), Declaration(declaration_type='var', id='c', type_specifier='bool', expression='true'), Declaration(declaration_type='var', id='d', type_specifier='int', expression='arr'), Declaration(declaration_type='var', id='e', type_specifier='string', expression='true'), Declaration(declaration_type='var', id='f', type_specifier='char', expression='arr'), Declaration(declaration_type='var', id='g', type_specifier='float', expression='true'), Declaration(declaration_type='var', id='g', type_specifier='string', expression='true')])
-# ast1 = Program(main_block_sequence=[Declaration(declaration_type='val', id='unsorted', type_specifier='[float]', expression=FunctionCall(id='getArrayRandomFloats', param_list=None)), FunctionDeclaration(declaration_type='ffi', id='float_array_length', param_list=[Parameter(declaration_type='val', id='arr', type_specifier='[float]'), Parameter(declaration_type='val', id='args', type_specifier='[string]')], return_type='int', body=None), FunctionDeclaration(declaration_type='function', id='bubble_sort', param_list=[Parameter(declaration_type='val', id='arr', type_specifier='[float]'), Parameter(declaration_type='val', id='args', type_specifier='[string]')], return_type='[float]', body=[Declaration(declaration_type='var', id='i', type_specifier='int', expression=0)])])
-ast2= Program(main_block_sequence=[Declaration(declaration_type='var', id='c', type_specifier='bool', expression='true'), Declaration(declaration_type='var', id='d', type_specifier='int', expression=Identifier(id='arr')), Declaration(declaration_type='var', id='e', type_specifier='string', expression='true'), Declaration(declaration_type='var', id='f', type_specifier='char', expression=Identifier(id='arr')), Declaration(declaration_type='var', id='g', type_specifier='float', expression='true'), Declaration(declaration_type='var', id='g', type_specifier='string', expression='true')])
-ast3 = Program(main_block_sequence=[Declaration(declaration_type='var', id='c', type_specifier='bool', expression='true')])
-
-types = ['integer','float','char','string','boolean','void']
+ast = Program(main_block_sequence=[FunctionDeclaration(declaration_type='function', id='maxRangeSquared', param_list=[Parameter(declaration_type='var', id='mi', type_specifier='float'), Parameter(declaration_type='val', id='ma', type_specifier='int')], return_type='int', body=[Declaration(declaration_type='var', id='current_max', type_specifier='int', expression=BinaryOperators(operator='^', left_operand=Identifier(id='mi'), right_operand=Literal(type='integer', value=2)))])])
 
 class TypeError(Exception):
 	pass
@@ -17,22 +11,24 @@ class Context(object):
         self.functions = {}
 
     def has_var(self,id):
+        print(self.variables)
         return id in self.variables
     
     def get_var(self,id):
         return self.variables[id]
     
     def add_func(self, id, returnType, params):
-        self.variables[id] = (returnType, params)
+        self.functions[id] = (returnType, params)
 
     def add_var(self, id, typ, varOrVal):
         self.variables[id] = (typ, varOrVal)
 
     def get_varOrVal(self, name):
-        return self.varOrVal[name][1]
+        return self.variables[name][1]
     
     def get_varValType(self, name):
-        return self.varOrVal[name][0]
+        print(self.variables)
+        return self.variables[name] [0]
 
     def get_func(self, name):
         return self.functions[name]
@@ -53,20 +49,25 @@ def verify(ctx: Context, node):
     elif isinstance(node, Declaration):
         name = node.id
         if node.declaration_type == "update":
+            print(name, ctx.has_var(name))
             if not ctx.has_var(name):
-                  raise TypeError("Variable %s doesnt exist impossible to update" % name)
+                  raise TypeError(f"Variable {name} doesnt exist impossible to update")
             #variavel existe, verificar se é var ou val
             if ctx.get_varOrVal(name) == "val":
-                raise TypeError("Variable %s is a val, impossible to update" % name)
+                raise TypeError(f"Variable {name} is a val, impossible to update")
             expr = node.expression
-            if verify(ctx, expr) != ctx.get_varValType[name]:
-                raise TypeError("Variable %s is of type %s and not %s" % (name, ctx.get_var[name], verify(ctx, expr)))
+            if verify(ctx, expr) != ctx.get_varValType(name):
+                raise TypeError(f"Variable {name} is of type {ctx.get_var(name)} and not {verify(ctx, expr)}")
         
-        if ctx.has_var(name):
-            raise TypeError("Variable %s already declared" % name)
-        
-        ctx.add_var(name, node.type_specifier, node.declaration_type)
+        elif ctx.has_var(name):
+            raise TypeError(f"Variable {name} already declared")
+        elif node.type_specifier != verify(ctx, node.expression):
+            raise TypeError(f"Variable {name} is of type {node.type_specifier} and not {verify(ctx, node.expression)}")
+        else:
+            ctx.add_var(name, node.type_specifier, node.declaration_type)
     elif isinstance(node, Identifier):
+        if not ctx.has_var(node.id):
+            raise TypeError(f"Variable {node.id} is not declared")
         return ctx.get_varValType(node.id)
     elif isinstance(node, ArrayAccess):	
         pass
@@ -74,20 +75,24 @@ def verify(ctx: Context, node):
         name = node.id
         type = node.return_type
         if ctx.has_func(name):
-            raise TypeError("function %s already declared" % name)
-        ctx.add_func(name, node.type_specifier)
+            raise TypeError(f"function {name} already declared")
+        ctx.add_func(name, node.return_type, node.param_list)
         for param in node.param_list:
-            print(param)
-            ctx.set_var(param.id , param.type_specifier)
+            verify(ctx, param)
+            # ctx.add_var(param.id , param.type_specifier, param.declaration_type)
+
+        if node.return_type != "void":
+            ctx.add_var(name, node.return_type, "var")
 
         for expr in node.body:
+            print(expr)
             verify(ctx, expr)
     elif isinstance(node, MainFunction):	
             pass
     elif isinstance(node, FunctionCall):
         name = node.id
         if not ctx.has_func(name):
-             raise TypeError("Function %s is not defined" % name)
+             raise TypeError(f"Function {name} is not defined")
         
         if len(node.param_list) > 1:
             args = (node.param_list[1])    
@@ -96,79 +101,88 @@ def verify(ctx: Context, node):
 
         rettype, vargs = ctx.ge[name]
         if len(args) != len(vargs):
-            raise TypeError("Function %s is expecting %d parameters and got %d" % (name, len(vargs), len(args)))
+            raise TypeError(f"Function {name} is expecting {len(vargs)} parameters and got {len(args)}")
         else:
             for i in range(len(vargs)):
                 #OBTER O ARGS E O SEU TIPO NO CONTEXTO E VERIFICAR O TIPO NO ARGS COM O TIPO DA FUNCAO
                 if vargs[i][1] != args[i].type:
-                    raise TypeError("Parameter #%d passed to function %s should be of type %s and not %s" % (i+1, name, vargs[i][1], args[i]))
+                    raise TypeError(f"Parameter {i+1} passed to function {name} should be of type {vargs[i][1]} and not {args[i]}")
 
         return rettype
 
     elif isinstance(node, BinaryOperators):	
         op = node.operator
-        vt1 = verify(node.left_operand)
-        vt2 = verify(node.right_operand)
-        if vt1 != vt2:
-            raise TypeError("Arguments of operation '%s' must be of the same type. Got %s and %s." % (op,vt1,vt2))
+        vt1 = verify(ctx, node.left_operand)
+        # print(vt1)
+        vt2 = verify(ctx, node.right_operand)
+        # print(vt2)
+        # if vt1 != vt2:
+        #     raise TypeError(f"Arguments of operation '{op}' must be of the same type. Got {vt1} and {vt2}.")
         if op in ['%','/', '*', '+', '-']:
-            if vt1 == 'integer' and not vt2 == 'integer':
-                raise TypeError("Operation %s requires both to be integers." % op)
+            if vt1 == 'int' and not vt2 == 'int':
+                raise TypeError(f"Operation {op} requires both to be integers.")
             if vt1 == 'float' and not vt2 == 'float':
-                raise TypeError("Operation %s requires both to be floats." % op)
+                raise TypeError(f"Operation {op} requires both to be floats.")
             return vt1
         if op == '^':
-            if vt1 == 'integer' and not vt2 == 'integer':
-                raise TypeError("Operation %s requires both to be integers." % op)
-            if vt1 == 'float' and not vt2 == 'integer':
-                raise TypeError( "Operation %s requires both to be floats." % op)
+            if vt1 == 'int' and not vt2 == 'int':
+                raise TypeError(f"Operation {op} requires both to be integers.")
+            if vt1 == 'float' and not vt2 == 'int':
+                raise TypeError(f"Operation {op} requires both to be floats.")
             return vt1
         if op == '=':
             if vt1 != vt2:
-                raise TypeError( "Operation %s requires both type to be the same." % op)
-            return 'boolean'
+                raise TypeError(f"Operation {op} requires both type to be the same.")
+            return 'bool'
         if op in ['<=','>=','>','<']:
-            if vt1 == 'integer' and not vt2 == 'integer':
-                raise TypeError("Operation %s requires both to be integers." % op)
+            if vt1 == 'int' and not vt2 == 'int':
+                raise TypeError(f"Operation {op} requires both to be integers.")
             if vt1 == 'float' and not vt2 == 'float':
-                raise TypeError("Operation %s requires both to be floats." % op)
-            return 'boolean'
+                raise TypeError(f"Operation {op} requires both to be floats.")
+            return 'bool'
         if op in ['&&','||']:
-            if verify(vt1) != "boolean":
-                raise TypeError("%s requires a boolean. Got %s instead." % (op, verify(vt1)))
-            if verify(vt2) != "boolean":
-                raise TypeError("%s requires a boolean. Got %s instead." % (op, verify(vt1)))
+            if verify(ctx ,vt1) != "bool":
+                raise TypeError(f"{op} requires a boolean. Got {verify(vt1)} instead.")
+            if verify(ctx ,vt2) != "bool":
+                raise TypeError(f"{op} requires a boolean. Got {verify(vt1)} instead.")
     elif isinstance(node, UnaryOperators):
         op = node.operator
-        vt = verify(node.operand)
+        vt = verify(ctx ,node.operand)
         if op == '!':
-            if vt != 'boolean':
-                raise TypeError("Operation %s requires a boolean. Got %s instead." % (op, vt))
-            return 'boolean'
+            if vt != 'bool':
+                raise TypeError(f"Operation {op} requires a boolean. Got {vt} instead.")
+            return 'bool'
         if op == '-':
-            if vt == 'integer':
-                return 'integer'
+            if vt == 'int':
+                return 'int'
             if vt == 'float':
                 return 'float'
-            raise TypeError("Operation %s requires an integer or float. Got %s instead." % (op, vt))
+            raise TypeError(f"Operation {op} requires an integer or float. Got {vt} instead.")
     elif isinstance(node, IfStatement):
         condition = node.condition
-        if verify(condition) != 'boolean':
-            raise TypeError("If condition requires a boolean. Got %s instead." % (verify(condition)))
+        if verify(ctx ,condition) != 'bool':
+            raise TypeError(f"If condition requires a boolean. Got {verify(condition)} instead.")
         for a in node.thenBlock:
-            verify(a)
+            verify(ctx ,a)
         for a in node.elseBlock:
-            verify(a)
+            verify(ctx ,a)
     
     elif isinstance(node, WhileStatement):	
         condition = node.condition
-        if verify(condition) != 'boolean':
-            raise TypeError("WHILE condition requires a boolean. Got %s instead." % (verify(condition)))
+        if verify(ctx ,condition) != 'bool':
+            raise TypeError(f"WHILE condition requires a boolean. Got {verify(condition)} instead.")
         for a in node.block_seq:
-            verify(a)
+            verify(ctx ,a)
+    elif isinstance(node, Parameter):	
+        print("ENTROU NO PARAMETER")
+        print(node)
+        ctx.add_var(node.id, node.type_specifier, node.declaration_type)
+    elif isinstance(node, Literal):
+        print("ENTROU NO LITERAL")
+        return node.type
     else:
         print("semantic missing:", node.__class__.__name__)
 
 
-verify(Context(),  ast2)
-print("OK!")
+# verify(Context(),  ast)
+# print("OK!")
