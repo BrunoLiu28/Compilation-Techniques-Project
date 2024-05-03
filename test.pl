@@ -1,7 +1,15 @@
-var c : bool := true;
+val num : int := 1_0;
 
-var d : int := 3; 
-var e : string := "sdsa";
-var f : char := 'c'; 
-var g : float := 0..5;
-var g : string := "sda";
+function fibonacci(val n : int) : int {
+    if n <= 1 {
+        fibonacci := n;
+    } else {
+        fibonacci := fibonacci(n - 1) + fibonacci(n - 2);
+    }
+    fibonacci := fibonacci;
+}
+
+function main(val args:[string]) {
+	val result : int := fibonacci(num);
+	print_int(result);
+}

@@ -9,7 +9,7 @@ function maxRangeSquared(var mi:string, val ma:int) : int {
 			current_max := current_candidate;
 		}
 	} 
-	maxRangeSquared := current_max; # This line returns the current max!
+	maxRangeSquared := current_max; 
 }
 
 

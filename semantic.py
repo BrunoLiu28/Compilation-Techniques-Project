@@ -1,3 +1,4 @@
+import copy
 from rules import ArrayAccess, BinaryOperators, Declaration, FunctionCall, FunctionDeclaration, Identifier, IfStatement, Literal, MainFunction, Parameter, Program, UnaryOperators, WhileStatement
 
 ast = Program(main_block_sequence=[FunctionDeclaration(declaration_type='function', id='maxRangeSquared', param_list=[Parameter(declaration_type='var', id='mi', type_specifier='float'), Parameter(declaration_type='val', id='ma', type_specifier='int')], return_type='int', body=[Declaration(declaration_type='var', id='current_max', type_specifier='int', expression=BinaryOperators(operator='^', left_operand=Identifier(id='mi'), right_operand=Literal(type='integer', value=2)))])])
@@ -6,12 +7,28 @@ class TypeError(Exception):
 	pass
 
 class Context(object):
+
+
     def __init__(self,name=None):
         self.variables = {}
         self.functions = {}
 
+        self.add_func('print_int', 'void', [Parameter(declaration_type='var', id='any', type_specifier='int')])
+        self.add_func('print_int', 'void', [Parameter(declaration_type='val', id='any', type_specifier='int')])
+
+        self.add_func('print_float', 'void', [Parameter(declaration_type='var', id='any', type_specifier='float')])
+        self.add_func('print_float', 'void', [Parameter(declaration_type='val', id='any', type_specifier='float')])
+
+        self.add_func('print_bool', 'void', [Parameter(declaration_type='var', id='any', type_specifier='bool')])
+        self.add_func('print_bool', 'void', [Parameter(declaration_type='val', id='any', type_specifier='bool')])
+
+        self.add_func('print_char', 'void', [Parameter(declaration_type='var', id='any', type_specifier='char')])
+        self.add_func('print_char', 'void', [Parameter(declaration_type='val', id='any', type_specifier='char')])
+
+        self.add_func('print', 'void', [Parameter(declaration_type='var', id='any', type_specifier='string')])
+        self.add_func('print', 'void', [Parameter(declaration_type='val', id='any', type_specifier='string')])
+
     def has_var(self,id):
-        print(self.variables)
         return id in self.variables
     
     def get_var(self,id):
@@ -27,11 +44,16 @@ class Context(object):
         return self.variables[name][1]
     
     def get_varValType(self, name):
-        print(self.variables)
         return self.variables[name] [0]
 
     def get_func(self, name):
         return self.functions[name]
+    
+    def get_funcType(self, name):
+        return self.functions[name][0]
+    
+    def get_funcParam(self, name):
+        return self.functions[name][1]
 
     def var_pop(self):
         self.variables.pop()
@@ -49,7 +71,6 @@ def verify(ctx: Context, node):
     elif isinstance(node, Declaration):
         name = node.id
         if node.declaration_type == "update":
-            print(name, ctx.has_var(name))
             if not ctx.has_var(name):
                   raise TypeError(f"Variable {name} doesnt exist impossible to update")
             #variavel existe, verificar se é var ou val
@@ -57,7 +78,7 @@ def verify(ctx: Context, node):
                 raise TypeError(f"Variable {name} is a val, impossible to update")
             expr = node.expression
             if verify(ctx, expr) != ctx.get_varValType(name):
-                raise TypeError(f"Variable {name} is of type {ctx.get_var(name)} and not {verify(ctx, expr)}")
+                raise TypeError(f"Variable {name} is of type {ctx.get_varValType(name)} and not {verify(ctx, expr)}")
         
         elif ctx.has_var(name):
             raise TypeError(f"Variable {name} already declared")
@@ -72,43 +93,60 @@ def verify(ctx: Context, node):
     elif isinstance(node, ArrayAccess):	
         pass
     elif isinstance(node, FunctionDeclaration):  #FAZER SEPARACAO SE DEVOLVE ALGUMA COISA OU SE É VOID
+        print(node)
         name = node.id
         type = node.return_type
         if ctx.has_func(name):
             raise TypeError(f"function {name} already declared")
-        ctx.add_func(name, node.return_type, node.param_list)
+        ctx.add_func(name, type, node.param_list)
+        print(node.param_list)
+        new_ctx = copy.deepcopy(ctx)
         for param in node.param_list:
-            verify(ctx, param)
-            # ctx.add_var(param.id , param.type_specifier, param.declaration_type)
-
-        if node.return_type != "void":
-            ctx.add_var(name, node.return_type, "var")
+            verify(new_ctx, param)
+            
+        if type != "void":
+            new_ctx.add_var(name, type, "var")
 
         for expr in node.body:
-            print(expr)
-            verify(ctx, expr)
-    elif isinstance(node, MainFunction):	
-            pass
-    elif isinstance(node, FunctionCall):
+            verify(new_ctx, expr)
+        
+    elif isinstance(node, MainFunction):
+        print(node)
+        name = "main"
+        if ctx.has_func(name):
+            raise TypeError(f"function {name} already declared")
+        ctx.add_func(name, "void", [Parameter(declaration_type='var', id='args', type_specifier='[string]')])
+
+        new_ctx = copy.deepcopy(ctx)
+
+        for expr in node.body:
+            verify(new_ctx, expr)
+    elif isinstance(node, FunctionCall):    ## VER ISTOOOOOOOOO!!!!!!
         name = node.id
         if not ctx.has_func(name):
              raise TypeError(f"Function {name} is not defined")
         
-        if len(node.param_list) > 1:
-            args = (node.param_list[1])    
-        else:
-            args = []
+        # if len(node.param_list) > 1:
+        #     args = (node.param_list[1])    
+        # else:
+        #     args = []
 
-        rettype, vargs = ctx.ge[name]
-        if len(args) != len(vargs):
-            raise TypeError(f"Function {name} is expecting {len(vargs)} parameters and got {len(args)}")
-        else:
-            for i in range(len(vargs)):
-                #OBTER O ARGS E O SEU TIPO NO CONTEXTO E VERIFICAR O TIPO NO ARGS COM O TIPO DA FUNCAO
-                if vargs[i][1] != args[i].type:
-                    raise TypeError(f"Parameter {i+1} passed to function {name} should be of type {vargs[i][1]} and not {args[i]}")
+        # rettype, vargs = ctx.get_func[name]
+        # if len(args) != len(vargs):
+        #     raise TypeError(f"Function {name} is expecting {len(vargs)} parameters and got {len(args)}")
+        # else:
+        #     for i in range(len(vargs)):
+        #         #OBTER O ARGS E O SEU TIPO NO CONTEXTO E VERIFICAR O TIPO NO ARGS COM O TIPO DA FUNCAO
+        #         if vargs[i][1] != args[i].type:
+        #             raise TypeError(f"Parameter {i+1} passed to function {name} should be of type {vargs[i][1]} and not {args[i]}")
 
-        return rettype
+        if len(node.param_list) != len(ctx.get_funcParam(name)):
+            raise TypeError(f"function {name} called with wrong number of arguments")
+        for arg, param in zip(node.param_list, ctx.get_funcParam(name)):
+            if verify(ctx, arg) != param.type_specifier:
+                raise TypeError(f"function {name} called with wrong argument types")
+
+        return ctx.get_funcType(name)
 
     elif isinstance(node, BinaryOperators):	
         op = node.operator
@@ -164,8 +202,9 @@ def verify(ctx: Context, node):
             raise TypeError(f"If condition requires a boolean. Got {verify(condition)} instead.")
         for a in node.thenBlock:
             verify(ctx ,a)
-        for a in node.elseBlock:
-            verify(ctx ,a)
+        if node.elseBlock != None:
+            for a in node.elseBlock:
+                verify(ctx ,a)
     
     elif isinstance(node, WhileStatement):	
         condition = node.condition
@@ -174,11 +213,8 @@ def verify(ctx: Context, node):
         for a in node.block_seq:
             verify(ctx ,a)
     elif isinstance(node, Parameter):	
-        print("ENTROU NO PARAMETER")
-        print(node)
         ctx.add_var(node.id, node.type_specifier, node.declaration_type)
     elif isinstance(node, Literal):
-        print("ENTROU NO LITERAL")
         return node.type
     else:
         print("semantic missing:", node.__class__.__name__)

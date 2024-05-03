@@ -305,12 +305,20 @@ def p_identifier(t):
 #                   | CHAR_LITERAL"""
 #     t[0] = t[1]
 def p_integer_literal(t):
-    """expression : INTEGER_LITERAL"""
-    t[0] = Literal(type='int', value=t[1])
+    """expression : INTEGER_LITERAL
+                  | MINUS INTEGER_LITERAL %prec UMINUS"""
+    if len(t) == 2:
+        t[0] = Literal(type='int', value=t[1])
+    else:
+        t[0] = Literal(type='int', value=-t[2])
     
 def p_float_literal(t):
-    """expression : FLOAT_LITERAL"""
-    t[0] = Literal(type='float', value=t[1])
+    """expression : FLOAT_LITERAL
+                  | MINUS FLOAT_LITERAL %prec UMINUS"""
+    if len(t) == 2:
+        t[0] = Literal(type='float', value=t[1])
+    else:
+        t[0] = Literal(type='float', value=-t[2])
 
 def p_string_literal(t):
     """expression : STRING_LITERAL"""
@@ -340,7 +348,7 @@ def p_expression(t):
                   | expression AND expression
                   | expression OR expression
                   | NOT expression
-                  | MINUS expression %prec UMINUS
+                  
                   | arrayaccess
                   | function_call
                   | LPAREN expression RPAREN'''
@@ -377,8 +385,8 @@ def p_expression(t):
         t[0]  = BinaryOperators(operator='||', left_operand=t[1], right_operand=t[3])
     elif t[1] == '!':
         t[0]  = UnaryOperators(operator='!', operand=t[2])
-    elif t[1] == '-':
-        t[0]  = -t[2]
+    # elif t[1] == '-':
+    #     t[0]  = -t[2]
 
 
 
