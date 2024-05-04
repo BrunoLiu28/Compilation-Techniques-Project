@@ -34,6 +34,7 @@ def main(options={},filename=False):
 	yacc.yacc(debug = logger, errorlog= logger ) 
 	data = get_input(input_filename) 
 	ast =  yacc.parse(data,lexer = lex.lex(nowarn=1)) 
+	print("----------------------------------------------------------------------------------------------------")
 	print(ast)
 	print("----------------------------------------------------------------------------------------------------")
 	verify(Context(),  ast)

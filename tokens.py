@@ -34,7 +34,6 @@ reserved_keywords = {
 }
 
 # Tokens
-t_COMMENT = r'\#.*'
 t_AND = r'&&'
 t_OR = r'\|\|'
 t_EQUAL = r'='
@@ -105,6 +104,11 @@ def t_STRING_LITERAL(t):
 def t_CHAR_LITERAL(t):
 	r"(\'([^\\\'])\')|(\"([^\\\"])\")"
 	return t
+
+def t_COMMENT(t):
+    r'\#.*'
+    pass
+
 # Ignored characters
 t_ignore = " \t"
 

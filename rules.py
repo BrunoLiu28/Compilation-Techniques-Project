@@ -174,8 +174,16 @@ def p_main_function(t):
     t[0] = MainFunction(body=t[7])
 
 def p_function_param_list(t):
-    """function_param_list : parameter COMMA function_param_list
-    | parameter"""
+    """function_param_list : function_param_list_aux
+                           |"""
+    if len(t) == 2:
+        t[0] = t[1]
+    else:
+        t[0] = None
+
+def p_function_param_list_aux(t):
+    """function_param_list_aux : parameter COMMA function_param_list_aux
+                            | parameter"""
     if len(t) == 4:
         if isinstance(t[3], list):
             t[0] = [t[1]] + t[3]
@@ -186,7 +194,7 @@ def p_function_param_list(t):
 
 def p_parameter(t):
     """ parameter : VAL ID COLON types
-                    | VAR ID COLON types"""
+                  | VAR ID COLON types"""
     if t[1] == 'var':
         t[0] = Parameter(declaration_type=t[1], id= t[2], type_specifier = t[4])
     else:
@@ -206,7 +214,7 @@ def p_function_call(t):
 
 def p_function_param_list_call(t):
     """function_param_list_call : expression COMMA function_param_list_call
-    | expression"""
+                                | expression"""
     if len(t) == 4:
         if isinstance(t[3], list):
             t[0] = [t[1]] + t[3]
@@ -243,8 +251,9 @@ def p_block(t):
 
 def p_if_block(t):
     """if_block : IF expression LBRACE block_sequence RBRACE ELSE LBRACE block_sequence RBRACE
-	| IF expression LBRACE block_sequence RBRACE 
+	            | IF expression LBRACE block_sequence RBRACE 
 	"""
+    print(t[2])
     if len(t) == 10:
         t[0] = IfStatement(condition=t[2], thenBlock= t[4], elseBlock=t[8])
     else:
@@ -252,8 +261,7 @@ def p_if_block(t):
 	
 def p_while_block(t):
     """while_block : WHILE expression LBRACE block_sequence RBRACE"""
-    t[0] = WhileStatement(condition= t[2], block_seq=t[4])
-
+    t[0] = WhileStatement(condition=t[2], block_seq=t[4])
 
 #FALTA OS ARRAYS E SE CALHAR INCLUIR O CHAR
 def p_types(t):
@@ -348,11 +356,9 @@ def p_expression(t):
                   | expression AND expression
                   | expression OR expression
                   | NOT expression
-                  
                   | arrayaccess
                   | function_call
                   | LPAREN expression RPAREN'''
-    
     if len(t) == 2:
         t[0] = t[1]
     elif t[2] == '+':
@@ -385,9 +391,6 @@ def p_expression(t):
         t[0]  = BinaryOperators(operator='||', left_operand=t[1], right_operand=t[3])
     elif t[1] == '!':
         t[0]  = UnaryOperators(operator='!', operand=t[2])
-    # elif t[1] == '-':
-    #     t[0]  = -t[2]
-
 
 
 def p_error(p):
