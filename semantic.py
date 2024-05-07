@@ -39,6 +39,7 @@ class Context(object):
     def add_var(self, id, typ, varOrVal):
         self.variables[id] = (typ, varOrVal)
 
+    #RETORNAR O PRIMEIRO ENCONTRADO
     def get_varOrVal(self, name):
         return self.variables[name][1]
     
@@ -62,6 +63,7 @@ class Context(object):
 
 contexts = []
 
+#FAZER 2 PASSAGENS PELO PROGRAMA
 
 def verify(ctx: Context, node):
     if isinstance(node, Program):
