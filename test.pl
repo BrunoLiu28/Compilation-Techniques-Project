@@ -1,10 +1,19 @@
-# val unsorted : [float] := [5.5, 3.3, 8.8, 2.2, 1.1, 9.9];
-
 function getArrayRandomFloats() : [float];
 
 val unsorted : [float] := getArrayRandomFloats();
 
 function float_array_length(val arr : [float]) : int;
+
+
+
+function main(val args:[string]) {
+	val sorted : [float] := bubble_sort(unsorted);
+    var i : int := float_array_length(sorted) - 1;
+    while i >= 0 {
+        print_float(sorted[i]);
+        i := i - 1;
+    }
+}
 
 function bubble_sort(val arr : [float]) : [float] {
     var sorted : [float] := arr; 
@@ -28,14 +37,3 @@ function bubble_sort(val arr : [float]) : [float] {
 
     bubble_sort := sorted;
 }
-
-# function main(val args:[string]) {
-# 	val sorted : [float] := bubble_sort(unsorted);
-#     var i : int := float_array_length(sorted) - 1;
-#     while i >= 0 {
-#         print_float(sorted[i]);
-#         i := i - 1;
-#     }
-# }
-
-

@@ -62,44 +62,84 @@ class Context(object):
         return id in self.functions
 
 contexts = []
-
+pass1 = True
 #FAZER 2 PASSAGENS PELO PROGRAMA
 
+
 def verify(ctx: Context, node):
+    global pass1
     if isinstance(node, Program):
         for block in node.main_block_sequence:
             verify(ctx, block)
-    elif isinstance(node, Declaration):
-        print(node)
-        name = node.id
-        if node.declaration_type == "update":
-            if isinstance(node.id, ArrayAccess):
-                if not ctx.has_var(node.id.ID):
-                    raise TypeError(f"Array {node.id.ID} doesnt exist impossible to update")
-                
-                if ctx.get_varOrVal(node.id.ID) == "val":
-                    raise TypeError(f"Array {node.id.ID} is a val, impossible to update")
-                
-                type = verify(ctx, node.id)
-                if type != verify(ctx, node.expression):
-                    raise TypeError(f"Array {node.id.ID} is of type {type} and not {verify(ctx, node.expression)}")
+        
+        pass1 = False  #SEGUNDA PASSAGEM
+        for block in node.main_block_sequence:
+            #IGNORAR DECLARATIONS E FUNCTIONDECLARATIONS
+            if isinstance(block, Declaration) or (isinstance(block, FunctionDeclaration) and block.declaration_type == "ffi"):
                 pass
             else:
-                if not ctx.has_var(name):
-                    raise TypeError(f"Variable {name} doesnt exist impossible to update")
-                #variavel existe, verificar se é var ou val
-                if ctx.get_varOrVal(name) == "val":
-                    raise TypeError(f"Variable {name} is a val, impossible to update")
-                expr = node.expression
-                if verify(ctx, expr) != ctx.get_varValType(name):
-                    raise TypeError(f"Variable {name} is of type {ctx.get_varValType(name)} and not {verify(ctx, expr)}")
-        
-        elif ctx.has_var(name):
-            raise TypeError(f"Variable {name} already declared")
-        elif node.type_specifier != verify(ctx, node.expression):
-            raise TypeError(f"Variable {name} is of type {node.type_specifier} and not {verify(ctx, node.expression)}")
+                verify(ctx, block)
+    elif isinstance(node, Declaration):
+        if pass1 :
+            name = node.id
+            if node.declaration_type == "update":
+                if isinstance(node.id, ArrayAccess):
+                    if not ctx.has_var(node.id.ID):
+                        raise TypeError(f"The global array {node.id.ID} doesnt exist impossible to update")
+                    
+                    if ctx.get_varOrVal(node.id.ID) == "val":
+                        raise TypeError(f"The global array {node.id.ID} is a val, impossible to update")
+                    
+                    type = verify(ctx, node.id)
+                    if type != verify(ctx, node.expression):
+                        raise TypeError(f"The global array {node.id.ID} is of type {type} and not {verify(ctx, node.expression)}")
+                    pass
+                else:
+                    if not ctx.has_var(name):
+                        raise TypeError(f"The global variable {name} doesnt exist impossible to update")
+                    #variavel existe, verificar se é var ou val
+                    if ctx.get_varOrVal(name) == "val":
+                        raise TypeError(f"The global variable {name} is a val, impossible to update")
+                    expr = node.expression
+                    if verify(ctx, expr) != ctx.get_varValType(name):
+                        raise TypeError(f"The global variable {name} is of type {ctx.get_varValType(name)} and not {verify(ctx, expr)}")
+            
+            elif ctx.has_var(name):
+                raise TypeError(f"The global variable {name} already declared")
+            elif node.type_specifier != verify(ctx, node.expression):
+                raise TypeError(f"The global variable {name} is of type {node.type_specifier} and not {verify(ctx, node.expression)}")
+            else:
+                ctx.add_var(name, node.type_specifier, node.declaration_type)
         else:
-            ctx.add_var(name, node.type_specifier, node.declaration_type)
+            name = node.id
+            if node.declaration_type == "update":
+                if isinstance(node.id, ArrayAccess):
+                    if not ctx.has_var(node.id.ID):
+                        raise TypeError(f"Array {node.id.ID} doesnt exist impossible to update")
+                    
+                    if ctx.get_varOrVal(node.id.ID) == "val":
+                        raise TypeError(f"Array {node.id.ID} is a val, impossible to update")
+                    
+                    type = verify(ctx, node.id)
+                    if type != verify(ctx, node.expression):
+                        raise TypeError(f"Array {node.id.ID} is of type {type} and not {verify(ctx, node.expression)}")
+                    pass
+                else:
+                    if not ctx.has_var(name):
+                        raise TypeError(f"Variable {name} doesnt exist impossible to update")
+                    #variavel existe, verificar se é var ou val
+                    if ctx.get_varOrVal(name) == "val":
+                        raise TypeError(f"Variable {name} is a val, impossible to update")
+                    expr = node.expression
+                    if verify(ctx, expr) != ctx.get_varValType(name):
+                        raise TypeError(f"Variable {name} is of type {ctx.get_varValType(name)} and not {verify(ctx, expr)}")
+            
+            elif ctx.has_var(name):
+                raise TypeError(f"Variable {name} already declared")
+            elif node.type_specifier != verify(ctx, node.expression):
+                raise TypeError(f"Variable {name} is of type {node.type_specifier} and not {verify(ctx, node.expression)}")
+            else:
+                ctx.add_var(name, node.type_specifier, node.declaration_type)
     elif isinstance(node, Identifier):
         if not ctx.has_var(node.id):
             raise TypeError(f"Variable {node.id} is not declared")
@@ -124,52 +164,40 @@ def verify(ctx: Context, node):
             
             ctx.add_func(name, type, node.param_list)
         else: #funcao normal
-            if ctx.has_func(name):
-                raise TypeError(f"function {name} already declared")
-            ctx.add_func(name, type, node.param_list)
+            if pass1 == True:
+                if ctx.has_func(name):
+                    raise TypeError(f"function {name} already declared")
+                ctx.add_func(name, type, node.param_list)
+            else:
+                new_ctx = copy.deepcopy(ctx)
+                if node.param_list != None:
+                    
+                    for param in node.param_list:
+                        verify(new_ctx, param)
+                    
+                if type != "void":
+                    new_ctx.add_var(name, type, "var")
 
-            new_ctx = copy.deepcopy(ctx)
-            if node.param_list != None:
-                
-                for param in node.param_list:
-                    verify(new_ctx, param)
-                
-            if type != "void":
-                new_ctx.add_var(name, type, "var")
-
-            for expr in node.body:
-                verify(new_ctx, expr)
+                for expr in node.body:
+                    verify(new_ctx, expr)
         
     elif isinstance(node, MainFunction):
         # print(node)
         name = "main"
-        if ctx.has_func(name):
-            raise TypeError(f"function {name} already declared")
-        ctx.add_func(name, "void", [Parameter(declaration_type='var', id='args', type_specifier='[string]')])
+        if pass1 == True:
+            if ctx.has_func(name):
+                raise TypeError(f"function {name} already declared")
+            ctx.add_func(name, "void", [Parameter(declaration_type='var', id='args', type_specifier='[string]')])
 
-        new_ctx = copy.deepcopy(ctx)
-
-        for expr in node.body:
-            verify(new_ctx, expr)
-    elif isinstance(node, FunctionCall):    ## VER ISTOOOOOOOOO!!!!!!
+        else:
+            new_ctx = copy.deepcopy(ctx)
+            for expr in node.body:
+                verify(new_ctx, expr)
+    elif isinstance(node, FunctionCall): 
         name = node.id
         if not ctx.has_func(name):
              raise TypeError(f"Function {name} is not defined")
         
-        # if len(node.param_list) > 1:
-        #     args = (node.param_list[1])    
-        # else:
-        #     args = []
-
-        # rettype, vargs = ctx.get_func[name]
-        # if len(args) != len(vargs):
-        #     raise TypeError(f"Function {name} is expecting {len(vargs)} parameters and got {len(args)}")
-        # else:
-        #     for i in range(len(vargs)):
-        #         #OBTER O ARGS E O SEU TIPO NO CONTEXTO E VERIFICAR O TIPO NO ARGS COM O TIPO DA FUNCAO
-        #         if vargs[i][1] != args[i].type:
-        #             raise TypeError(f"Parameter {i+1} passed to function {name} should be of type {vargs[i][1]} and not {args[i]}")
-
         if ctx.get_funcParam(name) != None and node.param_list == None:
             raise TypeError(f"function {name} have arguments and you called it without arguments")
         elif ctx.get_funcParam(name) == None and node.param_list != None:
