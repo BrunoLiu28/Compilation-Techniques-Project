@@ -77,8 +77,6 @@ def verify(ctx: Context, node):
             else:
                 verify(ctx, block)
     elif isinstance(node, Declaration):
-        print("DECLARATION")
-        print(node)
         if pass1 :
             name = node.id
             if node.declaration_type == "update":
@@ -111,7 +109,6 @@ def verify(ctx: Context, node):
                 ctx.add_var(name, node.type_specifier, node.declaration_type)
         else:
             name = node.id
-            print(node, "AQUIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII")
             if node.declaration_type == "update":
                 if isinstance(node.id, ArrayAccess):
                     if not ctx.has_var(node.id.ID):
@@ -145,20 +142,14 @@ def verify(ctx: Context, node):
             raise TypeError(f"Variable {node.id} is not declared")
         return ctx.get_varValType(node.id)
     elif isinstance(node, ArrayAccess):
-        print(node)	
         if not ctx.has_var(node.ID):
             raise TypeError(f"Variable {node.ID} is not declared")
         if len(node.index) > 1:
             for index in node.index:
                 if verify(ctx, index) != "int":
                     raise TypeError(f"Array index should be an integer and not {verify(ctx, index)}")
-        # if verify(ctx, node.index) != "int":
-        #     print(node)
-        #     raise TypeError(f"Array index should be an integer and not {verify(ctx, node.index)}")
         
-        print(ctx.get_varValType(node.ID), "dsadasdasd")
-        countOriginalSize = ctx.get_varValType(node.ID).count('[') #devolve [[[float]]] -> 3
-
+        countOriginalSize = ctx.get_varValType(node.ID).count('[') 
         if len(node.index) > countOriginalSize:
             raise TypeError(f"Array {node.ID} has {countOriginalSize} dimensions and you are trying to access {len(node.index)} dimensions")
        
@@ -167,16 +158,14 @@ def verify(ctx: Context, node):
         for _ in range(resultSize):
             base_type = "[" + base_type + "]"
 
-        print(base_type, "\n\n\n\n\n\n\n")
         return base_type
-    # elif isinstance(node, ArrayType):
-    #     return node.type
         
     elif isinstance(node, FunctionDeclaration):  #FAZER SEPARACAO SE DEVOLVE ALGUMA COISA OU SE É VOID
         #Se for FFI entra aqui
         name = node.id
         type = node.return_type
         if node.declaration_type == "ffi":
+            
             name = node.id
             if ctx.has_func(name):
                 raise TypeError(f"function {name} already declared")
@@ -201,7 +190,6 @@ def verify(ctx: Context, node):
                     verify(new_ctx, expr)
         
     elif isinstance(node, MainFunction):
-        # print(node)
         name = "main"
         if pass1 == True:
             if ctx.has_func(name):

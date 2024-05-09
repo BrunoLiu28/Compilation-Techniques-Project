@@ -1,4 +1,5 @@
 # val unsorted : [float] := [5.5, 3.3, 8.8, 2.2, 1.1, 9.9];
+function getArrayRandomFloats() : [float];
 
 val unsorted : [float] := getArrayRandomFloats();
 
