@@ -48,9 +48,9 @@ class ArrayAccess():
     ID: str
     index: list
 
-@dataclass
-class ArrayType():
-    type: str
+# @dataclass
+# class ArrayType():
+#     type: str
 
 @dataclass
 class Declaration(): 
@@ -270,7 +270,7 @@ def p_types(t):
     if len(t) == 2:
         t[0] = t[1]
     else:
-        t[0] = ArrayType(type= "["+t[2]+"]")
+        t[0] = "["+t[2]+"]"
 
 def p_defaultype(t):
     """defaulttype : INT_TYPE
@@ -305,7 +305,7 @@ def p_arrayaccess(t):
     if t[5] is not None:
         t[0] = ArrayAccess(ID=t[1], index=[t[3]] + t[5])
     else:
-        t[0] = ArrayAccess(ID=t[1], index=t[3])
+        t[0] = ArrayAccess(ID=t[1], index=[t[3]])
 
 def p_arrayaccess2(t):
     '''arrayaccess2 : LSQUARE expression RSQUARE arrayaccess2

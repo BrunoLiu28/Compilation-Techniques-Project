@@ -38,8 +38,8 @@ def main(options={},filename=False):
 	print("----------------------------------------------------------------------------------------------------")
 	print(ast)
 	print("----------------------------------------------------------------------------------------------------")
-	# verify(Context(),  ast)
-	# print("OK! TYPE CHECKING PASSED!")
+	verify(Context(),  ast)
+	print("OK! TYPE CHECKING PASSED!")
 
 	# interpretor(ContextInterpretor(),  ast)
 	# print("OK! INTERPRETATION PASSED!")

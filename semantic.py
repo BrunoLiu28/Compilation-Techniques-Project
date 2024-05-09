@@ -108,12 +108,11 @@ def verify(ctx: Context, node):
             elif node.type_specifier != verify(ctx, node.expression):
                 raise TypeError(f"The global variable {name} is of type {node.type_specifier} and not {verify(ctx, node.expression)}")
             else:
-                print("CHEGOU AQUI")
                 ctx.add_var(name, node.type_specifier, node.declaration_type)
         else:
             name = node.id
+            print(node, "AQUIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII")
             if node.declaration_type == "update":
-                print(node)
                 if isinstance(node.id, ArrayAccess):
                     if not ctx.has_var(node.id.ID):
                         raise TypeError(f"Array {node.id.ID} doesnt exist impossible to update")
@@ -149,17 +148,29 @@ def verify(ctx: Context, node):
         print(node)	
         if not ctx.has_var(node.ID):
             raise TypeError(f"Variable {node.ID} is not declared")
-        if verify(ctx, node.index) != "int":
-            raise TypeError(f"Array index should be an integer and not {verify(ctx, node.index)}")
+        if len(node.index) > 1:
+            for index in node.index:
+                if verify(ctx, index) != "int":
+                    raise TypeError(f"Array index should be an integer and not {verify(ctx, index)}")
+        # if verify(ctx, node.index) != "int":
+        #     print(node)
+        #     raise TypeError(f"Array index should be an integer and not {verify(ctx, node.index)}")
         
-        print(node)
-        # print(ctx.variables)
-        # print(ctx.get_varValType(node.ID))
-        countOriginalSize = ctx.get_varValType(node.ID).count('[')
-        # print(countOriginalSize)
-        # countWantedSize =
-        
-        return get_type(ctx.get_varValType(node.ID))
+        print(ctx.get_varValType(node.ID), "dsadasdasd")
+        countOriginalSize = ctx.get_varValType(node.ID).count('[') #devolve [[[float]]] -> 3
+
+        if len(node.index) > countOriginalSize:
+            raise TypeError(f"Array {node.ID} has {countOriginalSize} dimensions and you are trying to access {len(node.index)} dimensions")
+       
+        resultSize = countOriginalSize - len(node.index)
+        base_type = get_type(ctx.get_varValType(node.ID))
+        for _ in range(resultSize):
+            base_type = "[" + base_type + "]"
+
+        print(base_type, "\n\n\n\n\n\n\n")
+        return base_type
+    # elif isinstance(node, ArrayType):
+    #     return node.type
         
     elif isinstance(node, FunctionDeclaration):  #FAZER SEPARACAO SE DEVOLVE ALGUMA COISA OU SE É VOID
         #Se for FFI entra aqui
