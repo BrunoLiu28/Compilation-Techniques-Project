@@ -1,6 +1,7 @@
 import sys, os
 from subprocess import Popen, PIPE
 
+from interpretor import ContextInterpretor, interpretor
 from ply import yacc,lex
 
 from semantic import Context, verify
@@ -37,8 +38,11 @@ def main(options={},filename=False):
 	print("----------------------------------------------------------------------------------------------------")
 	print(ast)
 	print("----------------------------------------------------------------------------------------------------")
-	verify(Context(),  ast)
-	print("OK!")
+	# verify(Context(),  ast)
+	# print("OK! TYPE CHECKING PASSED!")
+
+	# interpretor(ContextInterpretor(),  ast)
+	# print("OK! INTERPRETATION PASSED!")
 	
 if __name__ == '__main__':
 	main()

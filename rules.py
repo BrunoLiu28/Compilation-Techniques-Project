@@ -46,7 +46,7 @@ class ArrayLiterals():
 @dataclass
 class ArrayAccess():
     ID: str
-    index: str
+    index: list
 
 @dataclass
 class ArrayType():
@@ -270,7 +270,7 @@ def p_types(t):
     if len(t) == 2:
         t[0] = t[1]
     else:
-        t[0] = t[1] + t[2] + t[3]
+        t[0] = ArrayType(type= "["+t[2]+"]")
 
 def p_defaultype(t):
     """defaulttype : INT_TYPE
@@ -290,28 +290,34 @@ def p_arraytype(t):
             | VOID_TYPE
             """
     if len(t)>2:
-        t[0] = ArrayType(type= t[2])
+        t[0] = t[1] + t[2] + t[3]
     else:
         t[0] = t[1]
         
-
-
-def p_arrayaccess(t):
-    '''arrayaccess : ID LSQUARE expression RSQUARE
-                    | function_call LSQUARE expression RSQUARE'''
-    t[0] = ArrayAccess(ID=t[1], index=t[3])
-
 def p_identifier(t):
     '''expression : ID '''
     t[0] = Identifier(id=t[1])
 
-# def p_typeliterals(t):
-#     """expression : INTEGER_LITERAL
-#                   | FLOAT_LITERAL
-#                   | STRING_LITERAL
-#                   | BOOL_LITERAL
-#                   | CHAR_LITERAL"""
-#     t[0] = t[1]
+
+def p_arrayaccess(t):
+    '''arrayaccess : ID LSQUARE expression RSQUARE arrayaccess2 
+                    | function_call LSQUARE expression RSQUARE arrayaccess2'''
+    if t[5] is not None:
+        t[0] = ArrayAccess(ID=t[1], index=[t[3]] + t[5])
+    else:
+        t[0] = ArrayAccess(ID=t[1], index=t[3])
+
+def p_arrayaccess2(t):
+    '''arrayaccess2 : LSQUARE expression RSQUARE arrayaccess2
+                    | '''
+    if len(t) == 5:
+        print(t[2])
+        if t[4] is not None:
+            t[0] = [t[2]] + t[4]
+        else:
+            t[0] = [t[2]]
+
+
 def p_integer_literal(t):
     """expression : INTEGER_LITERAL
                   | MINUS INTEGER_LITERAL %prec UMINUS"""
@@ -356,8 +362,8 @@ def p_expression(t):
                   | expression AND expression
                   | expression OR expression
                   | NOT expression
-                  | arrayaccess
                   | function_call
+                  | arrayaccess
                   | LPAREN expression RPAREN'''
     if len(t) == 2:
         t[0] = t[1]

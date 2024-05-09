@@ -55,9 +55,6 @@ class Context(object):
     def get_funcParam(self, name):
         return self.functions[name][1]
 
-    def var_pop(self):
-        self.variables.pop()
-
     def has_func(self, id):
         return id in self.functions
 
@@ -80,6 +77,8 @@ def verify(ctx: Context, node):
             else:
                 verify(ctx, block)
     elif isinstance(node, Declaration):
+        print("DECLARATION")
+        print(node)
         if pass1 :
             name = node.id
             if node.declaration_type == "update":
@@ -109,10 +108,12 @@ def verify(ctx: Context, node):
             elif node.type_specifier != verify(ctx, node.expression):
                 raise TypeError(f"The global variable {name} is of type {node.type_specifier} and not {verify(ctx, node.expression)}")
             else:
+                print("CHEGOU AQUI")
                 ctx.add_var(name, node.type_specifier, node.declaration_type)
         else:
             name = node.id
             if node.declaration_type == "update":
+                print(node)
                 if isinstance(node.id, ArrayAccess):
                     if not ctx.has_var(node.id.ID):
                         raise TypeError(f"Array {node.id.ID} doesnt exist impossible to update")
@@ -144,15 +145,22 @@ def verify(ctx: Context, node):
         if not ctx.has_var(node.id):
             raise TypeError(f"Variable {node.id} is not declared")
         return ctx.get_varValType(node.id)
-    elif isinstance(node, ArrayAccess):	#FALTA FAZER ESTE
+    elif isinstance(node, ArrayAccess):
+        print(node)	
         if not ctx.has_var(node.ID):
             raise TypeError(f"Variable {node.ID} is not declared")
         if verify(ctx, node.index) != "int":
             raise TypeError(f"Array index should be an integer and not {verify(ctx, node.index)}")
         
+        print(node)
+        # print(ctx.variables)
+        # print(ctx.get_varValType(node.ID))
+        countOriginalSize = ctx.get_varValType(node.ID).count('[')
+        # print(countOriginalSize)
+        # countWantedSize =
         
         return get_type(ctx.get_varValType(node.ID))
-        pass
+        
     elif isinstance(node, FunctionDeclaration):  #FAZER SEPARACAO SE DEVOLVE ALGUMA COISA OU SE É VOID
         #Se for FFI entra aqui
         name = node.id
@@ -231,7 +239,7 @@ def verify(ctx: Context, node):
             if vt1 == 'float' and not vt2 == 'int':
                 raise TypeError(f"Operation {op} requires both to be floats.")
             return vt1
-        if op == '=':
+        if op in ['=','!=']:
             if vt1 != vt2:
                 raise TypeError(f"Operation {op} requires both type to be the same.")
             return 'bool'
