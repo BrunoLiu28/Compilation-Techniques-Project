@@ -1,47 +1,20 @@
-# val unsorted : [float] := [5.5, 3.3, 8.8, 2.2, 1.1, 9.9];
-function getArrayRandomFloats() : [float];
-val unsorted : [float] := getArrayRandomFloats();
+val actual_min : int := -10;
+val actual_max : int := 20;
 
-function float_array_length(val arr : [float]) : int;
-
-function bubble_sort(val arr : [float]) : [float] {
-    var sorted : [float] := arr; 
-    var n : int := float_array_length(sorted);
-    var swapped : bool := true;
-
-    while swapped {
-        swapped := false;
-        var i : int := 0;
-        while i < n - 1 {
-            if sorted[i] > sorted[i + 1] {
-                var temp : float := sorted[i];
-                sorted[i] := sorted[i + 1];
-                sorted[i + 1] := temp;
-                swapped := true;
-            }
-            i := i + 1;
-        }
-        n := n - 1;
-    }
-
-    bubble_sort := sorted;
+function maxRangeSquared(var mi:int, val ma:int) : int {
+	var current_max : int := mi ^ 2;
+	while mi <= ma {
+		var current_candidate : int := mi ^ 2;
+		if current_candidate > current_max {
+			current_max := current_candidate;
+		}
+        mi := mi + 1;
+	} 
+	maxRangeSquared := current_max; # This line returns the current max!
 }
+
 
 function main(val args:[string]) {
-	val sorted : [float] := bubble_sort(unsorted);
-    var i : int := float_array_length(sorted) - 1;
-    while i >= 0 {
-        print_float(sorted[i]);
-        i := i - 1;
-    }
+	val result : int := maxRangeSquared(actual_min, actual_max);
+	print_int(result);
 }
-
-# c implementation to get the size of the array
-# int float_array_length(float arr[]) {
-#     int length = 0;
-#     while (!isnan(arr[length])) {
-#         length++;
-#     }
-#     return length;
-# }
-

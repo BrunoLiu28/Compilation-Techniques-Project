@@ -41,8 +41,8 @@ def main(options={},filename=False):
 	verify(Context(),  ast)
 	print("OK! TYPE CHECKING PASSED!")
 
-	# interpretor(ContextInterpretor(),  ast)
-	# print("OK! INTERPRETATION PASSED!")
+	interpretor(ContextInterpretor(),  ast)
+	print("OK! INTERPRETATION PASSED!")
 	
 if __name__ == '__main__':
 	main()

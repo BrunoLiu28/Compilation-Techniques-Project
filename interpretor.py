@@ -104,10 +104,7 @@ def interpretor(ctx: ContextInterpretor, node):
             raise TypeError(f"Variable {node.ID} is not declared")
         if verify(ctx, node.index) != "int":
             raise TypeError(f"Array index should be an integer and not {verify(ctx, node.index)}")
-        
-        
         return get_type(ctx.get_varValType(node.ID))
-        pass
     elif isinstance(node, FunctionDeclaration):  #FAZER SEPARACAO SE DEVOLVE ALGUMA COISA OU SE É VOID
         #Se for FFI entra aqui
         name = node.id
