@@ -9,35 +9,55 @@ pass1 = True
 #PRIMEIRA PASSAGEM VERIFICA VARIAVEIS GLOBAIS mas nao funcoes(?)
 codigo =[]
 counter = 0
+header = []
+body = []
+variable_map_global = {}
+variable_map = {}
+function_map = {}
+call_counter = 0
+
 def verify(node):
     global pass1
     global codigo
     global counter
+    global variable_map
+    global call_counter
+
     if isinstance(node, Program):
         for block in node.main_block_sequence:
-            verify(block)
+            if isinstance(block, Declaration):
+                verify(block)
 
         pass1 = False  #SEGUNDA PASSAGEM
         for block in node.main_block_sequence:
-            if isinstance(block, Declaration) or (isinstance(block, FunctionDeclaration) and block.declaration_type == "ffi"):
+            if isinstance(block, Declaration): #or (isinstance(block, FunctionDeclaration) and block.declaration_type == "ffi"):
                 pass
             else:
                 verify(block)
+
+        header_body = header + body
+        return header_body
     elif isinstance(node, Declaration):
         if pass1: #Global variables
+            name = node.id
             if node.type_specifier == "int":
-                print(f'@{node.id} = dso_local global i32 0')
-            elif node.type_specifier == "float":
+                header.append(f'@{node.id} = dso_local global i32 {verify(node.expression)}')
+                add_variable_global(name, "int", -1)
+            elif node.type_specifier == "float":   #VERIFICAR SE ESTA CERTO
                 valorDoCharEmHex = float_to_hex(node.expression)
-                print(f'@{node.id} = dso_local global float {valorDoCharEmHex}')
+                header.append(f'@{node.id} = dso_local global float {valorDoCharEmHex}')
+                add_variable_global(name, "float", -1)
             elif node.type_specifier == "bool":
-                print(f'@{node.id} = dso_local global i1 0')
+                header.append(f'@{node.id} = dso_local global i1 {verify(node.expression)}')
+                add_variable_global(name, "bool", -1)
             elif node.type_specifier == "string":
                 #devolver o valor mesmo no node.expression
-                print(f'@{node.id} = dso_local global [{len(node.expression)} x i8] c"{len(node.expression)}"')
-            # elif node.type_specifier == "char":
-            #     valorDoCharEmHex = hex(ord(node.expression))[2:]
-            #     print(f"@{node.id} = dso_local global i8 {valorDoCharEmHex}")
+                header.append(f'@{node.id} = dso_local global [{len(node.expression)} x i8] c"{len(node.expression)}"')
+                add_variable_global(name, "string", -1)
+            elif node.type_specifier == "char": 
+                valorDoCharEmHex = hex(ord(node.expression))[2:]
+                header.append(f"@{node.id} = dso_local global i8 {valorDoCharEmHex}")
+                add_variable_global(name, "char", -1)
         else: #Local variables
             name = node.id
             #UPDATE DE VARIAVELS
@@ -54,118 +74,251 @@ def verify(node):
                     #     raise TypeError(f"Array {node.id.ID} is of type {type} and not {verify(ctx, node.expression)}")
                     pass
                 else:   #UPDATE DE VARIAVEL QUE NAO É ARRAY	
-                    if node.type_specifier == "int":
-                        print(f"store i32 {interpretor(node.expression)}, i32* %{name}")
-                    elif node.type_specifier == "float":
-                        print(f"store float {interpretor(node.expression)}, float* %{name}")
-                    elif node.type_specifier == "bool":
+                    type = variable_map[name]["type"]
+                    if type == "int":
+                        body.append(f"store i32 {verify(node.expression)}, i32* %{name}")
+                    elif type == "float":
+                        body.append(f"store float {verify(node.expression)}, float* %{name}")
+                    elif type == "bool":
                         if node.expression == "true":
-                            print(f"store i1 1, i1* %{name}")
+                            body.append(f"store i1 1, i1* %{name}")
                         else:
-                            print(f"store i1 0, i1* %{name}")
-                    elif node.type_specifier == "string": #VER DEPOIS
+                            body.append(f"store i1 0, i1* %{name}")
+                    elif type == "string": #VER DEPOIS
                         # #devolver o valor mesmo no node.expression
-                        # print(f'@{node.id} = dso_local global [{len(node.expression)} x i8] c"{len(node.expression)}", align 1')
-                        pass
-                    elif node.type_specifier == "char":
-                        print(f"store i8 {ord(node.expression)}, i8* %{name}")
+                        body.append(f'@{node.id} = dso_local global [{len(node.expression)} x i8] c"{len(node.expression)}", align 1')
+                    elif type == "char":
+                        body.append(f"store i8 {ord(node.expression)}, i8* %{name}")
             else: #DECLARACAO DE VARIAVEL
                 if node.type_specifier == "int":
-                    print(f"%{name} = alloca i32")
-                    print(f"store i32 {interpretor(node.expression)}, i32* %{name}")
+                    body.append(f"%{name} = alloca i32")
+                    body.append(f"store i32 {verify(node.expression)}, i32* %{name}")
+                    add_variable(name, "int", -1)
                 elif node.type_specifier == "float":
-                    print(f"%{name} = alloca float")
-                    print(f"store float {interpretor(node.expression)}, float* %{name}")
+                    body.append(f"%{name} = alloca float")
+                    body.append(f"store float {verify(node.expression)}, float* %{name}")
+                    add_variable(name, "float", -1)
                 elif node.type_specifier == "bool":
-                    print(f"%{name} = alloca i1")
+                    body.append(f"%{name} = alloca i1")
                     if node.expression == "true":
-                        print(f"store i1 1, i1* %{name}")
+                        body.append(f"store i1 1, i1* %{name}")
                     else:
-                        print(f"store i1 0, i1* %{name}")
+                        body.append(f"store i1 0, i1* %{name}")
+                    add_variable(name, "bool", -1)
                 elif node.type_specifier == "string":  #NOT SURE
-                    print(f'@__const.{name} = private unnamed_addr constant [{len(node.expression) + 1} x i8] c"{node.expression}\\00"')
-                    print(f"%{name} = alloca [{len(node.expression) + 1} x i8]")
-                    print(f"%{counter} = bitcast [{len(node.expression) + 1} x i8]* %{name} to i8*")
-                    print(f"call void @llvm.memcpy.p0i8.p0i8.i64(i8* %{counter}, i8* getelementptr inbounds ([{len(node.expression) + 1} x i8], [{len(node.expression) + 1} x i8]* @__const.{name}, i32 0, i32 0), i64 {len(node.expression) + 1}, i1 false)")
+                    body.append(f'@__const.{name} = private unnamed_addr constant [{len(node.expression) + 1} x i8] c"{node.expression}\\00"')
+                    body.append(f"%{name} = alloca [{len(node.expression) + 1} x i8]")
+                    body.append(f"%{counter} = bitcast [{len(node.expression) + 1} x i8]* %{name} to i8*")
+                    body.append(f"call void @llvm.memcpy.p0i8.p0i8.i64(i8* %{counter}, i8* getelementptr inbounds ([{len(node.expression) + 1} x i8], [{len(node.expression) + 1} x i8]* @__const.{name}, i32 0, i32 0), i64 {len(node.expression) + 1}, i1 false)")
+                    add_variable(name, "string", counter)
                     counter += 1
                 elif node.type_specifier == "char": 
-                    print(f"%{name} = alloca i8")
-                    print(f"store i8 {ord(node.expression)}, i8* %{name}")
+                    body.append(f"%{name} = alloca i8")
+                    body.append(f"store i8 {ord(node.expression)}, i8* %{name}")
+                    add_variable(name, "char", -1)
                 pass
 
     elif isinstance(node, Identifier):
-       print(f'%{counter} = load i32, i32* %{node.id}')
+        if node.id in variable_map:
+            type = variable_map[node.id]["type"]
+            if type == "int":
+                body.append(f'%{counter} = load i32, i32* %{node.id}')
+                add_variable(node.id, "int", counter)
+            elif type == "float":
+                body.append(f'%{counter} = load float, float* %{node.id}')
+                add_variable(node.id, "float", counter)
+            elif type == "bool":
+                body.append(f'%{counter} = load i1, i1* %{node.id}')
+                add_variable(node.id, "bool", counter)
+            elif type == "string":
+                body.append(f'%{counter} = load i8*, i8** %{node.id}')
+                add_variable(node.id, "string", counter)
+            elif type == "char":
+                body.append(f'%{counter} = load i8, i8* %{node.id}')
+                add_variable(node.id, "char", counter)
+            counter += 1
+        else:
+            type = variable_map_global[node.id]["type"]
+            if type == "int":
+                body.append(f'%{counter} = load i32, i32* @{node.id}')
+                add_variable_global(node.id, "int", counter)
+            elif type == "float":
+                body.append(f'%{counter} = load float, float* @{node.id}')
+                add_variable_global(node.id, "float", counter)
+            elif type == "bool":
+                body.append(f'%{counter} = load i1, i1* @{node.id}')
+                add_variable_global(node.id, "bool", counter)
+            elif type == "string":
+                body.append(f'%{counter} = load i8*, i8** @{node.id}')
+                add_variable_global(node.id, "string", counter)
+            elif type == "char":
+                body.append(f'%{counter} = load i8, i8* @{node.id}')
+                add_variable_global(node.id, "char", counter)
+            counter += 1
+        
+        
     elif isinstance(node, ArrayAccess):	#FALTA FAZER ESTE
-        if not ctx.has_var(node.ID):
-            raise TypeError(f"Variable {node.ID} is not declared")
-        if verify(ctx, node.index) != "int":
-            raise TypeError(f"Array index should be an integer and not {verify(ctx, node.index)}")
-        
-        
-        return get_type(ctx.get_varValType(node.ID))
+        # if not ctx.has_var(node.ID):
+        #     raise TypeError(f"Variable {node.ID} is not declared")
+        # if verify(ctx, node.index) != "int":
+        #     raise TypeError(f"Array index should be an integer and not {verify(ctx, node.index)}")
+        # return get_type(ctx.get_varValType(node.ID))
         pass
     elif isinstance(node, FunctionDeclaration):  #FAZER SEPARACAO SE DEVOLVE ALGUMA COISA OU SE É VOID
         #Se for FFI entra aqui
         name = node.id
         type = node.return_type
-        if node.declaration_type == "ffi":
-            name = node.id
-            if ctx.has_func(name):
-                raise TypeError(f"function {name} already declared")
-            
-            ctx.add_func(name, type, node.param_list)
+        if node.declaration_type == "ffi": #FALTA FAZER VER DPS COMO SE FAZ
+            pass
         else: #funcao normal
-            if pass1 == True:
-                if ctx.has_func(name):
-                    raise TypeError(f"function {name} already declared")
-                ctx.add_func(name, type, node.param_list)
+            if type == "int":
+                body.append(f"define dso_local i32 @{name}(")
+            elif type == "float":
+                body.append(f"define dso_local float @{name}(")
+            elif type == "bool":
+                body.append(f"define dso_local i1 @{name}(")
+            elif type == "string":
+                body.append(f"define dso_local i8* @{name}(")
+            elif type == "char":
+                body.append(f"define dso_local signext i8 @{name}(")
+            elif type == "void":
+                body.append(f"define dso_local void @{name}(")
+
+            if node.param_list != None:
+                params = []
+                for x in node.param_list:
+                    if x.type_specifier == "int":
+                        params.append(f"i32 noundef %{x.id}")
+                    elif x.type_specifier == "float":
+                        params.append(f"float noundef %{x.id}")
+                    elif x.type_specifier == "bool":
+                        params.append(f"i1 noundef %{x.id}")
+                    elif x.type_specifier == "string":
+                        params.append(f"i8* noundef %{x.id}")
+                    elif x.type_specifier == "char":
+                        params.append(f"i8 noundef signext %{x.id}")
+                body[-1] += ",".join(params) + "){"
+                body.append("entry:")
+
+                #DECLARACAO DE PARAMETROS
+                for param in node.param_list:
+                    verify(param)
             else:
-                new_ctx = copy.deepcopy(ctx)
-                if node.param_list != None:
-                    
-                    for param in node.param_list:
-                        verify(new_ctx, param)
-                    
-                if type != "void":
-                    new_ctx.add_var(name, type, "var")
+                body[-1] += "){"
+                body.append("entry:")
 
-                for expr in node.body:
-                    verify(new_ctx, expr)
-        
-    elif isinstance(node, MainFunction):
-        # print(node)
-        name = "main"
-        if pass1 == True:
-            if ctx.has_func(name):
-                raise TypeError(f"function {name} already declared")
-            ctx.add_func(name, "void", [Parameter(declaration_type='var', id='args', type_specifier='[string]')])
+            #DECLARACAO DE VARIAVEL DE RETORNO
+            if type == "int":
+                body.append(f"%{name} = alloca i32")
+                body.append(f"store i32 -1, i32* %{name}")
+                add_variable(name, "int", -1)
+            elif type == "float":
+                body.append(f"%{name} = alloca float")
+                body.append(f"store float -1.0, float* %{name}")
+                add_variable(name, "float", -1)
+            elif type == "bool":
+                body.append(f"%{name} = alloca i1")
+                body.append(f"store i1 0, i1* %{name}")
+                add_variable(name, "bool", -1)
+            elif type == "string":
+                body.append(f"%{name} = alloca i8*")
+                body.append(f"store i8* "", i8** %{name}")
+                add_variable(name, "string", -1)
+            elif type == "char":
+                body.append(f"%{name} = alloca i8")
+                body.append(f"store i8 '', i8* %{name}")
+                add_variable(name, "char", -1)
 
-        else:
-            new_ctx = copy.deepcopy(ctx)
+            #BODY
             for expr in node.body:
-                verify(new_ctx, expr)
+                verify(expr)
+
+            #RETURN
+            if type == "int":
+                body.append(f"%{counter} = load i32, i32* %{name}")
+                body.append(f"ret i32 %{counter}")
+                counter+=1
+            elif type == "float":
+                body.append(f"%{counter} = load float, float* %{name}")
+                body.append(f"ret float %{counter}")
+            elif type == "bool":
+                body.append(f"%{counter} = load i1, i1* %{name}")
+                body.append(f"ret i1 %{counter}")
+            elif type == "string":
+                body.append(f"%{counter} = load i8*, i8** %{name}")
+                body.append(f"ret i8* %{counter}")
+            elif type == "char":
+                body.append(f"%{counter} = load i8, i8* %{name}")
+                body.append(f"ret i8 %{counter}")
+            elif type == "void":
+                body.append(f"ret void")
+        
+            body.append(f"}}")
+            counter = 0
+    elif isinstance(node, MainFunction):
+        body.append("define dso_local void @main() {")  #VERIFICAR SE É ISTO MAYBE VOID
+        body.append("entry:")
+
+        for expr in node.body:
+            verify(expr)
+        
+        body.append("ret void")
+        body.append("}")
+        counter = 0
+        pass
     elif isinstance(node, FunctionCall): 
         name = node.id
-        if not ctx.has_func(name):
-             raise TypeError(f"Function {name} is not defined")
-        
-        if ctx.get_funcParam(name) != None and node.param_list == None:
-            raise TypeError(f"function {name} have arguments and you called it without arguments")
-        elif ctx.get_funcParam(name) == None and node.param_list != None:
-            raise TypeError(f"function {name} dont have arguments and you called it with arguments")
-        
-        if ctx.get_funcParam(name) == None and node.param_list == None:
-            pass
-        else:
-            if len(node.param_list) != len(ctx.get_funcParam(name)):
-                raise TypeError(f"function {name} called with wrong number of arguments")
-            
-            for arg, param in zip(node.param_list, ctx.get_funcParam(name)):
-                if verify(ctx, arg) != param.type_specifier:
-                    raise TypeError(f"function {name} called with wrong argument types")
+        for arg in node.param_list:
+            if isinstance(arg, Literal):
+                continue
+            verify(arg)
 
-        return ctx.get_funcType(name)
+        # body.append(f"call void @{name}()") #FALTA POR PARAMETROS
+        print(node.param_list)
+        body.append(f"%call{call_counter} =call void @{name}(")
+        add_to_function(name, "void", call_counter)
+        call_counter += 1
+        params = []
+        for x in node.param_list:
+            if isinstance(x, Literal):
+                if x.type == "int":
+                    params.append(f"i32 noundef {x.value}")
+                elif x.type == "float":
+                    params.append(f"float noundef {x.value}")
+                elif x.type == "bool":
+                    params.append(f"i1 noundef {x.value}")
+                elif x.type == "string":
+                    params.append(f"i8* noundef {x.value}")
+                elif x.type == "char":
+                    params.append(f"i8 noundef signext {x.value}")
+            else:
+                if x.id in variable_map:
+                    type = variable_map[x.id]["type"]
+                    if type == "int":
+                        params.append(f"i32 noundef %{variable_map[x.id]["number"]}")
+                    elif type == "float":
+                        params.append(f"float noundef %{variable_map[x.id]["number"]}")
+                    elif type == "bool":
+                        params.append(f"i1 noundef %{variable_map[x.id]["number"]}")
+                    elif type == "string":
+                        params.append(f"i8* noundef %{variable_map[x.id]["number"]}")
+                    elif type == "char":
+                        params.append(f"i8 noundef signext %{variable_map[x.id]["number"]}")
+                else:
+                    type = variable_map_global[x.id]["type"]
+                    if type == "int":
+                        params.append(f"i32 noundef %{variable_map_global[x.id]["number"]}")
+                    elif type == "float":
+                        params.append(f"float noundef %{variable_map_global[x.id]["number"]}")
+                    elif type == "bool":
+                        params.append(f"i1 noundef %{variable_map_global[x.id]["number"]}")
+                    elif type == "string":
+                        params.append(f"i8* noundef %{variable_map_global[x.id]["number"]}")
+                    elif type == "char":
+                        params.append(f"i8 noundef signext %{variable_map_global[x.id]["number"]}")
+        body[-1] += ",".join(params) + ")"
 
+        return f"call{function_map[name]["number"]}"
     elif isinstance(node, BinaryOperators):	
         op = node.operator
         vt1 = interpretor(ctx, node.left_operand)
@@ -264,10 +417,30 @@ def verify(node):
             raise TypeError(f"WHILE condition requires a boolean. Got {verify(ctx, condition)} instead.")
         for a in node.block_seq:
             verify(ctx ,a)
-    elif isinstance(node, Parameter):	
-        ctx.add_var(node.id, node.type_specifier, node.declaration_type)
+    elif isinstance(node, Parameter):
+        if node.type_specifier == "int":
+            body.append(f"%{node.id}.addr = alloca i32")
+            body.append(f"store i32 %{node.id}, i32* %{node.id}.addr")
+            add_variable(node.id, "int", -1)
+        elif node.type_specifier == "float":
+            body.append(f"%{node.id}.addr = alloca float")
+            body.append(f"store float %{node.id}, float* %{node.id}.addr")
+            add_variable(node.id, "float", -1)
+        elif node.type_specifier == "bool":
+            body.append(f"%{node.id}.addr = alloca i1")
+            body.append(f"store i1 %{node.id}, i1* %{node.id}.addr")
+            add_variable(node.id, "bool", -1)
+        elif node.type_specifier == "string":
+            body.append(f"%{node.id}.addr = alloca i8*")
+            body.append(f"store i8* %{node.id}, i8** %{node.id}.addr")
+            add_variable(node.id, "string", -1)
+        elif node.type_specifier == "char":
+            body.append(f"%{node.id}.addr = alloca i8")
+            body.append(f"store i8 %{node.id}, i8* %{node.id}.addr")
+            add_variable(node.id, "char", -1)
+
     elif isinstance(node, Literal):
-        return node.type
+        return node.value
     else:
         print("semantic missing:", node.__class__.__name__)
 
@@ -296,4 +469,11 @@ def float_to_hex(f):
 
 print(float_to_hex(11.1))
 
-print(f'@__const. i8] c"\\00", align 1')
+def add_variable(name, var_type, number):
+    variable_map[name] = {"type": var_type, "number": number}
+
+def add_variable_global(name, var_type, number):
+    variable_map_global[name] = {"type": var_type, "number": number}
+
+def add_to_function(name, var_type, number):
+    function_map[name] = {"type": var_type, "number": number}

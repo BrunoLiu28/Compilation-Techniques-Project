@@ -7,6 +7,7 @@ from ply import yacc,lex
 from semantic import Context, verify
 from tokens import *
 from rules import *
+import codeGen
 
 parser = yacc.yacc()
 
@@ -43,6 +44,10 @@ def main(options={},filename=False):
 
 	interpretor(ContextInterpretor(),  ast)
 	print("OK! INTERPRETATION PASSED!")
-	
+	code_lines = codeGen.verify(ast)
+	code_string = '\n'.join(code_lines)
+	print("----------------------------------------------------------------------------------------------------")
+	print("----------------------------------------------------------------------------------------------------")
+	print(code_string)
 if __name__ == '__main__':
 	main()
