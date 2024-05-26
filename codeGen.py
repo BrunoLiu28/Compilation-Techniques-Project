@@ -15,6 +15,7 @@ variable_map_global = {}
 variable_map = {}
 function_map = {}
 call_counter = 0
+binary_Op_counter = 0
 
 def verify(node):
     global pass1
@@ -22,7 +23,7 @@ def verify(node):
     global counter
     global variable_map
     global call_counter
-
+    global binary_Op_counter
     if isinstance(node, Program):
         for block in node.main_block_sequence:
             if isinstance(block, Declaration):
@@ -137,6 +138,7 @@ def verify(node):
                 body.append(f'%{counter} = load i8, i8* %{node.id}')
                 add_variable(node.id, "char", counter)
             counter += 1
+            return f"{counter-1}"
         else:
             type = variable_map_global[node.id]["type"]
             if type == "int":
@@ -155,7 +157,7 @@ def verify(node):
                 body.append(f'%{counter} = load i8, i8* @{node.id}')
                 add_variable_global(node.id, "char", counter)
             counter += 1
-        
+            return f"{counter-1}"
         
     elif isinstance(node, ArrayAccess):	#FALTA FAZER ESTE
         # if not ctx.has_var(node.ID):
@@ -321,67 +323,67 @@ def verify(node):
         return f"call{function_map[name]["number"]}"
     elif isinstance(node, BinaryOperators):	
         op = node.operator
-        vt1 = interpretor(ctx, node.left_operand)
-        vt2 = interpretor(ctx, node.right_operand)
+        vt1 = verify(node.left_operand)
+        vt2 = verify(node.right_operand)
         if op == '%':
-            print(f'%rem = srem nsw i32 %{counter}, {node.right_operand}')
-            print(f'store i32 %rem, i32* %{node.left_operand}') #o node left_operand tem de ser nome da variavel atribuida
-            return vt1%vt2
+            body.append(f'%biop{binary_Op_counter} = srem nsw i32 %{vt1}, {vt2}')
+            id = f"biop{binary_Op_counter}"
+            binary_Op_counter += 1
+            return id
         elif op == '/':
-            print(f'%div = sdiv nsw i32 %{counter}, {node.right_operand}')
-            print(f'store i32 %div, i32* %{node.left_operand}') #o node left_operand tem de ser nome da variavel atribuida
-            return vt1/vt2
+            body.append(f'%biop{binary_Op_counter} = sdiv nsw i32 %{vt1}, {vt2}')
+            id = f"biop{binary_Op_counter}"
+            binary_Op_counter += 1
+            return id
         elif op == '*':
-            print(f'%mul = mul nsw i32 %{counter}, {node.right_operand}')
-            print(f'store i32 %mul, i32* %{node.left_operand}') #o node left_operand tem de ser nome da variavel atribuida
-            return vt1*vt2
+            body.append(f'%biop{binary_Op_counter} = mul nsw i32 %{vt1}, {vt2}')
+            id = f"biop{binary_Op_counter}"
+            binary_Op_counter += 1
+            return id
         elif op == '+':
-            # %0 = load i32, i32* %a, align 4
-            # %add = add nsw i32 %0, 2
-            # store i32 %add, i32* %b, align 4
-            # print(f'%{counter} = load i32, i32* %{node.left_operand}')
-            print(f'%add = add nsw i32 %{counter}, {node.right_operand}') #VERIFICAR ULTIMA PARTE
-            #VERIFICAR 
-            print(f'store i32 %add, i32* %{node.left_operand}') #o node left_operand tem de ser nome da variavel atribuida
-            return vt1+vt2
+            body.append(f'%biop{binary_Op_counter} = add nsw i32 %{vt1}, {vt2}') #VERIFICAR ULTIMA PARTE
+            id = f"biop{binary_Op_counter}"
+            binary_Op_counter += 1
+            return id
         elif op == '-':
-            print(f'%sub = sub nsw i32 %{counter}, {node.right_operand}')
-            print(f'store i32 %sub, i32* %{node.left_operand}') #o node left_operand tem de ser nome da variavel atribuida
-            return vt1-vt2
+            body.append(f'%biop{binary_Op_counter} = sub nsw i32 %{vt1}, {vt2}')
+            id = f"biop{binary_Op_counter}"
+            binary_Op_counter += 1
+            return id
         elif op == '^': #VER COMO FAZER ISTO
             return vt1**vt2
         elif op == '=':
             # %cmp = icmp eq i32 %0, %1
             # %conv = zext i1 %cmp to i32
             # store i32 %conv, i32* %b, align 4
-            print(f'%cmp = icmp eq i32 %{counter}, {node.right_operand}')
-            print(f'%conv = zext i1 %cmp to i32')
-            print(f'store i32 %conv, i32* %{node.left_operand}')
+            body.append(f'%cmp = icmp eq i32 %{vt1}, {vt2}')
+            body.append(f'%conv = zext i1 %cmp to i32')
+            # print(f'store i32 %conv, i32* %{node.left_operand}')
             return vt1==vt2
         elif op == '!=':
-            print(f'%cmp = icmp ne i32 %{counter}, {node.right_operand}')
-            print(f'%conv = zext i1 %cmp to i32')
-            print(f'store i32 %conv, i32* %{node.left_operand}')
+            body.append(f'%cmp = icmp ne i32 %{vt1}, {vt2}')
+            body.append(f'%conv = zext i1 %cmp to i32')
+            # print(f'store i32 %conv, i32* %{node.left_operand}')
             return vt1!=vt2
         elif op == '<=':
-            print(f'%cmp = icmp sle i32 %{counter}, {node.right_operand}')
-            print(f'%conv = zext i1 %cmp to i32')
-            print(f'store i32 %conv, i32* %{node.left_operand}')
+            body.append(f'%cmp = icmp sle i32 %{vt1}, {vt2}')
+            body.append(f'%conv = zext i1 %cmp to i32')
+            # print(f'store i32 %conv, i32* %{node.left_operand}')
             return vt1<=vt2
         elif op == '>=':
-            print(f'%cmp = icmp sge i32 %{counter}, {node.right_operand}')
-            print(f'%conv = zext i1 %cmp to i32')
-            print(f'store i32 %conv, i32* %{node.left_operand}')
+            body.append(f'%cmp = icmp sge i32 %{vt1}, {vt2}')
+            body.append(f'%conv = zext i1 %cmp to i32')
+            # print(f'store i32 %conv, i32* %{node.left_operand}')
             return vt1>=vt2
         elif op == '>':
-            print(f'%cmp = icmp sgt i32 %{counter}, {node.right_operand}')
-            print(f'%conv = zext i1 %cmp to i32')
-            print(f'store i32 %conv, i32* %{node.left_operand}')
+            body.append(f'%cmp = icmp sgt i32 %{vt1}, {vt2}')
+            body.append(f'%conv = zext i1 %cmp to i32')
+            # print(f'store i32 %conv, i32* %{node.left_operand}')
             return vt1>vt2
         elif op == '<':
-            print(f'%cmp = icmp slt i32 %{counter}, {node.right_operand}')
-            print(f'%conv = zext i1 %cmp to i32')
-            print(f'store i32 %conv, i32* %{node.left_operand}')
+            body.append(f'%cmp = icmp slt i32 %{vt1}, {vt2}')
+            body.append(f'%conv = zext i1 %cmp to i32')
+            # print(f'store i32 %conv, i32* %{node.left_operand}')
             return vt1<vt2
         elif op == '&&':
             return vt1 and vt2
@@ -403,13 +405,14 @@ def verify(node):
     elif isinstance(node, IfStatement):
         condition = node.condition
         # print(condition)
-        if verify(ctx ,condition) != 'bool':
-            raise TypeError(f"If condition requires a boolean. Got {verify(ctx, condition)} instead.")
-        for a in node.thenBlock:
-            verify(ctx ,a)
-        if node.elseBlock != None:
-            for a in node.elseBlock:
-                verify(ctx ,a)
+        verify(condition)
+        # if verify(ctx ,condition) != 'bool':
+        #     raise TypeError(f"If condition requires a boolean. Got {verify(ctx, condition)} instead.")
+        # for a in node.thenBlock:
+        #     verify(ctx ,a)
+        # if node.elseBlock != None:
+        #     for a in node.elseBlock:
+        #         verify(ctx ,a)
     
     elif isinstance(node, WhileStatement):	
         condition = node.condition
