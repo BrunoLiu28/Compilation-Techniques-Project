@@ -14,9 +14,13 @@
 # 	maxRangeSquared := 0;
 # }
 
+function getArrayRandomFloats(var mi:int) : [float];
+
+
 
 function main(val args:[string]) {
 	val result : int := 1;
+    val numbers : [float] := getArrayRandomFloats(result);
 	# val result2 : int := maxRangeSquared(2, actual_max);
 	# print_int(result);
 }

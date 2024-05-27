@@ -42,8 +42,8 @@ def main(options={},filename=False):
 	verify(Context(),  ast)
 	print("OK! TYPE CHECKING PASSED!")
 
-	interpretor(ContextInterpretor(),  ast)
-	print("OK! INTERPRETATION PASSED!")
+	# interpretor(ContextInterpretor(),  ast)
+	# print("OK! INTERPRETATION PASSED!")
 	code_lines = codeGen.verify(ast)
 	code_string = '\n'.join(code_lines)
 	print("----------------------------------------------------------------------------------------------------")
