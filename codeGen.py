@@ -263,7 +263,8 @@ def verify(node):
     elif isinstance(node, MainFunction):
         body.append("define dso_local void @main() {")  #VERIFICAR SE É ISTO MAYBE VOID
         body.append("entry:")
-
+        body.append(f"%argv.addr = alloca i8**")
+        body.append(f"store i8** %0, i8*** %argv.addr")
         for expr in node.body:
             verify(expr)
         

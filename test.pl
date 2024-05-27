@@ -15,16 +15,16 @@
 # }
 
 
-# function main(val args:[string]) {
-# 	val result : int := maxRangeSquared(2, actual_max);
-# 	val result2 : int := maxRangeSquared(2, actual_max);
-# 	# print_int(result);
-# }
+function main(val args:[string]) {
+	val result : int := 1;
+	# val result2 : int := maxRangeSquared(2, actual_max);
+	# print_int(result);
+}
 
 # var global : int := 1;
-function ola() : int {
-    ola := 1;
-    while -5 > ola {
-        ola := ola - 1;
-    }
-}
+# function ola() : int {
+#     ola := 1;
+#     while -5 > ola {
+#         ola := ola - 1;
+#     }
+# }
