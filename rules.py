@@ -253,7 +253,6 @@ def p_if_block(t):
     """if_block : IF expression LBRACE block_sequence RBRACE ELSE LBRACE block_sequence RBRACE
 	            | IF expression LBRACE block_sequence RBRACE 
 	"""
-    print(t[2])
     if len(t) == 10:
         t[0] = IfStatement(condition=t[2], thenBlock= t[4], elseBlock=t[8])
     else:
@@ -397,6 +396,8 @@ def p_expression(t):
         t[0]  = BinaryOperators(operator='||', left_operand=t[1], right_operand=t[3])
     elif t[1] == '!':
         t[0]  = UnaryOperators(operator='!', operand=t[2])
+    elif t[1] == '(':
+        t[0]  = t[2]
 
 
 def p_error(p):

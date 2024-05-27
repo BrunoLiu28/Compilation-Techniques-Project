@@ -24,6 +24,7 @@
 # var global : int := 1;
 function ola() : int {
     ola := 1;
-    var ola2: int := ola+2;
-
+    while -5 > ola {
+        ola := ola - 1;
+    }
 }

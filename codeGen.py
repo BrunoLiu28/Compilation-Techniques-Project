@@ -16,7 +16,8 @@ variable_map = {}
 function_map = {}
 call_counter = 0
 binary_Op_counter = 0
-
+if_counter = 0
+while_counter = 0
 def verify(node):
     global pass1
     global codigo
@@ -24,6 +25,8 @@ def verify(node):
     global variable_map
     global call_counter
     global binary_Op_counter
+    global if_counter
+    global while_counter
     if isinstance(node, Program):
         for block in node.main_block_sequence:
             if isinstance(block, Declaration):
@@ -86,7 +89,7 @@ def verify(node):
                         else:
                             body.append(f"store i1 0, i1* %{name}")
                     elif type == "string": #VER DEPOIS
-                        # #devolver o valor mesmo no node.expression
+                        #devolver o valor mesmo no node.expression
                         body.append(f'@{node.id} = dso_local global [{len(node.expression)} x i8] c"{len(node.expression)}", align 1')
                     elif type == "char":
                         body.append(f"store i8 {ord(node.expression)}, i8* %{name}")
@@ -159,7 +162,7 @@ def verify(node):
             counter += 1
             return f"{counter-1}"
         
-    elif isinstance(node, ArrayAccess):	#FALTA FAZER ESTE
+    elif isinstance(node, ArrayAccess):	                                                                                    #FALTA FAZER ESTE
         # if not ctx.has_var(node.ID):
         #     raise TypeError(f"Variable {node.ID} is not declared")
         # if verify(ctx, node.index) != "int":
@@ -319,7 +322,6 @@ def verify(node):
                     elif type == "char":
                         params.append(f"i8 noundef signext %{variable_map_global[x.id]["number"]}")
         body[-1] += ",".join(params) + ")"
-
         return f"call{function_map[name]["number"]}"
     elif isinstance(node, BinaryOperators):	
         op = node.operator
@@ -350,53 +352,51 @@ def verify(node):
             id = f"biop{binary_Op_counter}"
             binary_Op_counter += 1
             return id
-        elif op == '^': #VER COMO FAZER ISTO
+        elif op == '^':                                                                     #VER COMO FAZER ISTO
             return vt1**vt2
         elif op == '=':
-            # %cmp = icmp eq i32 %0, %1
-            # %conv = zext i1 %cmp to i32
-            # store i32 %conv, i32* %b, align 4
-            body.append(f'%cmp = icmp eq i32 %{vt1}, {vt2}')
-            body.append(f'%conv = zext i1 %cmp to i32')
-            # print(f'store i32 %conv, i32* %{node.left_operand}')
-            return vt1==vt2
+            body.append(f'%biop{binary_Op_counter} = icmp eq i32 %{vt1}, {vt2}')
+            id = f"biop{binary_Op_counter}"
+            binary_Op_counter += 1
+            return id
         elif op == '!=':
-            body.append(f'%cmp = icmp ne i32 %{vt1}, {vt2}')
-            body.append(f'%conv = zext i1 %cmp to i32')
-            # print(f'store i32 %conv, i32* %{node.left_operand}')
-            return vt1!=vt2
+            body.append(f'%biop{binary_Op_counter} = icmp ne i32 %{vt1}, {vt2}')
+            id = f"biop{binary_Op_counter}"
+            binary_Op_counter += 1
+            return id
         elif op == '<=':
-            body.append(f'%cmp = icmp sle i32 %{vt1}, {vt2}')
-            body.append(f'%conv = zext i1 %cmp to i32')
-            # print(f'store i32 %conv, i32* %{node.left_operand}')
-            return vt1<=vt2
+            body.append(f'%biop{binary_Op_counter} = icmp sle i32 %{vt1}, {vt2}')
+            id = f"biop{binary_Op_counter}"
+            binary_Op_counter += 1
+            return id
         elif op == '>=':
-            body.append(f'%cmp = icmp sge i32 %{vt1}, {vt2}')
-            body.append(f'%conv = zext i1 %cmp to i32')
-            # print(f'store i32 %conv, i32* %{node.left_operand}')
-            return vt1>=vt2
+            body.append(f'%biop{binary_Op_counter} = icmp sge i32 %{vt1}, {vt2}')
+            id = f"biop{binary_Op_counter}"
+            binary_Op_counter += 1
+            return id
         elif op == '>':
-            body.append(f'%cmp = icmp sgt i32 %{vt1}, {vt2}')
-            body.append(f'%conv = zext i1 %cmp to i32')
-            # print(f'store i32 %conv, i32* %{node.left_operand}')
-            return vt1>vt2
+            body.append(f'%biop{binary_Op_counter} = icmp sgt i32 %{vt1}, {vt2}')
+            id = f"biop{binary_Op_counter}"
+            binary_Op_counter += 1
+            return id
         elif op == '<':
-            body.append(f'%cmp = icmp slt i32 %{vt1}, {vt2}')
-            body.append(f'%conv = zext i1 %cmp to i32')
-            # print(f'store i32 %conv, i32* %{node.left_operand}')
-            return vt1<vt2
+            body.append(f'%biop{binary_Op_counter} = icmp slt i32 %{vt1}, {vt2}')
+            id = f"biop{binary_Op_counter}"
+            binary_Op_counter += 1
+            return id
         elif op == '&&':
             return vt1 and vt2
         elif op == '||':
             return vt1 or vt2
     elif isinstance(node, UnaryOperators):
         op = node.operator
-        vt = verify(ctx ,node.operand)
+        vt = verify(node.operand)
         if op == '!':
-            if vt != 'bool':
-                raise TypeError(f"Operation {op} requires a boolean. Got {vt} instead.")
-            return 'bool'
-        if op == '-':
+            body.append(f'%biop{binary_Op_counter} = xor i1 {vt}, true')
+            id = f"biop{binary_Op_counter}"
+            binary_Op_counter += 1
+            return id
+        if op == '-':                                                                                            #FALTA FAZER ESTE
             if vt == 'int':
                 return 'int'
             if vt == 'float':
@@ -405,21 +405,51 @@ def verify(node):
     elif isinstance(node, IfStatement):
         condition = node.condition
         # print(condition)
-        verify(condition)
-        # if verify(ctx ,condition) != 'bool':
-        #     raise TypeError(f"If condition requires a boolean. Got {verify(ctx, condition)} instead.")
-        # for a in node.thenBlock:
-        #     verify(ctx ,a)
-        # if node.elseBlock != None:
-        #     for a in node.elseBlock:
-        #         verify(ctx ,a)
-    
+        if node.elseBlock != None:  #TEM ELSE
+            id = verify(condition)
+            body.append(f"br i1 %{id}, label %if.then{if_counter}, label %if.else{if_counter}")
+
+            #THEN BLOCK
+            body.append(f"if.then{if_counter}:")
+            for a in node.thenBlock:
+                verify(a)
+            body.append(f"br label %if.end{if_counter}") 
+
+            #ELSE BLOCK
+            body.append(f"if.else{if_counter}:")
+            for a in node.elseBlock:
+                verify(a)
+            body.append(f"br label %if.end{if_counter}") 
+
+            body.append(f"if.end{if_counter}:") 
+        else:   #NAO TEM ELSE
+            id = verify(condition)
+            body.append(f"br i1 %{id}, label %if.then{if_counter}, label %if.end{if_counter}")
+
+            #THEN BLOCK
+            body.append(f"if.then{if_counter}:")
+            for a in node.thenBlock:
+                verify(a)
+            body.append(f"br label %if.end{if_counter}") 
+
+            body.append(f"if.end{if_counter}:")
     elif isinstance(node, WhileStatement):	
         condition = node.condition
-        if verify(ctx ,condition) != 'bool':
-            raise TypeError(f"WHILE condition requires a boolean. Got {verify(ctx, condition)} instead.")
+        body.append(f"br label %while.cond{while_counter}")
+        #WHILE CONDITION
+        body.append(f"while.cond{while_counter}:")
+        id = verify(condition)
+        body.append(f"br i1 %{id}, label %while.body{while_counter}, label %while.end{while_counter}")
+
+        #WHILE BODY
+        body.append(f"while.body{while_counter}:")
         for a in node.block_seq:
-            verify(ctx ,a)
+            verify(a)
+        body.append(f"br label %while.cond{while_counter}")
+
+        #END WHILE
+        body.append(f"while.end{while_counter}:")
+
     elif isinstance(node, Parameter):
         if node.type_specifier == "int":
             body.append(f"%{node.id}.addr = alloca i32")
