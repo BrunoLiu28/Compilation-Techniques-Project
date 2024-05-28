@@ -6,13 +6,14 @@
 main:                                   # @main
 	.cfi_startproc
 # %bb.0:                                # %entry
-	pushq	%rax
-	.cfi_def_cfa_offset 16
-	movq	%rdi, (%rsp)
+	subq	$24, %rsp
+	.cfi_def_cfa_offset 32
+	movq	%rdi, 16(%rsp)
+	callq	teste
+	movq	%rax, 8(%rsp)
+	movq	%rax, %rdi
 	callq	getArrayRandomFloats
-	movl	%eax, %edi
-	callq	print_int
-	popq	%rax
+	addq	$24, %rsp
 	.cfi_def_cfa_offset 8
 	retq
 .Lfunc_end0:
