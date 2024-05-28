@@ -20,3 +20,7 @@ void print_char(char value) {
 void print_string(const char* value) {
     printf("%s\n", value);
 }
+
+int getArrayRandomFloats() {
+    return 4;
+}

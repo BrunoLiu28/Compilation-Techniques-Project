@@ -18,6 +18,16 @@ call_counter = 0
 binary_Op_counter = 0
 if_counter = 0
 while_counter = 0
+
+def add_to_function(name, var_type, number):
+    function_map[name] = {"type": var_type, "number": number}
+
+add_to_function("print_int", "void", -1)
+add_to_function("print_float", "void", -1)
+add_to_function("print_bool", "void", -1)
+add_to_function("print_string", "void", -1)
+
+body.append("declare dso_local void @print_int(i32 noundef) #0")
 def verify(node):
     global pass1
     global codigo
@@ -177,6 +187,41 @@ def verify(node):
         name = node.id
         type = node.return_type
         if node.declaration_type == "ffi": #FALTA FAZER VER DPS COMO SE FAZ
+            # declare dso_local i32 @printf(i8* noundef, ...) #2
+            add_to_function(name, type, -1)
+            num_pairs, base_type = parse_type_specifier(function_map[node.id]["type"])
+            print(num_pairs)
+            arrayOrNot = '*' * num_pairs
+            if base_type == "int":
+                body.append(f"declare dso_local i32{arrayOrNot} @{name}(")
+            elif base_type == "float":
+                body.append(f"declare dso_local float{arrayOrNot} @{name}(")
+            elif base_type == "bool":
+                body.append(f"declare dso_local i1{arrayOrNot} @{name}(")
+            elif base_type == "string":
+                body.append(f"declare dso_local i8*{arrayOrNot} @{name}(")
+            elif base_type == "char":
+                body.append(f"declare dso_local i8{arrayOrNot} @{name}(")
+            else:
+                body.append(f"declare dso_local void @{name}(")
+            # node.param_list = function_map[node.id]["params"]
+            if node.param_list != None:
+                params = []
+                for x in node.param_list:
+                    if x.type_specifier == "int":
+                        params.append(f"i32 noundef")
+                    elif x.type_specifier == "float":
+                        params.append(f"float noundef")
+                    elif x.type_specifier == "bool":
+                        params.append(f"i1 noundef")
+                    elif x.type_specifier == "string":
+                        params.append(f"i8* noundef")
+                    elif x.type_specifier == "char":
+                        params.append(f"i8 noundef signext")
+                body[-1] += ",".join(params) + f")#{call_counter}"
+            else:
+                body[-1] += f") #{call_counter}"
+            
             add_to_function(name, type, -1)
             pass
         else: #funcao normal
@@ -265,10 +310,10 @@ def verify(node):
             body.append(f"}}")
             counter = 0
     elif isinstance(node, MainFunction):
-        body.append("define dso_local void @main() {")  #VERIFICAR SE É ISTO MAYBE VOID
+        body.append(f"define dso_local void @main(i8** noundef %argv) {{")  #VERIFICAR SE É ISTO MAYBE VOID
         body.append("entry:")
         body.append(f"%argv.addr = alloca i8**")
-        body.append(f"store i8** %0, i8*** %argv.addr")
+        body.append(f"store i8** %argv, i8*** %argv.addr")
         for expr in node.body:
             verify(expr)
         
@@ -278,19 +323,21 @@ def verify(node):
         pass
     elif isinstance(node, FunctionCall): 
         name = node.id
+        params = []
         if node.param_list != None:
             for arg in node.param_list:
                 if isinstance(arg, Literal):
                     continue
-                verify(arg)
+                
+                params.append(f"i32 noundef %{verify(arg)}")    #VERIFICAR SE É ISTO
 
-
-        print(node.param_list)
+        
         print(function_map[node.id]["type"])
         num_pairs, base_type = parse_type_specifier(function_map[node.id]["type"])
         print(num_pairs)
         arrayOrNot = '*' * num_pairs
-
+        print("TESTEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE")
+        print(base_type)
         if base_type == "int":
             body.append(f"%call{call_counter} = call i32{arrayOrNot} @{name}(")
         elif base_type == "float":
@@ -301,12 +348,15 @@ def verify(node):
             body.append(f"%call{call_counter} = call i8*{arrayOrNot} @{name}(")   #VER ISTO
         elif base_type == "char":
             body.append(f"%call{call_counter} = call i8{arrayOrNot} @{name}(")
+        else:
+            body.append(f"call void @{name}(")
         
         # body.append(f"%call{call_counter} = call void @{name}(")
 
         add_to_function(name, function_map[node.id]["type"], call_counter)
         call_counter += 1
-        params = []
+        # params = []
+        print(node)
         if node.param_list != None:
             for x in node.param_list:
                 if isinstance(x, Literal):
@@ -320,6 +370,9 @@ def verify(node):
                         params.append(f"i8* noundef {x.value}")
                     elif x.type == "char":
                         params.append(f"i8 noundef signext {x.value}")
+                elif isinstance(x, FunctionCall):
+                    # params.append(f"i32 noundef %")
+                    pass
                 else:
                     if x.id in variable_map:
                         type = variable_map[x.id]["type"]
@@ -348,6 +401,7 @@ def verify(node):
             body[-1] += ",".join(params) + ")"
         else:
             body[-1] += ")"
+        print("CHEGOUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUuu")
         return f"call{function_map[name]["number"]}"
     elif isinstance(node, BinaryOperators):	
         op = node.operator
@@ -534,8 +588,7 @@ def add_variable(name, var_type, number):
 def add_variable_global(name, var_type, number):
     variable_map_global[name] = {"type": var_type, "number": number}
 
-def add_to_function(name, var_type, number):
-    function_map[name] = {"type": var_type, "number": number}
+
 
 def parse_type_specifier(type_specifier):
     # Regular expression to match the base type and brackets
