@@ -287,7 +287,8 @@ def verify(node):
                 body.append(f"define dso_local signext i8 @{name}(")
             elif type == "void":
                 body.append(f"define dso_local void @{name}(")
-
+            add_to_function(name, type, -1)
+            
             if node.param_list != None:
                 params = []
                 for x in node.param_list:
@@ -414,34 +415,35 @@ def verify(node):
                     pass
                 else:
                     if x.id in variable_map: #VARIAVEL LOCAL
-                        verify(x)
-                        # type = variable_map[x.id]["type"]
+                        
                         num_pairs, type = parse_type_specifier(variable_map[x.id]["type"])
                         arrayOrNot = '*' * num_pairs
                         if type == "int":
-                            params.append(f"i32{arrayOrNot} noundef %{variable_map[x.id]["number"]}")
+                            params.append(f"i32{arrayOrNot} noundef {verify(x)}")
                         elif type == "float":
-                            params.append(f"float{arrayOrNot} noundef %{variable_map[x.id]["number"]}")
+                            params.append(f"float{arrayOrNot} noundef {verify(x)}")
                         elif type == "bool":
-                            params.append(f"i1{arrayOrNot} noundef %{variable_map[x.id]["number"]}")
+                            params.append(f"i1{arrayOrNot} noundef {verify(x)}")
                         elif type == "string":
-                            params.append(f"i8*{arrayOrNot} noundef %{variable_map[x.id]["number"]}")
+                            params.append(f"i8*{arrayOrNot} noundef {verify(x)}")
                         elif type == "char":
-                            params.append(f"i8{arrayOrNot} noundef signext %{variable_map[x.id]["number"]}")
+                            params.append(f"i8{arrayOrNot} noundef signext {verify(x)}")
                     else: #VARIAVEL GLOBAL
                         # type = variable_map_global[x.id]["type"]
                         num_pairs, type = parse_type_specifier(variable_map_global[x.id]["type"])
                         arrayOrNot = '*' * num_pairs
+                        print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
+                        print(x)
                         if type == "int":
-                            params.append(f"i32{arrayOrNot} noundef %{variable_map_global[x.id]["number"]}")
+                            params.append(f"i32{arrayOrNot} noundef {verify(x)}")
                         elif type == "float":
-                            params.append(f"float{arrayOrNot} noundef %{variable_map_global[x.id]["number"]}")
+                            params.append(f"float{arrayOrNot} noundef {verify(x)}")
                         elif type == "bool":
-                            params.append(f"i1{arrayOrNot} noundef %{variable_map_global[x.id]["number"]}")
+                            params.append(f"i1{arrayOrNot} noundef {verify(x)}")
                         elif type == "string":
-                            params.append(f"i8*{arrayOrNot} noundef %{variable_map_global[x.id]["number"]}")
+                            params.append(f"i8*{arrayOrNot} noundef {verify(x)}")
                         elif type == "char":
-                            params.append(f"i8{arrayOrNot} noundef signext %{variable_map_global[x.id]["number"]}")
+                            params.append(f"i8{arrayOrNot} noundef signext {verify(x)}")
             body.append(call + (",".join(params)) + ")")
         else:
             body.append(call + ("\n".join(params)) + ")")
