@@ -14,18 +14,29 @@
 # 	maxRangeSquared := 0;
 # }
 
-function getArrayRandomFloats(val m:[int]) : void;
-function teste() : [int];
+# function getArrayRandomFloats(val m:[float]) : void;
+# function teste() : [float];
 
 
 function main(val args:[string]) {
 	# print_int(getArrayRandomFloats());
 
-	# val result : int := 1;
-    val numbers : [int] := teste();
+	var s : string := "ola";
+	print(s);
+	# val a : int := 1;
+    # var numbers : [float] := teste();
+	# getArrayRandomFloats(numbers);
+	# # val i : float := 1.0;
+	# # print_float(i);
+	# numbers[a] := 8.2;
+	# # getArrayRandomFloats(numbers);
+	# val b : float := numbers[a];
+	# print_float(b);
+	# getArrayRandomFloats(numbers);
+	# val teste : float := 1232.74234;
 	# val result2 : int := maxRangeSquared(2, actual_max);
 	# print_int(result);
-	getArrayRandomFloats(numbers);
+	# print_float(teste);
 }
 
 # var global : int := 1;

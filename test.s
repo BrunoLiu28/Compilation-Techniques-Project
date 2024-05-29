@@ -9,10 +9,9 @@ main:                                   # @main
 	subq	$24, %rsp
 	.cfi_def_cfa_offset 32
 	movq	%rdi, 16(%rsp)
-	callq	teste
-	movq	%rax, 8(%rsp)
-	movq	%rax, %rdi
-	callq	getArrayRandomFloats
+	movq	$.L.str.0, 8(%rsp)
+	movl	$.L.str.0, %edi
+	callq	print
 	addq	$24, %rsp
 	.cfi_def_cfa_offset 8
 	retq
@@ -20,4 +19,10 @@ main:                                   # @main
 	.size	main, .Lfunc_end0-main
 	.cfi_endproc
                                         # -- End function
+	.type	.L.str.0,@object                # @.str.0
+	.section	.rodata.str1.1,"aMS",@progbits,1
+.L.str.0:
+	.asciz	"ola"
+	.size	.L.str.0, 4
+
 	.section	".note.GNU-stack","",@progbits

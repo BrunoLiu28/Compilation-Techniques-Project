@@ -14,10 +14,14 @@ body = []
 variable_map_global = {}
 variable_map = {}
 function_map = {}
+string_map = {}
 call_counter = 0
 binary_Op_counter = 0
 if_counter = 0
 while_counter = 0
+arrayAccess_counter = 0
+prom_counter = 0
+string_counter = 0
 
 def add_to_function(name, var_type, number):
     function_map[name] = {"type": var_type, "number": number}
@@ -25,9 +29,15 @@ def add_to_function(name, var_type, number):
 add_to_function("print_int", "void", -1)
 add_to_function("print_float", "void", -1)
 add_to_function("print_bool", "void", -1)
-add_to_function("print_string", "void", -1)
+add_to_function("print_char", "void", -1)
+add_to_function("print", "void", -1)
 
-body.append("declare dso_local void @print_int(i32 noundef) #0")
+body.append("declare dso_local void @print_int(i32 noundef) ")
+body.append("declare dso_local void @print_float(float noundef)")
+body.append("declare dso_local void @print_bool(i1 noundef) ")
+body.append("declare dso_local void @print_char(i8 noundef) ")
+body.append("declare dso_local void @print(i8* noundef) #0")
+
 def verify(node):
     global pass1
     global codigo
@@ -37,6 +47,10 @@ def verify(node):
     global binary_Op_counter
     global if_counter
     global while_counter
+    global arrayAccess_counter
+    global prom_counter
+    global string_counter
+    global string_map
     if isinstance(node, Program):
         for block in node.main_block_sequence:
             if isinstance(block, Declaration):
@@ -77,15 +91,24 @@ def verify(node):
             #UPDATE DE VARIAVELS
             if node.declaration_type == "update":
                 if isinstance(node.id, ArrayAccess): #DEPOIS
-                    # if not ctx.has_var(node.id.ID):
-                    #     raise TypeError(f"Array {node.id.ID} doesnt exist impossible to update")
-                    
-                    # if ctx.get_varOrVal(node.id.ID) == "val":
-                    #     raise TypeError(f"Array {node.id.ID} is a val, impossible to update")
-                    
-                    # type = verify(ctx, node.id)
-                    # if type != verify(ctx, node.expression):
-                    #     raise TypeError(f"Array {node.id.ID} is of type {type} and not {verify(ctx, node.expression)}")
+                    # verify(node.id)
+                    # print(node.id.index[0])
+                    num_pairs, base_type = parse_type_specifier(variable_map[node.id.ID]["type"])
+                    arrayOrNot = '*' * (num_pairs-1)
+                    if base_type == "int":
+                        body.append(f"store i32{arrayOrNot} {verify(node.id)}, i32* %arrayidx{arrayAccess_counter}")
+                    elif base_type == "float":
+                        body.append(f"store float {verify(node.expression)}, float* {verify(node.id)}")
+                    # elif base_type == "bool":
+                    #     if node.expression == "true":
+                    #         body.append(f"store i1 1, i1* %{name}")
+                    #     else:
+                    #         body.append(f"store i1 0, i1* %{name}")
+                    # elif base_type == "string": #VER DEPOIS
+                    #     #devolver o valor mesmo no node.expression
+                    #     body.append(f'@{node.id} = dso_local global [{len(node.expression)} x i8] c"{len(node.expression)}", align 1')
+                    # elif base_type == "char":
+                    #     body.append(f"store i8 {ord(node.expression)}, i8* %{name}")
                     pass
                 else:   #UPDATE DE VARIAVEL QUE NAO É ARRAY	
                     type = variable_map[name]["type"]
@@ -99,13 +122,11 @@ def verify(node):
                         else:
                             body.append(f"store i1 0, i1* %{name}")
                     elif type == "string": #VER DEPOIS
-                        #devolver o valor mesmo no node.expression
+
                         body.append(f'@{node.id} = dso_local global [{len(node.expression)} x i8] c"{len(node.expression)}", align 1')
                     elif type == "char":
                         body.append(f"store i8 {ord(node.expression)}, i8* %{name}")
             else: #DECLARACAO DE VARIAVEL
-                print("DECLARACAO DE VARIAVEL")
-                print(node)
                 num_pairs, base_type = parse_type_specifier(node.type_specifier)
                 arrayOrNot = '*' * num_pairs
                 if base_type == "int":
@@ -114,7 +135,13 @@ def verify(node):
                     add_variable(name, node.type_specifier, -1)
                 elif base_type == "float":
                     body.append(f"%{name} = alloca float{arrayOrNot}")
-                    body.append(f"store float{arrayOrNot} {verify(node.expression)}, float*{arrayOrNot} %{name}")
+                    if isinstance(node.expression, ArrayAccess):
+                        aux = verify(node.expression)
+                        body.append(f"%{counter} = load float, float* {aux}")
+                        body.append(f"store float{arrayOrNot} %{counter}, float*{arrayOrNot} %{name}")
+                        counter += 1
+                    else:
+                        body.append(f"store float{arrayOrNot} {verify(node.expression)}, float*{arrayOrNot} %{name}")
                     add_variable(name, node.type_specifier, -1)
                 elif base_type == "bool":
                     body.append(f"%{name} = alloca i1{arrayOrNot}")
@@ -124,15 +151,15 @@ def verify(node):
                         body.append(f"store i1{arrayOrNot} 0, i1*{arrayOrNot} %{name}")
                     add_variable(name, node.type_specifier, -1)
                 elif base_type == "string":  #NOT SURE E AINDA VERIFICAR ARRAY DE STRING
-                    body.append(f'@__const.{name} = private unnamed_addr constant [{len(node.expression) + 1} x i8] c"{node.expression}\\00"')
-                    body.append(f"%{name} = alloca [{len(node.expression) + 1} x i8]")
-                    body.append(f"%{counter} = bitcast [{len(node.expression) + 1} x i8]* %{name} to i8*")
-                    body.append(f"call void @llvm.memcpy.p0i8.p0i8.i64(i8* %{counter}, i8* getelementptr inbounds ([{len(node.expression) + 1} x i8], [{len(node.expression) + 1} x i8]* @__const.{name}, i32 0, i32 0), i64 {len(node.expression) + 1}, i1 false)")
+                    body.append(f"%{name} = alloca i8*")
+                    key = verify(node.expression)
+                    
+                    body.append(f"store i8* getelementptr inbounds ([{string_map[key]['size']} x i8], [{string_map[key]['size']} x i8]* {string_map[key]['id']}, i64 0, i64 0), i8** %{name}")
                     add_variable(name, node.type_specifier, counter)
-                    counter += 1
+ 
                 elif base_type == "char":    #VERIFICAR ARRAY DE CHAR
                     body.append(f"%{name} = alloca i8")
-                    body.append(f"store i8 {ord(node.expression)}, i8* %{name}")
+                    body.append(f"store i8 {ord(verify(node.expression)[1])}, i8* %{name}")
                     add_variable(name, node.type_specifier, -1)
                 pass
 
@@ -157,7 +184,7 @@ def verify(node):
                 body.append(f'%{counter} = load i8{arrayOrNot}, i8*{arrayOrNot} %{node.id}')
                 add_variable(node.id, variable_map[node.id]["type"], counter)
             counter += 1
-            return f"{counter-1}"
+            return f"%{counter-1}"
         else:
             # type = variable_map_global[node.id]["type"]
             num_pairs, type = parse_type_specifier(variable_map_global[node.id]["type"])
@@ -178,15 +205,32 @@ def verify(node):
                 body.append(f'%{counter} = load i8{arrayOrNot}, i8*{arrayOrNot} @{node.id}')
                 add_variable_global(node.id, "char", counter)
             counter += 1
-            return f"{counter-1}"
+            return f"%{counter-1}"
         
     elif isinstance(node, ArrayAccess):	                                                                                    #FALTA FAZER ESTE
-        # if not ctx.has_var(node.ID):
-        #     raise TypeError(f"Variable {node.ID} is not declared")
-        # if verify(ctx, node.index) != "int":
-        #     raise TypeError(f"Array index should be an integer and not {verify(ctx, node.index)}")
-        # return get_type(ctx.get_varValType(node.ID))
-        pass
+        num_pairs, type = parse_type_specifier(variable_map[node.ID]["type"])
+        arrayOrNot = '*' * (num_pairs-1)
+        if type == "int":
+            if isinstance(node.index[0], Literal):
+                body.append(f"%arrayidx{arrayAccess_counter} = getelementptr inbounds i32{arrayOrNot}, i32*{arrayOrNot} {verify(Identifier(id=node.ID))}, i64 {verify(node.index[0])}")
+            else:
+                body.append(f"%idxprom{prom_counter} = sext i32 {verify(node.index[0])} to i64")
+                body.append(f"%arrayidx{arrayAccess_counter} = getelementptr inbounds i32{arrayOrNot}, i32*{arrayOrNot} {verify(Identifier(id=node.ID))}, i64 %idxprom{prom_counter}")
+                prom_counter += 1
+            # counter += 1
+            arrayAccess_counter += 1
+            return f"%arrayidx{arrayAccess_counter-1}"
+        elif type == "float":
+            if isinstance(node.index[0], Literal):
+                body.append(f"%arrayidx{arrayAccess_counter} = getelementptr inbounds float{arrayOrNot}, float*{arrayOrNot} {verify(Identifier(id=node.ID))}, i64 {verify(node.index[0])}")
+            else:
+                body.append(f"%idxprom{prom_counter} = sext i32 {verify(node.index[0])} to i64")
+                body.append(f"%arrayidx{arrayAccess_counter} = getelementptr inbounds float{arrayOrNot}, float*{arrayOrNot} {verify(Identifier(id=node.ID))}, i64 %idxprom{prom_counter}")
+                prom_counter += 1
+            # counter += 1
+
+            arrayAccess_counter += 1
+            return f"%arrayidx{arrayAccess_counter-1}"
     elif isinstance(node, FunctionDeclaration):  #FAZER SEPARACAO SE DEVOLVE ALGUMA COISA OU SE É VOID
         #Se for FFI entra aqui
         name = node.id
@@ -195,7 +239,6 @@ def verify(node):
             # declare dso_local i32 @printf(i8* noundef, ...) #2
             add_to_function(name, type, -1)
             num_pairs, base_type = parse_type_specifier(function_map[node.id]["type"])
-            print(num_pairs)
             arrayOrNot = '*' * num_pairs
             if base_type == "int":
                 body.append(f"declare dso_local i32{arrayOrNot} @{name}(")
@@ -213,19 +256,21 @@ def verify(node):
             if node.param_list != None:
                 params = []
                 for x in node.param_list:
-                    if x.type_specifier == "int":
-                        params.append(f"i32 noundef")
-                    elif x.type_specifier == "float":
-                        params.append(f"float noundef")
-                    elif x.type_specifier == "bool":
-                        params.append(f"i1 noundef")
-                    elif x.type_specifier == "string":
-                        params.append(f"i8* noundef")
-                    elif x.type_specifier == "char":
-                        params.append(f"i8 noundef signext")
-                body[-1] += ",".join(params) + f")#{call_counter}"
+                    num_pairs, base_type = parse_type_specifier(x.type_specifier)
+                    arrayOrNot = '*' * num_pairs 
+                    if base_type == "int":
+                        params.append(f"i32{arrayOrNot} noundef %{x.id}")
+                    elif base_type == "float":
+                        params.append(f"float{arrayOrNot} noundef %{x.id}")
+                    elif base_type == "bool":
+                        params.append(f"i1{arrayOrNot} noundef %{x.id}")
+                    elif base_type == "string":
+                        params.append(f"i8*{arrayOrNot} noundef %{x.id}")
+                    elif base_type == "char":
+                        params.append(f"i8{arrayOrNot} noundef signext %{x.id}")
+                body[-1] += ",".join(params) + f")"
             else:
-                body[-1] += f") #{call_counter}"
+                body[-1] += f")"
             
             add_to_function(name, type, -1)
             pass
@@ -328,37 +373,29 @@ def verify(node):
         pass
     elif isinstance(node, FunctionCall): 
         name = node.id
-        params = []
-        # if node.param_list != None:
-        #     for arg in node.param_list:
-        #         if isinstance(arg, Literal):
-        #             continue
-                # params.append(f"i32 noundef %{verify(arg)}")    #VERIFICAR SE É ISTO
+        call = ""
 
-        
         num_pairs, base_type = parse_type_specifier(function_map[node.id]["type"])
         arrayOrNot = '*' * num_pairs
         
         if base_type == "int":
-            params.append(f"%call{call_counter} = call i32{arrayOrNot} @{name}(")
+            call = (f"%call{call_counter} = call i32{arrayOrNot} @{name}(")
         elif base_type == "float":
-            params.append(f"%call{call_counter} = call float{arrayOrNot} @{name}(")
+            call = (f"%call{call_counter} = call float{arrayOrNot} @{name}(")
         elif base_type == "bool":
-            params.append(f"%call{call_counter} = call i1{arrayOrNot} @{name}(")
+            call = (f"%call{call_counter} = call i1{arrayOrNot} @{name}(")
         elif base_type == "string":
-            params.append(f"%call{call_counter} = call i8*{arrayOrNot} @{name}(")   #VER ISTO
+            call = (f"%call{call_counter} = call i8*{arrayOrNot} @{name}(")   #VER ISTO
         elif base_type == "char":
-            params.append(f"%call{call_counter} = call i8{arrayOrNot} @{name}(")
+            call = (f"%call{call_counter} = call i8{arrayOrNot} @{name}(")
         else:
-            params.append(f"call void @{name}(")
+            call = (f"call void @{name}(")
         
         # body.append(f"%call{call_counter} = call void @{name}(")
 
         add_to_function(name, function_map[node.id]["type"], call_counter)
         call_counter += 1
-        # params = []
-        print(node)
-        
+        params = []
         if node.param_list != None:
             for x in node.param_list:
                 if isinstance(x, Literal):
@@ -376,12 +413,9 @@ def verify(node):
                     # params.append(f"i32 noundef %")
                     pass
                 else:
-                    if x.id in variable_map:
-                        print(x)
-                        print("................................................")
+                    if x.id in variable_map: #VARIAVEL LOCAL
                         verify(x)
                         # type = variable_map[x.id]["type"]
-                        print(variable_map[x.id]["type"])
                         num_pairs, type = parse_type_specifier(variable_map[x.id]["type"])
                         arrayOrNot = '*' * num_pairs
                         if type == "int":
@@ -394,7 +428,7 @@ def verify(node):
                             params.append(f"i8*{arrayOrNot} noundef %{variable_map[x.id]["number"]}")
                         elif type == "char":
                             params.append(f"i8{arrayOrNot} noundef signext %{variable_map[x.id]["number"]}")
-                    else:
+                    else: #VARIAVEL GLOBAL
                         # type = variable_map_global[x.id]["type"]
                         num_pairs, type = parse_type_specifier(variable_map_global[x.id]["type"])
                         arrayOrNot = '*' * num_pairs
@@ -408,10 +442,9 @@ def verify(node):
                             params.append(f"i8*{arrayOrNot} noundef %{variable_map_global[x.id]["number"]}")
                         elif type == "char":
                             params.append(f"i8{arrayOrNot} noundef signext %{variable_map_global[x.id]["number"]}")
-            body[-1] += ",".join(params) + ")"
+            body.append(call + (",".join(params)) + ")")
         else:
-            body[-1] += "\n".join(params) + ")"
-        print("CHEGOUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUuu")
+            body.append(call + ("\n".join(params)) + ")")
         return f"%call{function_map[name]["number"]}"
     elif isinstance(node, BinaryOperators):	
         op = node.operator
@@ -494,7 +527,6 @@ def verify(node):
             raise TypeError(f"Operation {op} requires an integer or float. Got {vt} instead.")
     elif isinstance(node, IfStatement):
         condition = node.condition
-        # print(condition)
         if node.elseBlock != None:  #TEM ELSE
             id = verify(condition)
             body.append(f"br i1 %{id}, label %if.then{if_counter}, label %if.else{if_counter}")
@@ -563,6 +595,18 @@ def verify(node):
             add_variable(node.id, "char", -1)
 
     elif isinstance(node, Literal):
+        if node.type == "float":
+            return float_to_hex(node.value)
+        elif node.type == "string":
+            if node.value not in string_map:
+                header.append(f'@.str.{string_counter} = private unnamed_addr constant [{len(node.value) + 1} x i8] c"{node.value}\\00"')
+                add_string(node.value, f"@.str.{string_counter}", len(node.value)+1)
+                string_counter += 1
+            else:
+                return node.value  
+            # header.append(f'@.str.{string_counter} = private unnamed_addr constant [{len(node.value) + 1} x i8] c"{node.value}\\00"')
+            # string_counter += 1
+            return node.value
         return node.value
     else:
         print("semantic missing:", node.__class__.__name__)
@@ -590,15 +634,14 @@ def float_to_hex(f):
     
     return hex_representation
 
-print(float_to_hex(11.1))
-
 def add_variable(name, var_type, number):
     variable_map[name] = {"type": var_type, "number": number}
 
 def add_variable_global(name, var_type, number):
     variable_map_global[name] = {"type": var_type, "number": number}
 
-
+def add_string(value, id, size):
+    string_map[value] = {"id": id, "size": size}
 
 def parse_type_specifier(type_specifier):
     # Regular expression to match the base type and brackets
@@ -618,3 +661,10 @@ def parse_type_specifier(type_specifier):
     num_pairs = len(opening_brackets)# // 2
     
     return num_pairs, base_type
+
+def float_to_hex(f):
+    packed = struct.pack('>d', f)
+    unpacked = struct.unpack('>Q', packed)[0]
+    hex_value = f"0x{unpacked:016X}"
+    hex_value = hex_value[:-7] + '0000000'
+    return hex_value
