@@ -164,7 +164,7 @@ def verify(node):
                 pass
 
     elif isinstance(node, Identifier):
-        if node.id in variable_map:
+        if node.id in variable_map: #VARIAVEL LOCAL
             num_pairs, type = parse_type_specifier(variable_map[node.id]["type"])
             arrayOrNot = '*' * num_pairs
             # type = variable_map[node.id]["type"]
@@ -185,7 +185,7 @@ def verify(node):
                 add_variable(node.id, variable_map[node.id]["type"], counter)
             counter += 1
             return f"%{counter-1}"
-        else:
+        else:   #VARIAVEL GLOBAL
             # type = variable_map_global[node.id]["type"]
             num_pairs, type = parse_type_specifier(variable_map_global[node.id]["type"])
             arrayOrNot = '*' * num_pairs
@@ -361,7 +361,7 @@ def verify(node):
             body.append(f"}}")
             counter = 0
     elif isinstance(node, MainFunction):
-        body.append(f"define dso_local void @main(i8** noundef %argv) {{")  #VERIFICAR SE É ISTO MAYBE VOID
+        body.append(f"define dso_local void @main(i8** noundef %argv) {{")
         body.append("entry:")
         body.append(f"%argv.addr = alloca i8**")
         body.append(f"store i8** %argv, i8*** %argv.addr")
@@ -411,11 +411,21 @@ def verify(node):
                     elif x.type == "char":
                         params.append(f"i8 noundef signext {x.value}")
                 elif isinstance(x, FunctionCall):
-                    # params.append(f"i32 noundef %")
-                    pass
+                    num_pairs, type = parse_type_specifier(function_map[x.id]["type"])
+                    arrayOrNot = '*' * num_pairs
+                    if type == "int":
+                        params.append(f"i32{arrayOrNot} noundef {verify(x)}")
+                    elif type == "float":
+                        params.append(f"float{arrayOrNot} noundef {verify(x)}")
+                    elif type == "bool":
+                        params.append(f"i1{arrayOrNot} noundef {verify(x)}")
+                    elif type == "string":
+                        params.append(f"i8*{arrayOrNot} noundef {verify(x)}")
+                    elif type == "char":
+                        params.append(f"i8{arrayOrNot} noundef signext {verify(x)}")
+
                 else:
                     if x.id in variable_map: #VARIAVEL LOCAL
-                        
                         num_pairs, type = parse_type_specifier(variable_map[x.id]["type"])
                         arrayOrNot = '*' * num_pairs
                         if type == "int":
@@ -429,7 +439,6 @@ def verify(node):
                         elif type == "char":
                             params.append(f"i8{arrayOrNot} noundef signext {verify(x)}")
                     else: #VARIAVEL GLOBAL
-                        # type = variable_map_global[x.id]["type"]
                         num_pairs, type = parse_type_specifier(variable_map_global[x.id]["type"])
                         arrayOrNot = '*' * num_pairs
                         print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
@@ -453,60 +462,60 @@ def verify(node):
         vt1 = verify(node.left_operand)
         vt2 = verify(node.right_operand)
         if op == '%':
-            body.append(f'%biop{binary_Op_counter} = srem nsw i32 %{vt1}, {vt2}')
-            id = f"biop{binary_Op_counter}"
+            body.append(f'%biop{binary_Op_counter} = srem nsw i32 {vt1}, {vt2}')
+            id = f"%biop{binary_Op_counter}"
             binary_Op_counter += 1
             return id
         elif op == '/':
-            body.append(f'%biop{binary_Op_counter} = sdiv nsw i32 %{vt1}, {vt2}')
-            id = f"biop{binary_Op_counter}"
+            body.append(f'%biop{binary_Op_counter} = sdiv i32 {vt1}, {vt2}')
+            id = f"%biop{binary_Op_counter}"
             binary_Op_counter += 1
             return id
         elif op == '*':
-            body.append(f'%biop{binary_Op_counter} = mul nsw i32 %{vt1}, {vt2}')
-            id = f"biop{binary_Op_counter}"
+            body.append(f'%biop{binary_Op_counter} = mul nsw i32 {vt1}, {vt2}')
+            id = f"%biop{binary_Op_counter}"
             binary_Op_counter += 1
             return id
         elif op == '+':
-            body.append(f'%biop{binary_Op_counter} = add nsw i32 %{vt1}, {vt2}') #VERIFICAR ULTIMA PARTE
-            id = f"biop{binary_Op_counter}"
+            body.append(f'%biop{binary_Op_counter} = add nsw i32 {vt1}, {vt2}') #VERIFICAR ULTIMA PARTE
+            id = f"%biop{binary_Op_counter}"
             binary_Op_counter += 1
             return id
         elif op == '-':
-            body.append(f'%biop{binary_Op_counter} = sub nsw i32 %{vt1}, {vt2}')
-            id = f"biop{binary_Op_counter}"
+            body.append(f'%biop{binary_Op_counter} = sub nsw i32 {vt1}, {vt2}')
+            id = f"%biop{binary_Op_counter}"
             binary_Op_counter += 1
             return id
         elif op == '^':                                                                     #VER COMO FAZER ISTO
             return vt1**vt2
         elif op == '=':
-            body.append(f'%biop{binary_Op_counter} = icmp eq i32 %{vt1}, {vt2}')
-            id = f"biop{binary_Op_counter}"
+            body.append(f'%biop{binary_Op_counter} = icmp eq i32 {vt1}, {vt2}')
+            id = f"%biop{binary_Op_counter}"
             binary_Op_counter += 1
             return id
         elif op == '!=':
-            body.append(f'%biop{binary_Op_counter} = icmp ne i32 %{vt1}, {vt2}')
-            id = f"biop{binary_Op_counter}"
+            body.append(f'%biop{binary_Op_counter} = icmp ne i32 {vt1}, {vt2}')
+            id = f"%biop{binary_Op_counter}"
             binary_Op_counter += 1
             return id
         elif op == '<=':
-            body.append(f'%biop{binary_Op_counter} = icmp sle i32 %{vt1}, {vt2}')
-            id = f"biop{binary_Op_counter}"
+            body.append(f'%biop{binary_Op_counter} = icmp sle i32 {vt1}, {vt2}')
+            id = f"%biop{binary_Op_counter}"
             binary_Op_counter += 1
             return id
         elif op == '>=':
-            body.append(f'%biop{binary_Op_counter} = icmp sge i32 %{vt1}, {vt2}')
-            id = f"biop{binary_Op_counter}"
+            body.append(f'%biop{binary_Op_counter} = icmp sge i32 {vt1}, {vt2}')
+            id = f"%biop{binary_Op_counter}"
             binary_Op_counter += 1
             return id
         elif op == '>':
-            body.append(f'%biop{binary_Op_counter} = icmp sgt i32 %{vt1}, {vt2}')
-            id = f"biop{binary_Op_counter}"
+            body.append(f'%biop{binary_Op_counter} = icmp sgt i32 {vt1}, {vt2}')
+            id = f"%biop{binary_Op_counter}"
             binary_Op_counter += 1
             return id
         elif op == '<':
-            body.append(f'%biop{binary_Op_counter} = icmp slt i32 %{vt1}, {vt2}')
-            id = f"biop{binary_Op_counter}"
+            body.append(f'%biop{binary_Op_counter} = icmp slt i32 {vt1}, {vt2}')
+            id = f"%biop{binary_Op_counter}"
             binary_Op_counter += 1
             return id
         elif op == '&&':
@@ -666,7 +675,7 @@ def parse_type_specifier(type_specifier):
 
 def float_to_hex(f):
     packed = struct.pack('>d', f)
-    unpacked = struct.unpack('>Q', packed)[0]
+    unpacked = struct.unpack('>Q', packed)[0] & 0xffffffffe0000000
     hex_value = f"0x{unpacked:016X}"
     hex_value = hex_value[:-7] + '0000000'
     return hex_value
