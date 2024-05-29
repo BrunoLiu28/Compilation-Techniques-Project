@@ -27,6 +27,16 @@ class Context(object):
         self.add_func('print', 'void', [Parameter(declaration_type='var', id='any', type_specifier='string')])
         self.add_func('print', 'void', [Parameter(declaration_type='val', id='any', type_specifier='string')])
 
+        self.add_func('pow_int', 'int', [Parameter(declaration_type='val', id='any', type_specifier='int'), Parameter(declaration_type='val', id='any', type_specifier='int')])
+        self.add_func('pow_int', 'int', [Parameter(declaration_type='var', id='any', type_specifier='int'), Parameter(declaration_type='val', id='any', type_specifier='int')])
+        self.add_func('pow_int', 'int', [Parameter(declaration_type='val', id='any', type_specifier='int'), Parameter(declaration_type='var', id='any', type_specifier='int')])
+        self.add_func('pow_int', 'int', [Parameter(declaration_type='var', id='any', type_specifier='int'), Parameter(declaration_type='var', id='any', type_specifier='int')])
+
+        self.add_func('pow_float', 'float', [Parameter(declaration_type='val', id='any', type_specifier='float'), Parameter(declaration_type='val', id='any', type_specifier='int')])
+        self.add_func('pow_float', 'float', [Parameter(declaration_type='var', id='any', type_specifier='float'), Parameter(declaration_type='val', id='any', type_specifier='int')])
+        self.add_func('pow_float', 'float', [Parameter(declaration_type='val', id='any', type_specifier='float'), Parameter(declaration_type='var', id='any', type_specifier='int')])
+        self.add_func('pow_float', 'float', [Parameter(declaration_type='var', id='any', type_specifier='float'), Parameter(declaration_type='var', id='any', type_specifier='int')])
+        
     def has_var(self,id):
         return id in self.variables
     

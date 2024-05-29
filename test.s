@@ -1,18 +1,5 @@
 	.text
 	.file	"test.ll"
-	.globl	ola                             # -- Begin function ola
-	.p2align	4, 0x90
-	.type	ola,@function
-ola:                                    # @ola
-	.cfi_startproc
-# %bb.0:                                # %entry
-	movl	$18, -4(%rsp)
-	movl	$18, %eax
-	retq
-.Lfunc_end0:
-	.size	ola, .Lfunc_end0-ola
-	.cfi_endproc
-                                        # -- End function
 	.globl	main                            # -- Begin function main
 	.p2align	4, 0x90
 	.type	main,@function
@@ -22,15 +9,31 @@ main:                                   # @main
 	subq	$24, %rsp
 	.cfi_def_cfa_offset 32
 	movq	%rdi, 16(%rsp)
-	callq	ola
-	movl	%eax, 12(%rsp)
-	movl	%eax, %edi
+	cmpl	$6, actual_max(%rip)
+	jl	.LBB0_3
+	.p2align	4, 0x90
+.LBB0_2:                                # %while.body0
+                                        # =>This Inner Loop Header: Depth=1
+	movl	$2, 12(%rsp)
+	addl	$-2, actual_max(%rip)
+	cmpl	$6, actual_max(%rip)
+	jge	.LBB0_2
+.LBB0_3:                                # %while.end0
+	movl	actual_max(%rip), %edi
 	callq	print_int
 	addq	$24, %rsp
 	.cfi_def_cfa_offset 8
 	retq
-.Lfunc_end1:
-	.size	main, .Lfunc_end1-main
+.Lfunc_end0:
+	.size	main, .Lfunc_end0-main
 	.cfi_endproc
                                         # -- End function
+	.type	actual_max,@object              # @actual_max
+	.data
+	.globl	actual_max
+	.p2align	2
+actual_max:
+	.long	20                              # 0x14
+	.size	actual_max, 4
+
 	.section	".note.GNU-stack","",@progbits

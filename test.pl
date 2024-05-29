@@ -28,8 +28,9 @@
 #         var a : int := 2;
 #     }
 # }
+var actual_max : int := 20;
 
-# function main(val args:[string]) {
+function main(val args:[string]) {
 # 	# print_int(getArrayRandomFloats());
 # 	# var s : string := "ola";
 # 	# print(s);
@@ -47,7 +48,17 @@
 # 	val result2 : int := maxRangeSquared(2, actual_max);
 # 	print_int(result2);
 # 	# print_float(teste);
-# }
+    if actual_max > 5 {
+        var z : int := 2;
+        while actual_max > 5 {
+            var x : int := 2;
+            var y : int := 2;
+            actual_max := actual_max-2;
+        }
+    }
+    
+    # print_int(actual_max);
+}
 
 # # var global : int := 1;
 # # function ola() : int {
@@ -58,22 +69,22 @@
 # # }
 
 
-val actual_min : int := -9;
-val actual_max : int := 9;
+# val actual_min : int := -9;
+# val actual_max : int := 9;
 
-function maxRangeSquared(var mi:int, val ma:int) : int {
-	var current_max : int := mi + 2;
-	while mi <= ma {
-		var current_candidate : int := mi + 2;
-		if current_candidate > current_max {
-			current_max := current_candidate;
-		}
-	} 
-	maxRangeSquared := current_max; # This line returns the current max!
-}
+# function maxRangeSquared(var mi:int, val ma:int) : int {
+# 	var current_max : int := mi + 2;
+# 	while mi <= ma {
+# 		var current_candidate : int := mi + 2;
+# 		if current_candidate > current_max {
+# 			current_max := current_candidate;
+# 		}
+# 	} 
+# 	maxRangeSquared := current_max; # This line returns the current max!
+# }
 
 
-function main(val args:[string]) {
-	val result : int := maxRangeSquared(actual_min, actual_max);
-	print_int(result);
-}
+# function main(val args:[string]) {
+# 	val result : int := maxRangeSquared(actual_min, actual_max);
+# 	print_int(result);
+# }

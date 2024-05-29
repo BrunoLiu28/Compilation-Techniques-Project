@@ -22,6 +22,25 @@ void print(const char* value) {
     printf("%s\n", value);
 }
 
+int pow_int (int base, int exp){
+    int result = 1; // Initialize result to 1, as anything raised to the power of 0 is 1
+    while (exp > 0) {
+        result *= base; // Multiply result by base
+        exp--; // Decrement exponent
+    }
+    return result;
+}
+
+float pow_float (float base, int exp){
+    float result = 1; // Initialize result to 1, as anything raised to the power of 0 is 1
+    while (exp > 0) {
+        result *= base; // Multiply result by base
+        exp--; // Decrement exponent
+    }
+    return result;
+}
+
+
 void getArrayRandomFloats(float* m) {
     printf("%f\n", m[1]);
 }
