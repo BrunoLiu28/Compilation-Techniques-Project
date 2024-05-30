@@ -1,3 +1,6 @@
+from ply import lex
+import sys
+
 tokens = (
     'COMMENT', 'VAL', 'VAR', 'FUNCTION', 'ID',
     'INT_TYPE','FLOAT_TYPE','STRING_TYPE','VOID_TYPE', 'BOOL_TYPE', 'CHAR_TYPE',
@@ -119,11 +122,11 @@ def t_newline(t):
     t.lexer.lineno += t.value.count("\n")
     
 def t_error(t):
-    print("Illegal character '%s'" % t.value[0])
+    print(f"Illegal character '{t.value[0]}' at line {t.lineno}")
     t.lexer.skip(1)
+    sys.exit(1)
 
-from ply import lex
-import sys
+
 
 if __name__ == '__main__':
     

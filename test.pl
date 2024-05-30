@@ -91,7 +91,7 @@
 
 val num : int := 1_5;
 
-function fibonacci(va n : int) : int {
+function fibonacci(var n : int) : float {
     if n <= 1 {
         fibonacci := n;
     } else {

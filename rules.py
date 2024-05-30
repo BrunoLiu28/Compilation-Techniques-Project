@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+import sys
 
 
 start = 'program'
@@ -424,5 +425,8 @@ def p_expression(t):
 
 
 def p_error(p):
-    print("Syntax error in input!")
-    print(p)
+    if p:
+        print(f"Syntactic error at '{p.value}' on line {p.lineno}")
+    else:
+        print("Syntactic error at EOF")
+    sys.exit(1)
