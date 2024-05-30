@@ -12,10 +12,12 @@ counter = 0
 header = []
 body = []
 alloc_list = []
+store_param = []
 variable_map_global = {}
 variable_map = {}
 function_map = {}
 string_map = {}
+register_map = {}
 call_counter = 0
 binary_Op_counter = 0
 if_counter = 0
@@ -34,6 +36,8 @@ add_to_function("print_char", "void", -1)
 add_to_function("print", "void", -1)
 add_to_function("pow_int", "int", -1)
 add_to_function("pow_float", "float", -1)
+add_to_function("and", "int", -1)
+add_to_function("or", "int", -1)
 
 body.append("declare dso_local void @print_int(i32 noundef) ")
 body.append("declare dso_local void @print_float(float noundef)")
@@ -41,7 +45,9 @@ body.append("declare dso_local void @print_bool(i1 noundef) ")
 body.append("declare dso_local void @print_char(i8 noundef) ")
 body.append("declare dso_local void @print(i8* noundef)")
 body.append("declare dso_local i32 @pow_int(i32, i32)")
-body.append("declare dso_local float @pow_float(float, float)")
+body.append("declare dso_local float @pow_float(float, i32)")
+body.append("declare dso_local i1 @and(i1, i1)")
+body.append("declare dso_local i1 @or(i1, i1)")
 
 def verify(node):
     global pass1
@@ -58,6 +64,8 @@ def verify(node):
     global string_counter
     global string_map
     global alloc_list
+    global register_map
+    global store_param
     if isinstance(node, Program):
         for block in node.main_block_sequence:
             if isinstance(block, Declaration):
@@ -98,8 +106,8 @@ def verify(node):
             #UPDATE DE VARIAVELS
             if node.declaration_type == "update":
                 if isinstance(node.id, ArrayAccess): #DEPOIS
-                    # verify(node.id)
-                    # print(node.id.index[0])
+                    
+
                     num_pairs, base_type = parse_type_specifier(variable_map[node.id.ID]["type"])
                     arrayOrNot = '*' * (num_pairs-1)
                     if base_type == "int":
@@ -120,20 +128,19 @@ def verify(node):
                 else:   #UPDATE DE VARIAVEL QUE NAO É ARRAY	 
                     if node.id in variable_map: #VARIAVEL LOCAL
                         type = variable_map[name]["type"]
+                        is_param = ""
+                        if node.id in store_param:
+                            is_param = ".addr"
                         if type == "int":
-                            body.append(f"store i32 {verify(node.expression)}, i32* %{name}")
+                            body.append(f"store i32 {verify(node.expression)}, i32* %{name+is_param}")
                         elif type == "float":
-                            body.append(f"store float {verify(node.expression)}, float* %{name}")
+                            body.append(f"store float {verify(node.expression)}, float* %{name+is_param}")
                         elif type == "bool":
-                            if node.expression == "true":
-                                body.append(f"store i1 1, i1* %{name}")
-                            else:
-                                body.append(f"store i1 0, i1* %{name}")
+                            body.append(f"store i1 {verify(node.expression)}, i1* %{name+is_param}")
                         elif type == "string": #VER DEPOIS
-
                             body.append(f'@{node.id} = dso_local global [{len(node.expression)} x i8] c"{len(node.expression)}", align 1')
                         elif type == "char":
-                            body.append(f"store i8 {ord(node.expression)}, i8* %{name}")
+                            body.append(f"store i8 {ord(node.expression)}, i8* %{name+is_param}")
                     else: #VARIAVEL GLOBAL
                         type = variable_map_global[name]["type"]
                         if type == "int":
@@ -154,38 +161,44 @@ def verify(node):
                 arrayOrNot = '*' * num_pairs
                 if base_type == "int":
                     if name not in variable_map:
-                        body.append(f"%{name} = alloca i32{arrayOrNot}")
+                        alloc_list.append(f"%{name} = alloca i32{arrayOrNot}")
                         add_variable(name, node.type_specifier, -1)
-                    body.append(f"store i32{arrayOrNot} {verify(node.expression)}, i32*{arrayOrNot} %{name}")
+                    if isinstance(node.expression, ArrayAccess):
+                        aux = verify(node.expression)
+                        body.append(f"%{counter} = load i32, i32* {aux}")
+                        body.append(f"store i32{arrayOrNot} %{counter}, i32*{arrayOrNot} %{name}")
+                        add_register(counter, "int")
+                        counter += 1
+                    else:
+                        body.append(f"store i32{arrayOrNot} {verify(node.expression)}, i32*{arrayOrNot} %{name}")
                 elif base_type == "float":
                     if name not in variable_map:
-                        body.append(f"%{name} = alloca float{arrayOrNot}")
+                        alloc_list.append(f"%{name} = alloca float{arrayOrNot}")
                         add_variable(name, node.type_specifier, -1)
                     if isinstance(node.expression, ArrayAccess):
                         aux = verify(node.expression)
                         body.append(f"%{counter} = load float, float* {aux}")
                         body.append(f"store float{arrayOrNot} %{counter}, float*{arrayOrNot} %{name}")
+                        add_register(counter, "float")
                         counter += 1
                     else:
                         body.append(f"store float{arrayOrNot} {verify(node.expression)}, float*{arrayOrNot} %{name}")
                     
                 elif base_type == "bool":
                     if name not in variable_map:
-                        body.append(f"%{name} = alloca i1{arrayOrNot}")
+                        alloc_list.append(f"%{name} = alloca i1{arrayOrNot}")
                         add_variable(name, node.type_specifier, -1)
-                    if node.expression == "true":
-                        body.append(f"store i1{arrayOrNot} 1, i1*{arrayOrNot} %{name}")
-                    else:
-                        body.append(f"store i1{arrayOrNot} 0, i1*{arrayOrNot} %{name}")
+
+                    body.append(f"store i1{arrayOrNot} {verify(node.expression)}, i1* %{name}")
                 elif base_type == "string":  #NOT SURE E AINDA VERIFICAR ARRAY DE STRING
                     if name not in variable_map:
-                        body.append(f"%{name} = alloca i8*")
+                        alloc_list.append(f"%{name} = alloca i8*")
                         add_variable(name, node.type_specifier, -1)
                     key = verify(node.expression)
                     body.append(f"store i8* getelementptr inbounds ([{string_map[key]['size']} x i8], [{string_map[key]['size']} x i8]* {string_map[key]['id']}, i64 0, i64 0), i8** %{name}")
                 elif base_type == "char":    #VERIFICAR ARRAY DE CHAR
                     if name not in variable_map:
-                        body.append(f"%{name} = alloca i8")
+                        alloc_list.append(f"%{name} = alloca i8")
                         add_variable(name, node.type_specifier, -1)
                     body.append(f"store i8 {ord(verify(node.expression)[1])}, i8* %{name}")
                 pass
@@ -194,21 +207,29 @@ def verify(node):
         if node.id in variable_map: #VARIAVEL LOCAL
             num_pairs, type = parse_type_specifier(variable_map[node.id]["type"])
             arrayOrNot = '*' * num_pairs
+            is_param = ""
+            if node.id in store_param:
+                is_param = ".addr"
             # type = variable_map[node.id]["type"]
             if type == "int":
-                body.append(f'%{counter} = load i32{arrayOrNot}, i32*{arrayOrNot} %{node.id}')
+                body.append(f'%{counter} = load i32{arrayOrNot}, i32*{arrayOrNot} %{node.id + is_param}')
+                add_register(f'%{counter}', "int")
                 add_variable(node.id, variable_map[node.id]["type"], counter)
             elif type == "float":
-                body.append(f'%{counter} = load float{arrayOrNot}, float*{arrayOrNot} %{node.id}')
+                body.append(f'%{counter} = load float{arrayOrNot}, float*{arrayOrNot} %{node.id+ is_param}')
+                add_register(f'%{counter}', "float")
                 add_variable(node.id, variable_map[node.id]["type"], counter)
             elif type == "bool":
-                body.append(f'%{counter} = load i1{arrayOrNot}, i1*{arrayOrNot} %{node.id}')
+                body.append(f'%{counter} = load i1{arrayOrNot}, i1*{arrayOrNot} %{node.id+ is_param}')
+                add_register(f'%{counter}', "bool")
                 add_variable(node.id, variable_map[node.id]["type"], counter)
             elif type == "string":
-                body.append(f'%{counter} = load i8*{arrayOrNot}, i8**{arrayOrNot} %{node.id}')
+                body.append(f'%{counter} = load i8*{arrayOrNot}, i8**{arrayOrNot} %{node.id+ is_param}')
+                add_register(f'%{counter}', "string")
                 add_variable(node.id, variable_map[node.id]["type"], counter)
             elif type == "char":
-                body.append(f'%{counter} = load i8{arrayOrNot}, i8*{arrayOrNot} %{node.id}')
+                body.append(f'%{counter} = load i8{arrayOrNot}, i8*{arrayOrNot} %{node.id+ is_param}')
+                add_register(f'%{counter}', "char")
                 add_variable(node.id, variable_map[node.id]["type"], counter)
             counter += 1
             return f"%{counter-1}"
@@ -218,18 +239,23 @@ def verify(node):
             arrayOrNot = '*' * num_pairs
             if type == "int":
                 body.append(f'%{counter} = load i32{arrayOrNot}, i32*{arrayOrNot} @{node.id}')
+                add_register(counter, "int")
                 add_variable_global(node.id, "int", counter)
             elif type == "float":
                 body.append(f'%{counter} = load float{arrayOrNot}, float*{arrayOrNot} @{node.id}')
+                add_register(counter, "float")
                 add_variable_global(node.id, "float", counter)
             elif type == "bool":
                 body.append(f'%{counter} = load i1{arrayOrNot}, i1*{arrayOrNot} @{node.id}')
+                add_register(counter, "bool")
                 add_variable_global(node.id, "bool", counter)
             elif type == "string":
                 body.append(f'%{counter} = load i8*{arrayOrNot}, i8**{arrayOrNot} @{node.id}')
+                add_register(counter, "string")
                 add_variable_global(node.id, "string", counter)
             elif type == "char":
                 body.append(f'%{counter} = load i8{arrayOrNot}, i8*{arrayOrNot} @{node.id}')
+                add_register(counter, "char")
                 add_variable_global(node.id, "char", counter)
             counter += 1
             return f"%{counter-1}"
@@ -238,33 +264,58 @@ def verify(node):
         num_pairs, type = parse_type_specifier(variable_map[node.ID]["type"])
         arrayOrNot = '*' * (num_pairs-1)
         if type == "int":
-            if isinstance(node.index[0], Literal):
-                body.append(f"%arrayidx{arrayAccess_counter} = getelementptr inbounds i32{arrayOrNot}, i32*{arrayOrNot} {verify(Identifier(id=node.ID))}, i64 {verify(node.index[0])}")
-            else:
-                body.append(f"%idxprom{prom_counter} = sext i32 {verify(node.index[0])} to i64")
-                body.append(f"%arrayidx{arrayAccess_counter} = getelementptr inbounds i32{arrayOrNot}, i32*{arrayOrNot} {verify(Identifier(id=node.ID))}, i64 %idxprom{prom_counter}")
-                prom_counter += 1
-            # counter += 1
-            arrayAccess_counter += 1
+            for i in range(len(node.index)):
+                if i == 0:
+                    if isinstance(node.index[i], Literal):
+                        body.append(f"%arrayidx{arrayAccess_counter} = getelementptr inbounds i32{arrayOrNot}, i32*{arrayOrNot} {verify(Identifier(id=node.ID))}, i64 {verify(node.index[i])}")
+                    else:
+                        body.append(f"%idxprom{prom_counter} = sext i32 {verify(node.index[i])} to i64")
+                        body.append(f"%arrayidx{arrayAccess_counter} = getelementptr inbounds i32{arrayOrNot}, i32*{arrayOrNot} {verify(Identifier(id=node.ID))}, i64 %idxprom{prom_counter}")
+                        prom_counter += 1
+                    add_variable(f"arrayidx{arrayAccess_counter}", variable_map[node.ID]["type"][1:-1], arrayAccess_counter)
+                else:
+                    if isinstance(node.index[i], Literal):
+                        body.append(f"%arrayidx{arrayAccess_counter} = getelementptr inbounds i32{arrayOrNot}, i32*{arrayOrNot} {verify(Identifier(id=f"arrayidx{arrayAccess_counter-1}"))}, i64 {verify(node.index[i])}")
+                    else:
+                        body.append(f"%idxprom{prom_counter} = sext i32 {verify(node.index[i])} to i64")
+                        body.append(f"%arrayidx{arrayAccess_counter} = getelementptr inbounds i32{arrayOrNot}, i32*{arrayOrNot} {verify(Identifier(id=f"arrayidx{arrayAccess_counter-1}"))}, i64 %idxprom{prom_counter}")
+                        prom_counter += 1
+                    add_variable(f"arrayidx{arrayAccess_counter}", variable_map[f"arrayidx{arrayAccess_counter-1}"]["type"][1:-1], arrayAccess_counter)
+                arrayAccess_counter += 1
+                arrayOrNot = arrayOrNot[:-1]
+            add_variable(f"arrayidx{arrayAccess_counter}", type, arrayAccess_counter)
             return f"%arrayidx{arrayAccess_counter-1}"
         elif type == "float":
-            if isinstance(node.index[0], Literal):
-                body.append(f"%arrayidx{arrayAccess_counter} = getelementptr inbounds float{arrayOrNot}, float*{arrayOrNot} {verify(Identifier(id=node.ID))}, i64 {verify(node.index[0])}")
-            else:
-                body.append(f"%idxprom{prom_counter} = sext i32 {verify(node.index[0])} to i64")
-                body.append(f"%arrayidx{arrayAccess_counter} = getelementptr inbounds float{arrayOrNot}, float*{arrayOrNot} {verify(Identifier(id=node.ID))}, i64 %idxprom{prom_counter}")
-                prom_counter += 1
-            # counter += 1
+            for i in range(len(node.index)):
+                if i == 0:
+                    if isinstance(node.index[i], Literal):
+                        body.append(f"%arrayidx{arrayAccess_counter} = getelementptr inbounds float{arrayOrNot}, float*{arrayOrNot} {verify(Identifier(id=node.ID))}, i64 {verify(node.index[i])}")
+                    else:
+                        body.append(f"%idxprom{prom_counter} = sext i32 {verify(node.index[i])} to i64")
+                        body.append(f"%arrayidx{arrayAccess_counter} = getelementptr inbounds float{arrayOrNot}, float*{arrayOrNot} {verify(Identifier(id=node.ID))}, i64 %idxprom{prom_counter}")
+                        prom_counter += 1
+                    add_variable(f"arrayidx{arrayAccess_counter}", variable_map[node.ID]["type"][1:-1], arrayAccess_counter)
+                else:
+                    if isinstance(node.index[i], Literal):
+                        body.append(f"%arrayidx{arrayAccess_counter} = getelementptr inbounds float{arrayOrNot}, float*{arrayOrNot} {verify(Identifier(id=f"arrayidx{arrayAccess_counter-1}"))}, i64 {verify(node.index[i])}")
+                    else:
+                        body.append(f"%idxprom{prom_counter} = sext i32 {verify(node.index[i])} to i64")
+                        body.append(f"%arrayidx{arrayAccess_counter} = getelementptr inbounds float{arrayOrNot}, float*{arrayOrNot} {verify(Identifier(id=f"arrayidx{arrayAccess_counter-1}"))}, i64 %idxprom{prom_counter}")
+                        prom_counter += 1
+                    add_variable(f"arrayidx{arrayAccess_counter}", variable_map[f"arrayidx{arrayAccess_counter-1}"]["type"][1:-1], arrayAccess_counter)
+                arrayAccess_counter += 1
+                arrayOrNot = arrayOrNot[:-1]
 
-            arrayAccess_counter += 1
+            add_variable(f"arrayidx{arrayAccess_counter}", type, arrayAccess_counter)
             return f"%arrayidx{arrayAccess_counter-1}"
+        # elif type == "bool": #FALTA FAZER PARA OS OUTROS TIPOS
     elif isinstance(node, FunctionDeclaration):  #FAZER SEPARACAO SE DEVOLVE ALGUMA COISA OU SE É VOID
         #Se for FFI entra aqui
         name = node.id
         type = node.return_type
         alloc_list = []
+        store_param = []
         if node.declaration_type == "ffi": #FALTA FAZER VER DPS COMO SE FAZ
-            # declare dso_local i32 @printf(i8* noundef, ...) #2
             add_to_function(name, type, -1)
             num_pairs, base_type = parse_type_specifier(function_map[node.id]["type"])
             arrayOrNot = '*' * num_pairs
@@ -369,22 +420,27 @@ def verify(node):
 
             body = body[:index] + alloc_list + body[index:]
 
-            #RETURN
+            #RETURN VALUE
             if type == "int":
                 body.append(f"%{counter} = load i32, i32* %{name}")
+                add_register(counter, "int")
                 body.append(f"ret i32 %{counter}")
                 counter+=1
             elif type == "float":
                 body.append(f"%{counter} = load float, float* %{name}")
+                add_register(counter, "float")
                 body.append(f"ret float %{counter}")
             elif type == "bool":
                 body.append(f"%{counter} = load i1, i1* %{name}")
+                add_register(counter, "bool")
                 body.append(f"ret i1 %{counter}")
             elif type == "string":
                 body.append(f"%{counter} = load i8*, i8** %{name}")
+                add_register(counter, "string")
                 body.append(f"ret i8* %{counter}")
             elif type == "char":
                 body.append(f"%{counter} = load i8, i8* %{name}")
+                add_register(counter, "char")
                 body.append(f"ret i8 %{counter}")
             elif type == "void":
                 body.append(f"ret void")
@@ -420,14 +476,19 @@ def verify(node):
         
         if base_type == "int":
             call = (f"%call{call_counter} = call i32{arrayOrNot} @{name}(")
+            add_register(f"%call{call_counter}", "int")
         elif base_type == "float":
             call = (f"%call{call_counter} = call float{arrayOrNot} @{name}(")
+            add_register(f"%call{call_counter}", "float")
         elif base_type == "bool":
             call = (f"%call{call_counter} = call i1{arrayOrNot} @{name}(")
+            add_register(f"%call{call_counter}", "bool")
         elif base_type == "string":
             call = (f"%call{call_counter} = call i8*{arrayOrNot} @{name}(")   #VER ISTO
+            add_register(f"%call{call_counter}", "string")
         elif base_type == "char":
             call = (f"%call{call_counter} = call i8{arrayOrNot} @{name}(")
+            add_register(f"%call{call_counter}", "char")
         else:
             call = (f"call void @{name}(")
         
@@ -464,7 +525,22 @@ def verify(node):
                         params.append(f"i8{arrayOrNot} noundef signext {verify(x)}")
 
                 else:
-                    if x.id in variable_map: #VARIAVEL LOCAL
+                    if isinstance(x, ArrayAccess):
+                        num_pairs, type = parse_type_specifier(variable_map[x.ID]["type"])
+                        arrayOrNot = '*' * (num_pairs-1)
+                        value = verify(x)[1:]
+                        print(value)
+                        if type == "int":
+                            params.append(f"i32{arrayOrNot} noundef {verify(Identifier(id=value))}")
+                        elif type == "float":
+                            params.append(f"float{arrayOrNot} noundef {verify(Identifier(id=value))}")
+                        elif type == "bool":
+                            params.append(f"i1{arrayOrNot} noundef {verify(Identifier(id=value))}")
+                        elif type == "string":
+                            params.append(f"i8*{arrayOrNot} noundef {verify(Identifier(id=value))}")
+                        elif type == "char":
+                            params.append(f"i8{arrayOrNot} noundef signext {verify(Identifier(id=value))}")
+                    elif x.id in variable_map: #VARIAVEL LOCAL
                         num_pairs, type = parse_type_specifier(variable_map[x.id]["type"])
                         arrayOrNot = '*' * num_pairs
                         if type == "int":
@@ -480,8 +556,6 @@ def verify(node):
                     else: #VARIAVEL GLOBAL
                         num_pairs, type = parse_type_specifier(variable_map_global[x.id]["type"])
                         arrayOrNot = '*' * num_pairs
-                        print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
-                        print(x)
                         if type == "int":
                             params.append(f"i32{arrayOrNot} noundef {verify(x)}")
                         elif type == "float":
@@ -500,79 +574,219 @@ def verify(node):
         op = node.operator
         vt1 = verify(node.left_operand)
         vt2 = verify(node.right_operand)
+        
         if op == '%':
-            body.append(f'%biop{binary_Op_counter} = srem nsw i32 {vt1}, {vt2}')
+            body.append(f'%biop{binary_Op_counter} = srem i32 {vt1}, {vt2}')
             id = f"%biop{binary_Op_counter}"
+            add_register(id, "int")
             binary_Op_counter += 1
             return id
         elif op == '/':
-            body.append(f'%biop{binary_Op_counter} = sdiv i32 {vt1}, {vt2}')
+            if isinstance(vt1, int):
+                body.append(f'%biop{binary_Op_counter} = sdiv i32 {vt1}, {vt2}')
+                add_register(f"%biop{binary_Op_counter}", "int")
+            elif "%" in vt1:
+                vt1_type = register_map[vt1]["type"]
+                if vt1_type == "int":
+                    body.append(f'%biop{binary_Op_counter} = sdiv i32 {vt1}, {vt2}')
+                    add_register(f"%biop{binary_Op_counter}", "int")
+                elif vt1_type == "float":
+                    body.append(f'%biop{binary_Op_counter} = fdiv float {vt1}, {vt2}')
+                    add_register(f"%biop{binary_Op_counter}", "float")
+            else:
+                body.append(f'%biop{binary_Op_counter} = fdiv float {vt1}, {vt2}')
+                add_register(f"%biop{binary_Op_counter}", "float")
+
             id = f"%biop{binary_Op_counter}"
             binary_Op_counter += 1
             return id
         elif op == '*':
-            body.append(f'%biop{binary_Op_counter} = mul nsw i32 {vt1}, {vt2}')
+            if isinstance(vt1, int):
+                body.append(f'%biop{binary_Op_counter} = mul nsw i32 {vt1}, {vt2}')
+                add_register(f"%biop{binary_Op_counter}", "int")
+            elif "%" in vt1:
+                vt1_type = register_map[vt1]["type"]
+                if vt1_type == "int":
+                    body.append(f'%biop{binary_Op_counter} = mul nsw i32 {vt1}, {vt2}')
+                    add_register(f"%biop{binary_Op_counter}", "int")
+                elif vt1_type == "float":
+                    body.append(f'%biop{binary_Op_counter} = fmul float {vt1}, {vt2}')
+                    add_register(f"%biop{binary_Op_counter}", "float")
+            else:
+                body.append(f'%biop{binary_Op_counter} = fmul float {vt1}, {vt2}')
+                add_register(f"%biop{binary_Op_counter}", "float")
             id = f"%biop{binary_Op_counter}"
             binary_Op_counter += 1
             return id
         elif op == '+':
-            body.append(f'%biop{binary_Op_counter} = add nsw i32 {vt1}, {vt2}') #VERIFICAR ULTIMA PARTE
+            if isinstance(vt1, int):
+                body.append(f'%biop{binary_Op_counter} = add nsw i32 {vt1}, {vt2}')
+                add_register(f"%biop{binary_Op_counter}", "int")
+            elif "%" in vt1:
+                vt1_type = register_map[vt1]["type"]
+                if vt1_type == "int":
+                    body.append(f'%biop{binary_Op_counter} = add nsw i32 {vt1}, {vt2}')
+                    add_register(f"%biop{binary_Op_counter}", "int")
+                elif vt1_type == "float":
+                    body.append(f'%biop{binary_Op_counter} = fadd float {vt1}, {vt2}')
+                    add_register(f"%biop{binary_Op_counter}", "float")
+            else:
+                body.append(f'%biop{binary_Op_counter} = fadd float {vt1}, {vt2}')
+                add_register(f"%biop{binary_Op_counter}", "float")
             id = f"%biop{binary_Op_counter}"
             binary_Op_counter += 1
             return id
         elif op == '-':
-            body.append(f'%biop{binary_Op_counter} = sub nsw i32 {vt1}, {vt2}')
+            if isinstance(vt1, int):
+                body.append(f'%biop{binary_Op_counter} = sub nsw i32 {vt1}, {vt2}')
+                add_register(f"%biop{binary_Op_counter}", "int")
+            elif "%" in vt1:
+                vt1_type = register_map[vt1]["type"]
+                if vt1_type == "int":
+                    body.append(f'%biop{binary_Op_counter} = sub nsw i32 {vt1}, {vt2}')
+                    add_register(f"%biop{binary_Op_counter}", "int")
+                elif vt1_type == "float":
+                    body.append(f'%biop{binary_Op_counter} = fsub float {vt1}, {vt2}')
+                    add_register(f"%biop{binary_Op_counter}", "float")
+            else:
+                body.append(f'%biop{binary_Op_counter} = fsub float {vt1}, {vt2}')
+                add_register(f"%biop{binary_Op_counter}", "float")
             id = f"%biop{binary_Op_counter}"
+            add_register(id, "int")
             binary_Op_counter += 1
             return id
-        elif op == '^': 
-            body.append(f'%biop{binary_Op_counter} = call i32 @pow(i32 {vt1}, i32 {vt2})')
+        elif op == '^':
+            if isinstance(vt1, int):
+                body.append(f'%biop{binary_Op_counter} = call i32 @pow_int(i32 {vt1}, i32 {vt2})')
+                add_register(f"%biop{binary_Op_counter}", "int")
+            elif "%" in vt1:
+                vt1_type = register_map[vt1]["type"]
+                if vt1_type == "int":
+                    body.append(f'%biop{binary_Op_counter} = call i32 @pow_int(i32 {vt1}, i32 {vt2})')
+                    add_register(f"%biop{binary_Op_counter}", "int")
+                elif vt1_type == "float":
+                    body.append(f'%biop{binary_Op_counter} = call float @pow_float(float {vt1}, i32 {vt2})')
+                    add_register(f"%biop{binary_Op_counter}", "float")
+            else:
+                body.append(f'%biop{binary_Op_counter} = call float @pow_float(float {vt1}, i32 {vt2})')
+                add_register(f"%biop{binary_Op_counter}", "float")
             id = f"%biop{binary_Op_counter}"
             binary_Op_counter += 1
             return id
         elif op == '=':
-            body.append(f'%biop{binary_Op_counter} = icmp eq i32 {vt1}, {vt2}')
+            if isinstance(vt1, int):
+                body.append(f'%biop{binary_Op_counter} = icmp eq i32 {vt1}, {vt2}')
+            elif "%" in vt1:
+                vt1_type = register_map[vt1]["type"]
+                if vt1_type == "int":
+                    body.append(f'%biop{binary_Op_counter} = icmp eq i32 {vt1}, {vt2}')
+                elif vt1_type == "float":
+                    body.append(f'%biop{binary_Op_counter} = fcmp oeq float {vt1}, {vt2}')
+            else:
+                body.append(f'%biop{binary_Op_counter} = fcmp oeq float {vt1}, {vt2}')
+            
             id = f"%biop{binary_Op_counter}"
+            add_register(id, "bool")
             binary_Op_counter += 1
             return id
         elif op == '!=':
-            body.append(f'%biop{binary_Op_counter} = icmp ne i32 {vt1}, {vt2}')
+            if isinstance(vt1, int):
+                body.append(f'%biop{binary_Op_counter} = icmp ne i32 {vt1}, {vt2}')
+            elif "%" in vt1:
+                vt1_type = register_map[vt1]["type"]
+                if vt1_type == "int":
+                    body.append(f'%biop{binary_Op_counter} = icmp ne i32 {vt1}, {vt2}')
+                elif vt1_type == "float":
+                    body.append(f'%biop{binary_Op_counter} = fcmp one float {vt1}, {vt2}')
+            else:
+                body.append(f'%biop{binary_Op_counter} = fcmp one float {vt1}, {vt2}')
+
             id = f"%biop{binary_Op_counter}"
+            add_register(id, "bool")
             binary_Op_counter += 1
             return id
         elif op == '<=':
-            body.append(f'%biop{binary_Op_counter} = icmp sle i32 {vt1}, {vt2}')
+            if isinstance(vt1, int):
+                body.append(f'%biop{binary_Op_counter} = icmp sle i32 {vt1}, {vt2}')
+            elif "%" in vt1:
+                vt1_type = register_map[vt1]["type"]
+                if vt1_type == "int":
+                    body.append(f'%biop{binary_Op_counter} = icmp sle i32 {vt1}, {vt2}')
+                elif vt1_type == "float":
+                    body.append(f'%biop{binary_Op_counter} = fcmp ole float {vt1}, {vt2}')
+            else:
+                body.append(f'%biop{binary_Op_counter} = fcmp ole float {vt1}, {vt2}')
+
             id = f"%biop{binary_Op_counter}"
+            add_register(id, "bool")
             binary_Op_counter += 1
             return id
         elif op == '>=':
-            body.append(f'%biop{binary_Op_counter} = icmp sge i32 {vt1}, {vt2}')
+            if isinstance(vt1, int):
+                body.append(f'%biop{binary_Op_counter} = icmp sge i32 {vt1}, {vt2}')
+            elif "%" in vt1:
+                vt1_type = register_map[vt1]["type"]
+                if vt1_type == "int":
+                    body.append(f'%biop{binary_Op_counter} = icmp sge i32 {vt1}, {vt2}')
+                elif vt1_type == "float":
+                    body.append(f'%biop{binary_Op_counter} = fcmp oge float {vt1}, {vt2}')
+            else:
+                body.append(f'%biop{binary_Op_counter} = fcmp oge float {vt1}, {vt2}')
             id = f"%biop{binary_Op_counter}"
+            add_register(id, "bool")
             binary_Op_counter += 1
             return id
         elif op == '>':
-            body.append(f'%biop{binary_Op_counter} = icmp sgt i32 {vt1}, {vt2}')
+            if isinstance(vt1, int):
+                body.append(f'%biop{binary_Op_counter} = icmp sgt i32 {vt1}, {vt2}')
+            elif "%" in vt1:
+                vt1_type = register_map[vt1]["type"]
+                if vt1_type == "int":
+                    body.append(f'%biop{binary_Op_counter} = icmp sgt i32 {vt1}, {vt2}')
+                elif vt1_type == "float":
+                    body.append(f'%biop{binary_Op_counter} = fcmp ogt float {vt1}, {vt2}')
+            else:
+                body.append(f'%biop{binary_Op_counter} = fcmp ogt float {vt1}, {vt2}')
             id = f"%biop{binary_Op_counter}"
+            add_register(id, "bool")
             binary_Op_counter += 1
             return id
         elif op == '<':
-            body.append(f'%biop{binary_Op_counter} = icmp slt i32 {vt1}, {vt2}')
+            if isinstance(vt1, int):
+                body.append(f'%biop{binary_Op_counter} = icmp slt i32 {vt1}, {vt2}')
+            elif "%" in vt1:
+                vt1_type = register_map[vt1]["type"]
+                if vt1_type == "int":
+                    body.append(f'%biop{binary_Op_counter} = icmp slt i32 {vt1}, {vt2}')
+                elif vt1_type == "float":
+                    body.append(f'%biop{binary_Op_counter} = fcmp olt float {vt1}, {vt2}')
+            else:
+                body.append(f'%biop{binary_Op_counter} = fcmp olt float {vt1}, {vt2}')
+            id = f"%biop{binary_Op_counter}"
+            add_register(id, "bool")
+            binary_Op_counter += 1
+            return id
+        elif op == '&&': 
+            body.append(f'%biop{binary_Op_counter} = call i1 @and(i1 {vt1}, i1 {vt2})')
+            add_register(f"%biop{binary_Op_counter}", "bool")
             id = f"%biop{binary_Op_counter}"
             binary_Op_counter += 1
             return id
-        elif op == '&&':
-            return vt1 and vt2
-        elif op == '||':
-            return vt1 or vt2
+        elif op == '||': 
+            body.append(f'%biop{binary_Op_counter} = call i1 @or(i1 {vt1}, i1 {vt2})')
+            add_register(f"%biop{binary_Op_counter}", "bool")
+            id = f"%biop{binary_Op_counter}"
+            binary_Op_counter += 1
+            return id
     elif isinstance(node, UnaryOperators):
         op = node.operator
         vt = verify(node.operand)
-        if op == '!':
+        if op == '!': #FALTA FAZER ESTE
             body.append(f'%biop{binary_Op_counter} = xor i1 {vt}, true')
             id = f"biop{binary_Op_counter}"
             binary_Op_counter += 1
             return id
-        if op == '-':                                                                                            #FALTA FAZER ESTE
+        if op == '-':    #FALTA FAZER ESTE
             if vt == 'int':
                 return 'int'
             if vt == 'float':
@@ -580,52 +794,10 @@ def verify(node):
             raise TypeError(f"Operation {op} requires an integer or float. Got {vt} instead.")
     elif isinstance(node, IfStatement):
         condition = node.condition
-        #OBTER OS ALLOCS
-        for a in node.thenBlock:
-            if isinstance(a, Declaration) and a.declaration_type != "update":
-                name  = a.id
-                num_pairs, base_type = parse_type_specifier(a.type_specifier)
-                arrayOrNot = '*' * num_pairs
-                if base_type == "int":
-                    alloc_list.append(f"%{name} = alloca i32{arrayOrNot}")
-                    add_variable(name, a.type_specifier, -1)
-                elif base_type == "float":
-                    alloc_list.append(f"%{name} = alloca float{arrayOrNot}")
-                    add_variable(name, a.type_specifier, -1)
-                elif base_type == "bool":
-                    alloc_list.append(f"%{name} = alloca i1{arrayOrNot}")
-                    add_variable(name, a.type_specifier, -1)
-                elif base_type == "string":  #NOT SURE E AINDA VERIFICAR ARRAY DE STRING
-                    alloc_list.append(f"%{name} = alloca i8*{arrayOrNot}")
-                    add_variable(name, a.type_specifier, counter)
-                elif base_type == "char":    #VERIFICAR ARRAY DE CHAR
-                    alloc_list.append(f"%{name} = alloca i8{arrayOrNot}")
-                    add_variable(name, a.type_specifier, -1)
-        if node.elseBlock != None:  #TEM ELSE
-            #OBTER OS ALLOCS
-            for a in node.elseBlock:
-                if isinstance(a, Declaration) and a.declaration_type != "update":
-                    name  = a.id
-                    num_pairs, base_type = parse_type_specifier(a.type_specifier)
-                    arrayOrNot = '*' * num_pairs
-                    if base_type == "int":
-                        alloc_list.append(f"%{name} = alloca i32{arrayOrNot}")
-                        add_variable(name, a.type_specifier, -1)
-                    elif base_type == "float":
-                        alloc_list.append(f"%{name} = alloca float{arrayOrNot}")
-                        add_variable(name, a.type_specifier, -1)
-                    elif base_type == "bool":
-                        alloc_list.append(f"%{name} = alloca i1{arrayOrNot}")
-                        add_variable(name, a.type_specifier, -1)
-                    elif base_type == "string":  #NOT SURE E AINDA VERIFICAR ARRAY DE STRING
-                        alloc_list.append(f"%{name} = alloca i8*{arrayOrNot}")
-                        add_variable(name, a.type_specifier, counter)
-                    elif base_type == "char":    #VERIFICAR ARRAY DE CHAR
-                        alloc_list.append(f"%{name} = alloca i8{arrayOrNot}")
-                        add_variable(name, a.type_specifier, -1)
 
+        if node.elseBlock != None:  #TEM ELSE
             id = verify(condition)
-            body.append(f"br i1 %{id}, label %if.then{if_counter}, label %if.else{if_counter}")
+            body.append(f"br i1 {id}, label %if.then{if_counter}, label %if.else{if_counter}")
 
             #THEN BLOCK
             body.append(f"if.then{if_counter}:")
@@ -642,7 +814,7 @@ def verify(node):
             body.append(f"if.end{if_counter}:") 
         else:   #NAO TEM ELSE
             id = verify(condition)
-            body.append(f"br i1 %{id}, label %if.then{if_counter}, label %if.end{if_counter}")
+            body.append(f"br i1 {id}, label %if.then{if_counter}, label %if.end{if_counter}")
 
             #THEN BLOCK
             body.append(f"if.then{if_counter}:")
@@ -651,28 +823,9 @@ def verify(node):
             body.append(f"br label %if.end{if_counter}")
 
             body.append(f"if.end{if_counter}:")
+        if_counter += 1
     elif isinstance(node, WhileStatement):	
         condition = node.condition
-        for a in node.block_seq:
-            if isinstance(a, Declaration) and a.declaration_type != "update":
-                name  = a.id
-                num_pairs, base_type = parse_type_specifier(a.type_specifier)
-                arrayOrNot = '*' * num_pairs
-                if base_type == "int":
-                    alloc_list.append(f"%{name} = alloca i32{arrayOrNot}")
-                    add_variable(name, a.type_specifier, -1)
-                elif base_type == "float":
-                    alloc_list.append(f"%{name} = alloca float{arrayOrNot}")
-                    add_variable(name, a.type_specifier, -1)
-                elif base_type == "bool":
-                    alloc_list.append(f"%{name} = alloca i1{arrayOrNot}")
-                    add_variable(name, a.type_specifier, -1)
-                elif base_type == "string":  #NOT SURE E AINDA VERIFICAR ARRAY DE STRING
-                    alloc_list.append(f"%{name} = alloca i8*{arrayOrNot}")
-                    add_variable(name, a.type_specifier, counter)
-                elif base_type == "char":    #VERIFICAR ARRAY DE CHAR
-                    alloc_list.append(f"%{name} = alloca i8{arrayOrNot}")
-                    add_variable(name, a.type_specifier, -1)
 
         body.append(f"br label %while.cond{while_counter}")
         #WHILE CONDITION
@@ -694,6 +847,7 @@ def verify(node):
         if node.type_specifier == "int":
             body.append(f"%{node.id}.addr = alloca i32")
             body.append(f"store i32 %{node.id}, i32* %{node.id}.addr")
+            
             add_variable(node.id, "int", -1)
         elif node.type_specifier == "float":
             body.append(f"%{node.id}.addr = alloca float")
@@ -711,7 +865,7 @@ def verify(node):
             body.append(f"%{node.id}.addr = alloca i8")
             body.append(f"store i8 %{node.id}, i8* %{node.id}.addr")
             add_variable(node.id, "char", -1)
-
+        store_param.append(node.id)
     elif isinstance(node, Literal):
         if node.type == "float":
             return float_to_hex(node.value)
@@ -722,9 +876,12 @@ def verify(node):
                 string_counter += 1
             else:
                 return node.value  
-            # header.append(f'@.str.{string_counter} = private unnamed_addr constant [{len(node.value) + 1} x i8] c"{node.value}\\00"')
-            # string_counter += 1
             return node.value
+        elif node.type == "bool":
+            if node.value == "true":
+                return 1
+            else:
+                return 0
         return node.value
     else:
         print("semantic missing:", node.__class__.__name__)
@@ -737,21 +894,6 @@ def get_type(type_string):
     else:
         return None
 
-
-def float_to_hex(f):
-    # Convert the float to its binary representation
-    bits = ''.join(bin(c).replace('0b', '').rjust(8, '0') for c in bytearray(struct.pack('>d', f)))
-    
-    # Extract sign, exponent, and significand parts
-    sign = bits[0]
-    exponent = bits[1:12]
-    significand = bits[12:]
-    
-    # Format the result as hexadecimal
-    hex_representation = hex(int(sign + exponent + significand, 2))
-    
-    return hex_representation
-
 def add_variable(name, var_type, number):
     variable_map[name] = {"type": var_type, "number": number}
 
@@ -760,6 +902,9 @@ def add_variable_global(name, var_type, number):
 
 def add_string(value, id, size):
     string_map[value] = {"id": id, "size": size}
+
+def add_register(register, var_type):
+    register_map[register] = {"type": var_type}
 
 def parse_type_specifier(type_specifier):
     # Regular expression to match the base type and brackets

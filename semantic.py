@@ -37,6 +37,16 @@ class Context(object):
         self.add_func('pow_float', 'float', [Parameter(declaration_type='val', id='any', type_specifier='float'), Parameter(declaration_type='var', id='any', type_specifier='int')])
         self.add_func('pow_float', 'float', [Parameter(declaration_type='var', id='any', type_specifier='float'), Parameter(declaration_type='var', id='any', type_specifier='int')])
         
+        self.add_func('and', 'bool', [Parameter(declaration_type='var', id='any', type_specifier='bool'), Parameter(declaration_type='var', id='any', type_specifier='bool')])
+        self.add_func('and', 'bool', [Parameter(declaration_type='var', id='any', type_specifier='bool'), Parameter(declaration_type='val', id='any', type_specifier='bool')])
+        self.add_func('and', 'bool', [Parameter(declaration_type='val', id='any', type_specifier='bool'), Parameter(declaration_type='var', id='any', type_specifier='bool')])
+        self.add_func('and', 'bool', [Parameter(declaration_type='val', id='any', type_specifier='bool'), Parameter(declaration_type='val', id='any', type_specifier='bool')])
+
+        self.add_func('or', 'bool', [Parameter(declaration_type='var', id='any', type_specifier='bool'), Parameter(declaration_type='var', id='any', type_specifier='bool')])
+        self.add_func('or', 'bool', [Parameter(declaration_type='var', id='any', type_specifier='bool'), Parameter(declaration_type='val', id='any', type_specifier='bool')])
+        self.add_func('or', 'bool', [Parameter(declaration_type='val', id='any', type_specifier='bool'), Parameter(declaration_type='var', id='any', type_specifier='bool')])
+        self.add_func('or', 'bool', [Parameter(declaration_type='val', id='any', type_specifier='bool'), Parameter(declaration_type='val', id='any', type_specifier='bool')])
+    
     def has_var(self,id):
         return id in self.variables
     
@@ -236,11 +246,14 @@ def verify(ctx: Context, node):
         op = node.operator
         vt1 = verify(ctx, node.left_operand)
         vt2 = verify(ctx, node.right_operand)
+        print(vt1, vt2)
         if op in ['%','/', '*', '+', '-']:
             if vt1 == 'int' and not vt2 == 'int':
                 raise TypeError(f"Operation {op} requires both to be integers.")
             if vt1 == 'float' and not vt2 == 'float':
                 raise TypeError(f"Operation {op} requires both to be floats.")
+            if vt1 == 'char' or vt2 == 'char' or vt1 == 'string' or vt2 == 'string' or vt2 == 'bool' or vt1 == 'bool':
+                raise TypeError(f"Operation {op} requires both to be integers or floats.")
             return vt1
         if op == '^':
             if vt1 == 'int' and not vt2 == 'int':
@@ -257,12 +270,15 @@ def verify(ctx: Context, node):
                 raise TypeError(f"Operation {op} requires both to be integers.")
             if vt1 == 'float' and not vt2 == 'float':
                 raise TypeError(f"Operation {op} requires both to be floats.")
+            elif vt1 == 'char' or vt2 == 'char' or vt1 == 'string' or vt2 == 'string'or vt2 == 'bool' or vt1 == 'bool':
+                raise TypeError(f"Operation {op} requires both to be integers or floats.")
             return 'bool'
         if op in ['&&','||']:
-            if verify(ctx ,vt1) != "bool":
+            if vt1 != "bool":
                 raise TypeError(f"{op} requires a boolean. Got {verify(ctx, vt1)} instead.")
-            if verify(ctx ,vt2) != "bool":
-                raise TypeError(f"{op} requires a boolean. Got {verify(ctx, vt1)} instead.")
+            if vt2 != "bool":
+                raise TypeError(f"{op} requires a boolean. Got {verify(ctx, vt2)} instead.")
+            return 'bool'
     elif isinstance(node, UnaryOperators):
         op = node.operator
         vt = verify(ctx ,node.operand)
@@ -278,7 +294,6 @@ def verify(ctx: Context, node):
             raise TypeError(f"Operation {op} requires an integer or float. Got {vt} instead.")
     elif isinstance(node, IfStatement):
         condition = node.condition
-        # print(condition)
         if verify(ctx ,condition) != 'bool':
             raise TypeError(f"If condition requires a boolean. Got {verify(ctx, condition)} instead.")
         for a in node.thenBlock:
