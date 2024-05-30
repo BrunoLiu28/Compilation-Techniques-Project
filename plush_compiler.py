@@ -2,7 +2,7 @@
 # from subprocess import Popen, PIPE
 
 # # from interpretor import ContextInterpretor, interpretor
-from ply import yacc,lex
+# from ply import yacc,lex
 
 # from semantic import Context, verify
 # from tokens import *
@@ -93,6 +93,14 @@ from tokens import *
 from rules import *
 import codeGen
 
+def yacc_error_handler(token):
+    if token is not None:
+        print(f"Syntax error in input!")
+        print(token)
+    else:
+        print("Syntax error in input!")
+    sys.exit(1)
+	
 parser = yacc.yacc()
 
 def get_input(file=False):
@@ -120,9 +128,14 @@ def main():
     tree_flag = args.tree
 
     logger = yacc.NullLogger()
-    yacc.yacc(debug=logger, errorlog=logger)
+    yacc.yacc(debug=logger, errorlog=yacc.NullLogger())
     data = get_input(input_filename)
-    ast = yacc.parse(data, lexer=lex.lex(nowarn=1))
+    
+    try:
+        ast = yacc.parse(data, lexer=lex.lex(nowarn=1))
+    except Exception as e:
+        print(f"Exception: {e}")
+        sys.exit(1)
 
     if ast is None:
         print("Syntax error detected")
@@ -138,7 +151,11 @@ def main():
                     continuar = True
                     input_filename = i.filepath
                     data = get_input(input_filename)
-                    importedAst = yacc.parse(data, lexer=lex.lex(nowarn=1))
+                    try:
+                        importedAst = yacc.parse(data, lexer=lex.lex(nowarn=1))
+                    except Exception as e:
+                        print(f"Exception: {e}")
+                        sys.exit(1)
                     if i.functions[0] == "*":
                         importedAst.main_block_sequence = [block for block in importedAst.main_block_sequence if not isinstance(block, MainFunction)]
                         new_main_block_sequence.extend(importedAst.main_block_sequence)
@@ -154,11 +171,8 @@ def main():
                 else:
                     new_main_block_sequence.append(i)
             ast.main_block_sequence = new_main_block_sequence
-            
-    if tree_flag:
-        ast_json = json.dumps(ast, default=lambda o: o.__dict__, indent=4)
-        # print(ast_json)
-        sys.exit(0)
+    print("OK! PARSER PASSED!") 
+    
     verify(Context(), ast)
     print("OK! TYPE CHECKING PASSED!")
 
@@ -167,6 +181,10 @@ def main():
     with open("test.ll", "w") as file:
         file.write(code_string)
     print("llvm CODE GENERATED!")
-
+	
+    if tree_flag:
+        ast_json = json.dumps(ast, default=lambda o: o.__dict__, indent=2)
+        print(ast_json)
+        sys.exit(0)
 if __name__ == '__main__':
     main()
