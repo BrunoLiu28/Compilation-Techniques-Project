@@ -103,9 +103,13 @@ def verify(node):
                 header.append(f"@{node.id} = dso_local global i8 {valorDoCharEmHex}")
                 add_variable_global(name, "char", -1)
         else: #Local variables
+            
             name = node.id
             #UPDATE DE VARIAVELS
             if node.declaration_type == "update":
+                # is_param = ""
+                # if node.id in store_param:
+                #     is_param = ".addr"
                 if isinstance(node.id, ArrayAccess): #DEPOIS
                     num_pairs, base_type = parse_type_specifier(variable_map[node.id.ID]["type"])
                     arrayOrNot = '*' * (num_pairs-1)
@@ -153,20 +157,20 @@ def verify(node):
                             if isinstance(node.expression, ArrayAccess):
                                 aux = verify(node.expression)
                                 body.append(f"%{counter} = load i32, i32* {aux}")
-                                body.append(f"store i32{arrayOrNot} %{counter}, i32*{arrayOrNot} %{name}")
+                                body.append(f"store i32{arrayOrNot} %{counter}, i32*{arrayOrNot} %{name+is_param}")
                                 add_register(counter, "i32")
                                 counter += 1
                             else:
-                                body.append(f"store i32{arrayOrNot} {verify(node.expression)}, i32*{arrayOrNot} %{name}")
+                                body.append(f"store i32{arrayOrNot} {verify(node.expression)}, i32*{arrayOrNot} %{name+is_param}")
                         elif type == "float":
                             if isinstance(node.expression, ArrayAccess):
                                 aux = verify(node.expression)
                                 body.append(f"%{counter} = load float, float* {aux}")
-                                body.append(f"store float{arrayOrNot} %{counter}, float*{arrayOrNot} %{name}")
+                                body.append(f"store float{arrayOrNot} %{counter}, float*{arrayOrNot} %{name+is_param}")
                                 add_register(counter, "float")
                                 counter += 1
                             else:
-                                body.append(f"store float{arrayOrNot} {verify(node.expression)}, float*{arrayOrNot} %{name}")
+                                body.append(f"store float{arrayOrNot} {verify(node.expression)}, float*{arrayOrNot} %{name+is_param}")
                             # body.append(f"store float {verify(node.expression)}, float* %{name+is_param}")
                         elif type == "bool":
                             body.append(f"store i1 {verify(node.expression)}, i1* %{name+is_param}")
@@ -175,7 +179,7 @@ def verify(node):
                                 alloc_list.append(f"%{name} = alloca i8*")
                                 add_variable(name, node.type_specifier, -1)
                             # key = verify(node.expression)
-                            body.append(f"store i8* {verify(node.expression)}, i8** %{name}")
+                            body.append(f"store i8* {verify(node.expression)}, i8** %{name+is_param}")
                         elif type == "char":
                             body.append(f"store i8 {ord(node.expression)}, i8* %{name+is_param}")
                     else: #VARIAVEL GLOBAL

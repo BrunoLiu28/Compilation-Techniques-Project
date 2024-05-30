@@ -1,71 +1,80 @@
 	.text
 	.file	"test.ll"
+	.globl	fibonacci                       # -- Begin function fibonacci
+	.p2align	4, 0x90
+	.type	fibonacci,@function
+fibonacci:                              # @fibonacci
+	.cfi_startproc
+# %bb.0:                                # %entry
+	pushq	%rbx
+	.cfi_def_cfa_offset 16
+	subq	$16, %rsp
+	.cfi_def_cfa_offset 32
+	.cfi_offset %rbx, -16
+	movl	%edi, 12(%rsp)
+	movl	$-1, 8(%rsp)
+	cmpl	$1, %edi
+	jg	.LBB0_2
+# %bb.1:                                # %if.then0
+	movl	12(%rsp), %eax
+	jmp	.LBB0_3
+.LBB0_2:                                # %if.else0
+	movl	12(%rsp), %edi
+	decl	%edi
+	callq	fibonacci
+	movl	%eax, %ebx
+	movl	12(%rsp), %edi
+	addl	$-2, %edi
+	callq	fibonacci
+	addl	%ebx, %eax
+.LBB0_3:                                # %if.end0
+	movl	%eax, 8(%rsp)
+	movl	8(%rsp), %eax
+	addq	$16, %rsp
+	.cfi_def_cfa_offset 16
+	popq	%rbx
+	.cfi_def_cfa_offset 8
+	retq
+.Lfunc_end0:
+	.size	fibonacci, .Lfunc_end0-fibonacci
+	.cfi_endproc
+                                        # -- End function
 	.globl	main                            # -- Begin function main
 	.p2align	4, 0x90
 	.type	main,@function
 main:                                   # @main
 	.cfi_startproc
 # %bb.0:                                # %entry
-	subq	$40, %rsp
-	.cfi_def_cfa_offset 48
-	movq	%rdi, 32(%rsp)
-	movl	$5, 12(%rsp)
-	callq	getArrayRandomFloatsSize5
-	movq	%rax, 16(%rsp)
-	movl	$0, 8(%rsp)
-	jmp	.LBB0_1
-	.p2align	4, 0x90
-.LBB0_4:                                # %if.end0
-                                        #   in Loop: Header=BB0_1 Depth=1
-	incl	8(%rsp)
-.LBB0_1:                                # %while.cond0
-                                        # =>This Inner Loop Header: Depth=1
-	movl	12(%rsp), %eax
-	decl	%eax
-	cmpl	%eax, 8(%rsp)
-	jge	.LBB0_5
-# %bb.2:                                # %while.body0
-                                        #   in Loop: Header=BB0_1 Depth=1
-	movslq	8(%rsp), %rax
-	movq	16(%rsp), %rcx
-	movss	(%rcx,%rax,4), %xmm0            # xmm0 = mem[0],zero,zero,zero
-	ucomiss	4(%rcx,%rax,4), %xmm0
-	jbe	.LBB0_4
-# %bb.3:                                # %if.then0
-                                        #   in Loop: Header=BB0_1 Depth=1
-	movq	16(%rsp), %rax
-	movslq	8(%rsp), %rcx
-	movss	(%rax,%rcx,4), %xmm0            # xmm0 = mem[0],zero,zero,zero
-	movss	%xmm0, 28(%rsp)
-	movss	4(%rax,%rcx,4), %xmm0           # xmm0 = mem[0],zero,zero,zero
-	movss	%xmm0, (%rax,%rcx,4)
-	movss	28(%rsp), %xmm0                 # xmm0 = mem[0],zero,zero,zero
-	movslq	8(%rsp), %rax
-	movq	16(%rsp), %rcx
-	movss	%xmm0, 4(%rcx,%rax,4)
-	jmp	.LBB0_4
-.LBB0_5:                                # %while.end0
-	movl	$0, 8(%rsp)
-	.p2align	4, 0x90
-.LBB0_6:                                # %while.cond1
-                                        # =>This Inner Loop Header: Depth=1
-	movl	8(%rsp), %eax
-	cmpl	12(%rsp), %eax
-	jge	.LBB0_8
-# %bb.7:                                # %while.body1
-                                        #   in Loop: Header=BB0_6 Depth=1
-	movslq	8(%rsp), %rax
-	movq	16(%rsp), %rcx
-	movss	(%rcx,%rax,4), %xmm0            # xmm0 = mem[0],zero,zero,zero
-	callq	print_float
-	incl	8(%rsp)
-	jmp	.LBB0_6
-.LBB0_8:                                # %while.end1
-	addq	$40, %rsp
+	subq	$24, %rsp
+	.cfi_def_cfa_offset 32
+	movq	%rdi, 16(%rsp)
+	movl	num(%rip), %edi
+	callq	fibonacci
+	movl	%eax, 12(%rsp)
+	movl	$.L.str.0, %edi
+	callq	print
+	movl	12(%rsp), %edi
+	callq	print_int
+	addq	$24, %rsp
 	.cfi_def_cfa_offset 8
 	retq
-.Lfunc_end0:
-	.size	main, .Lfunc_end0-main
+.Lfunc_end1:
+	.size	main, .Lfunc_end1-main
 	.cfi_endproc
                                         # -- End function
+	.type	num,@object                     # @num
+	.data
+	.globl	num
+	.p2align	2
+num:
+	.long	15                              # 0xf
+	.size	num, 4
+
+	.type	.L.str.0,@object                # @.str.0
+	.section	.rodata.str1.16,"aMS",@progbits,1
+	.p2align	4
+.L.str.0:
+	.asciz	"The fibonacci of the number you entered is:"
+	.size	.L.str.0, 44
+
 	.section	".note.GNU-stack","",@progbits

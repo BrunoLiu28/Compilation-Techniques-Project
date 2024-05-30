@@ -5,7 +5,7 @@ function string_length(val str : string) : int;
 function palindromeString(val str : string) : int {
 	var result : int := 1;
 	var i : int := 0;
-    var j : int := string_length(str);
+    var j : int := 5;
     while (i < j) && (result = 1){
         if str.get_array()[i] != str.get_array()[j] {
             result := -1;
@@ -28,11 +28,11 @@ function main(val args:[string]) {
 }
 
 # c implementation to get the size of the array
-int string_length(char str[]) {
-    int length = 0;
-    while (str[length] != '\0') {
-        length++;
-    }
-    return length;
-}
+# int string_length(char str[]) {
+#     int length = 0;
+#     while (str[length] != '\0') {
+#         length++;
+#     }
+#     return length;
+# }
 

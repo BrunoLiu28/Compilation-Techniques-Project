@@ -222,6 +222,7 @@ def verify(ctx: Context, node):
                 verify(new_ctx, expr)
     elif isinstance(node, FunctionCall): 
         name = node.id
+        print(ctx.functions)
         if not ctx.has_func(name):
              raise TypeError(f"Function {name} is not defined")
         
