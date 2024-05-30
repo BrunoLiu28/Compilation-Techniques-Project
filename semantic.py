@@ -222,8 +222,6 @@ def verify(ctx: Context, node):
                 verify(new_ctx, expr)
     elif isinstance(node, FunctionCall): 
         name = node.id
-        print(ctx.functions)
-        print(name)
         if not ctx.has_func(name):
              raise TypeError(f"Function {name} is not defined")
         
@@ -248,7 +246,6 @@ def verify(ctx: Context, node):
         op = node.operator
         vt1 = verify(ctx, node.left_operand)
         vt2 = verify(ctx, node.right_operand)
-        print(vt1, vt2)
         if op in ['%','/', '*', '+', '-']:
             if vt1 == 'int' and not vt2 == 'int':
                 raise TypeError(f"Operation {op} requires both to be integers.")
@@ -324,7 +321,3 @@ def get_type(type_string):
         return match.group(1)
     else:
         return None
-
-
-# verify(Context(),  ast)
-# print("OK!")

@@ -1,7 +1,6 @@
 import copy
 import re
 import struct
-from interpretor import interpretor
 from rules import ArrayAccess, BinaryOperators, Declaration, FunctionCall, FunctionDeclaration, Identifier, IfStatement, Literal, MainFunction, Parameter, Program, UnaryOperators, WhileStatement
 pass1 = True
 #FAZER 2 PASSAGENS PELO PROGRAMA
@@ -98,8 +97,6 @@ def verify(node):
                 add_variable_global(name, "bool", -1)
             elif node.type_specifier == "string":
                 add_variable_global(name, node.type_specifier, -1)
-                
-                print()
                 body.append(f"@{node.id} = dso_local global i8* {verify(node.expression)}")
             elif node.type_specifier == "char": 
                 valorDoCharEmHex = hex(ord(node.expression))[2:]
@@ -278,8 +275,6 @@ def verify(node):
             counter += 1
             return f"%{counter-1}"
         else:   #VARIAVEL GLOBAL
-            # type = variable_map_global[node.id]["type"]
-            print(body)
             num_pairs, type = parse_type_specifier(variable_map_global[node.id]["type"])
             arrayOrNot = '*' * num_pairs
             
@@ -322,10 +317,12 @@ def verify(node):
                     add_register(f"%arrayidx{arrayAccess_counter}", "float")
                 else:
                     if isinstance(node.index[i], Literal):
-                        body.append(f"%arrayidx{arrayAccess_counter} = getelementptr inbounds i32{arrayOrNot}, i32*{arrayOrNot} {verify(Identifier(id=f"arrayidx{arrayAccess_counter-1}"))}, i64 {verify(node.index[i])}")
+                        arrayidx_inner = f"arrayidx{arrayAccess_counter-1}"
+                        body.append(f"%arrayidx{arrayAccess_counter} = getelementptr inbounds i32{arrayOrNot}, i32*{arrayOrNot} {verify(Identifier(id=arrayidx_inner))}, i64 {verify(node.index[i])}")
                     else:
                         body.append(f"%idxprom{prom_counter} = sext i32 {verify(node.index[i])} to i64")
-                        body.append(f"%arrayidx{arrayAccess_counter} = getelementptr inbounds i32{arrayOrNot}, i32*{arrayOrNot} {verify(Identifier(id=f"arrayidx{arrayAccess_counter-1}"))}, i64 %idxprom{prom_counter}")
+                        arrayidx_inner = f"arrayidx{arrayAccess_counter-1}"
+                        body.append(f"%arrayidx{arrayAccess_counter} = getelementptr inbounds i32{arrayOrNot}, i32*{arrayOrNot} {verify(Identifier(id=arrayidx_inner))}, i64 %idxprom{prom_counter}")
                         prom_counter += 1
                     add_variable(f"arrayidx{arrayAccess_counter}", variable_map[f"arrayidx{arrayAccess_counter-1}"]["type"][1:-1], arrayAccess_counter)
                 arrayAccess_counter += 1
@@ -346,10 +343,12 @@ def verify(node):
                     add_register(f"%arrayidx{arrayAccess_counter}", "float")
                 else:
                     if isinstance(node.index[i], Literal):
-                        body.append(f"%arrayidx{arrayAccess_counter} = getelementptr inbounds float{arrayOrNot}, float*{arrayOrNot} {verify(Identifier(id=f"arrayidx{arrayAccess_counter-1}"))}, i64 {verify(node.index[i])}")
+                        arrayidx_inner = f"arrayidx{arrayAccess_counter-1}"
+                        body.append(f"%arrayidx{arrayAccess_counter} = getelementptr inbounds float{arrayOrNot}, float*{arrayOrNot} {verify(Identifier(id=arrayidx_inner))}, i64 {verify(node.index[i])}")
                     else:
                         body.append(f"%idxprom{prom_counter} = sext i32 {verify(node.index[i])} to i64")
-                        body.append(f"%arrayidx{arrayAccess_counter} = getelementptr inbounds float{arrayOrNot}, float*{arrayOrNot} {verify(Identifier(id=f"arrayidx{arrayAccess_counter-1}"))}, i64 %idxprom{prom_counter}")
+                        arrayidx_inner = f"arrayidx{arrayAccess_counter-1}"
+                        body.append(f"%arrayidx{arrayAccess_counter} = getelementptr inbounds float{arrayOrNot}, float*{arrayOrNot} {verify(Identifier(id=arrayidx_inner))}, i64 %idxprom{prom_counter}")
                         prom_counter += 1
                     add_variable(f"arrayidx{arrayAccess_counter}", variable_map[f"arrayidx{arrayAccess_counter-1}"]["type"][1:-1], arrayAccess_counter)
                     add_register(f"%arrayidx{arrayAccess_counter}", "float")
@@ -600,8 +599,6 @@ def verify(node):
                 elif isinstance(x, BinaryOperators):
                     register = verify(x)
                     register_type = register_map[register]["type"]  
-                    print(register)
-                    print(register_type)
                     num_pairs, type = parse_type_specifier(register_type)
                     arrayOrNot = '*' * (num_pairs-1)
                     if type == "int":
@@ -643,7 +640,7 @@ def verify(node):
             body.append(call + (",".join(params)) + ")")
         else:
             body.append(call + ("\n".join(params)) + ")")
-        return f"%call{function_map[name]["number"]}"
+        return f"%call{function_map[name]['number']}"
     elif isinstance(node, BinaryOperators):	
         op = node.operator
         vt1 = verify(node.left_operand)
@@ -814,13 +811,9 @@ def verify(node):
             binary_Op_counter += 1
             return id
         elif op == '>':
-            print(node.left_operand)
-            print(node.right_operand)
             if isinstance(vt1, int):
                 body.append(f'%biop{binary_Op_counter} = icmp sgt i32 {vt1}, {vt2}')
             elif "%" in vt1:
-                print(body)
-                print(register_map)
                 vt1_type = register_map[vt1]["type"]
                 if vt1_type == "int":
                     body.append(f'%biop{binary_Op_counter} = icmp sgt i32 {vt1}, {vt2}')
