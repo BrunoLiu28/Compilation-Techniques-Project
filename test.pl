@@ -15,9 +15,9 @@
 # }
 
 # # function getArrayRandomFloats(val m:[float]) : void;
-function teste() : [float];
-function createMatrix() : [[float]];
-function createMatrix2() : [[int]];
+# function teste() : [float];
+# function createMatrix() : [[float]];
+# function createMatrix2() : [[int]];
 # function ola(): int {
 #     ola := 2*9;
 # }
@@ -116,22 +116,113 @@ function createMatrix2() : [[int]];
 # 	print_int(result);
 # }
 
-function isPrime(val num:int) : bool {
-    isPrime := true;
-    if num <= 1 {
-        isPrime := false;
-    }
-    var i : int := 2;
-    while i * i <= num {
-        var f : int := 2;
-        if num % i = 0 {
-            isPrime := false; 
+# function isPrime(val num:int) : bool {
+#     isPrime := true;
+#     if num <= 1 {
+#         isPrime := false;
+#     }
+#     var i : int := 2;
+#     while i * i <= num {
+#         var f : int := 2;
+#         if num % i = 0 {
+#             isPrime := false; 
+#         }
+#         i := i + 1;
+#     }
+
+# }
+# function main(val args:[string]) {
+#     val _ult : bool := isPrime(10+7);
+#     print_bool(_ult);
+# }
+
+# function float_array_length(val arr : [float]) : int;
+
+# function bubble_sort(val arr : [float]) : [float] {
+#     var sorted : [float] := arr; 
+#     var n : int := float_array_length(sorted);
+#     var swapped : bool := true;
+
+#     while swapped {
+#         swapped := false;
+#         # var i : int := 0;
+#         # while i < n - 1 {
+#         #     if sorted[i] > sorted[i + 1] {
+#         #         var temp : float := sorted[i];
+#         #         sorted[i] := sorted[i + 1];
+#         #         sorted[i + 1] := temp;
+#         #         swapped := true;
+#         #     }
+#         #     i := i + 1;
+#         # }
+#         n := n - 1;
+#     }
+
+#     bubble_sort := sorted;
+# }
+
+# var mmm : string := "teste";
+# var teste : string := "testdsadasdse";
+
+# function main(val args:[string]) {
+    # val unsorted : [float] := getArrayRandomFloats();
+	# val sorted : [float] := bubble_sort(unsorted);
+
+    # var sorted : [float] := teste();
+    # var n : int := 5;
+    # print_int(n);
+    # var swapped : bool := true;
+    # var temp : float := sorted[0];
+    # while swapped {
+    #     swapped := false;
+        # var i : int := 0;
+        # while i < n - 1 {
+        #     if sorted[i+1] > sorted[i] {
+        #         temp := sorted[i+1];
+        #         # sorted[i] := sorted[i + 1];
+        #         # sorted[i + 1] := temp;
+        #         # swapped := true;
+        #     }
+        #     print_float(temp);
+        #     i := i + 1;
+        # }
+        
+        # teste := "teste";
+        # print(teste);
+        # # print(swapped);
+        # print_float(temp);
+    #     n := n - 1;
+    # }
+
+    # var final : [float] := sorted;
+    # var f : int := float_array_length(final) - 1;
+    # while i >= 0 {
+    #     print_float(sorted[i]);
+    #     i := i - 1;
+    # }
+# }
+
+# function getArrayRandomFloats(val arr : int) : [float];
+
+function getArrayRandomFloatsSize5() : [float];
+
+function main(val args:[string]) {
+    var n : int := 5; 
+    var sorted : [float] := getArrayRandomFloatsSize5(); 
+
+    var i : int := 0;
+    while i < n - 1 {
+        if sorted[i] > sorted[i + 1] {
+            var temp : float := sorted[i];
+            sorted[i] := sorted[i + 1];
+            sorted[i + 1] := temp;
         }
         i := i + 1;
     }
 
-}
-function main(val args:[string]) {
-    val _ult : bool := isPrime(17+17);
-    print_bool(_ult);
+    i := 0;
+    while i < n  {
+        print_float(sorted[i]);
+        i := i + 1;
+    }
 }

@@ -45,7 +45,26 @@ float pow_float (float base, int exp){
 //     printf("%f\n", m[1]);
 // }
 
-float* teste() {
+// float* getArrayRandomFloatsSize5(int size) {
+//     // Seed the random number generator
+//     srand(time(NULL));
+
+//     // Allocate memory for an array of given size
+//     float *arr = (float *)malloc(size * sizeof(float));
+//     if (arr == NULL) {
+//         printf("Memory allocation failed\n");
+//         exit(1);
+//     }
+
+//     // Initialize the array with random numbers
+//     for (int i = 0; i < size; i++) {
+//         arr[i] = (float)rand() / RAND_MAX; // Generate random float between 0 and 1
+//     }
+
+//     return arr;
+// }
+
+float* getArrayRandomFloatsSize5() {
     // Allocate memory for an array of 5 integers
     float *arr = (float *)malloc(5 * sizeof(float));
     if (arr == NULL) {
@@ -63,64 +82,63 @@ float* teste() {
     return arr;
 }
 
+// float** createMatrix() {
+//     // Allocate memory for the array of pointers to rows
+//     float **matrix = (float **)malloc(4 * sizeof(float *));
+//     if (matrix == NULL) {
+//         printf("Memory allocation failed\n");
+//         exit(1);
+//     }
 
-float** createMatrix() {
-    // Allocate memory for the array of pointers to rows
-    float **matrix = (float **)malloc(4 * sizeof(float *));
-    if (matrix == NULL) {
-        printf("Memory allocation failed\n");
-        exit(1);
-    }
+//     // Allocate memory for each row
+//     for (int i = 0; i < 4; i++) {
+//         matrix[i] = (float *)malloc(5 * sizeof(float));
+//         if (matrix[i] == NULL) {
+//             printf("Memory allocation failed\n");
+//             exit(1);
+//         }
+//     }
 
-    // Allocate memory for each row
-    for (int i = 0; i < 4; i++) {
-        matrix[i] = (float *)malloc(5 * sizeof(float));
-        if (matrix[i] == NULL) {
-            printf("Memory allocation failed\n");
-            exit(1);
-        }
-    }
+//     // Initialize the matrix with some values
+//     float value = 1.0;
+//     for (int i = 0; i < 4; i++) {
+//         for (int j = 0; j < 5; j++) {
+//             matrix[i][j] = value;
+//             value += 1.0;
+//         }
+//     }
 
-    // Initialize the matrix with some values
-    float value = 1.0;
-    for (int i = 0; i < 4; i++) {
-        for (int j = 0; j < 5; j++) {
-            matrix[i][j] = value;
-            value += 1.0;
-        }
-    }
+//     return matrix;
+// }
 
-    return matrix;
-}
+// int** createMatrix2() {
+//     // Allocate memory for the array of pointers to rows
+//     int **matrix = (int **)malloc(4 * sizeof(int *));
+//     if (matrix == NULL) {
+//         printf("Memory allocation failed\n");
+//         exit(1);
+//     }
 
-int** createMatrix2() {
-    // Allocate memory for the array of pointers to rows
-    int **matrix = (int **)malloc(4 * sizeof(int *));
-    if (matrix == NULL) {
-        printf("Memory allocation failed\n");
-        exit(1);
-    }
+//     // Allocate memory for each row
+//     for (int i = 0; i < 4; i++) {
+//         matrix[i] = (int *)malloc(5 * sizeof(int));
+//         if (matrix[i] == NULL) {
+//             printf("Memory allocation failed\n");
+//             exit(1);
+//         }
+//     }
 
-    // Allocate memory for each row
-    for (int i = 0; i < 4; i++) {
-        matrix[i] = (int *)malloc(5 * sizeof(int));
-        if (matrix[i] == NULL) {
-            printf("Memory allocation failed\n");
-            exit(1);
-        }
-    }
+//     // Initialize the matrix with some values
+//     int value = 1;
+//     for (int i = 0; i < 4; i++) {
+//         for (int j = 0; j < 5; j++) {
+//             matrix[i][j] = value;
+//             value += 1;
+//         }
+//     }
 
-    // Initialize the matrix with some values
-    int value = 1;
-    for (int i = 0; i < 4; i++) {
-        for (int j = 0; j < 5; j++) {
-            matrix[i][j] = value;
-            value += 1;
-        }
-    }
-
-    return matrix;
-}
+//     return matrix;
+// }
 
 int and(int a, int b) {
     return a && b;
@@ -129,3 +147,14 @@ int and(int a, int b) {
 int or(int a, int b) {
     return a || b;
 }
+
+
+// int float_array_length(float *array) {
+//     printf("%ld\n", sizeof(array));
+//     array = teste();
+//     printf("%ld\n", sizeof(array));
+//     printf("%ld\n", sizeof(float));
+//     size_t size = sizeof(array) / sizeof(float);
+//     printf("%ld\n", size);
+//     return size;
+// }
