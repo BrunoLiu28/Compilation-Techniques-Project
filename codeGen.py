@@ -70,6 +70,9 @@ def verify(node):
         for block in node.main_block_sequence:
             if isinstance(block, Declaration):
                 verify(block)
+            elif isinstance(block, FunctionDeclaration):
+                add_to_function(block.id, block.return_type, -1)
+
 
         pass1 = False  #SEGUNDA PASSAGEM
         for block in node.main_block_sequence:
