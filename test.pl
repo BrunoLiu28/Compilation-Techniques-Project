@@ -251,22 +251,22 @@
 # }
 
 
-#EXEMPLO SEQUENCIA DE FIBONACCI
-
-val num : int := 1_5;
-
-function fibonacci(val n : int) : int {
-    if n <= 1 {
-        fibonacci := n;
+#EXEMPLO IS LEAP YEAR
+function isLeapYear(val year:int) : bool {
+    if (year % 4 = 0 && year % 100 != 0) || (year % 400 = 0) {
+        isLeapYear := true;
     } else {
-        fibonacci := fibonacci(n - 1) + fibonacci(n - 2);
+        isLeapYear := false;
     }
-    fibonacci := fibonacci;
 }
 
 function main(val args:[string]) {
-	val result : int := fibonacci(num);
-    print("The fibonacci of the number you entered is:");
-	print_int(result);
+    var year : int := 2023; 
+    var leap : bool := isLeapYear(year);
+    if leap {
+        print("Leap year");
+    } else {
+        print("Not a leap year");
+    }
 }
 

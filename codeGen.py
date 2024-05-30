@@ -103,7 +103,6 @@ def verify(node):
                 header.append(f"@{node.id} = dso_local global i8 {valorDoCharEmHex}")
                 add_variable_global(name, "char", -1)
         else: #Local variables
-            
             name = node.id
             #UPDATE DE VARIAVELS
             if node.declaration_type == "update":
@@ -364,8 +363,6 @@ def verify(node):
         alloc_list = []
         store_param = []
         if node.declaration_type == "ffi": #FALTA FAZER VER DPS COMO SE FAZ
-            print("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
-            print(name)
             add_to_function(name, type, -1)
             num_pairs, base_type = parse_type_specifier(function_map[node.id]["type"])
             arrayOrNot = '*' * num_pairs
@@ -402,7 +399,6 @@ def verify(node):
                 body[-1] += f")"
             
             add_to_function(name, type, -1)
-            print("MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM")
             return
         else: #funcao normal
             num_pairs, base_type = parse_type_specifier(type)
@@ -499,11 +495,17 @@ def verify(node):
                 body.append(f"ret i8 %{counter}")
             elif type == "void":
                 body.append(f"ret void")
-        
+            
+            #REMOVER PARAMETROS
+            if node.param_list != None:
+                for param in node.param_list:
+                    variable_map.pop(param.id)
+
             body.append(f"}}")
             counter = 0
     elif isinstance(node, MainFunction):
         alloc_list = []
+        store_param = []
         body.append(f"define dso_local void @main(i8** noundef %argv) {{")
         body.append("entry:")
         body.append(f"%argv.addr = alloca i8**")
