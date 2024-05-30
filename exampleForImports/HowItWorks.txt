@@ -1,0 +1,6 @@
+In this example we have 3 file, where:
+    "main.pl" needs the "fibonacci" function, and "main.pl" imports everything from "second.pl"
+    "second.pl" has some functions and a main and imports just the function "fibonacci" from "third.pl"
+    "third.pl" has the function "fibonacci"
+
+Because of this sequence of imports it is possible to run the "main.pl" because it will have the "fibonacci" function imported
