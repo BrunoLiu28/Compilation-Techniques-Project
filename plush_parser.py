@@ -38,18 +38,27 @@ def main(options={},filename=False):
 	ast =  yacc.parse(data,lexer = lex.lex(nowarn=1)) 
 	print("----------------------------------------------------------------------------------------------------")
 	print(ast)
-	print("----------------------------------------------------------------------------------------------------")
-	verify(Context(),  ast)
-	print("OK! TYPE CHECKING PASSED!")
+	for i in ast.main_block_sequence:
+		if isinstance(i, ImportStatement):
+			input_filename = i.filepath 
+			logger = yacc.NullLogger() 
+			yacc.yacc(debug = logger, errorlog= logger ) 
+			data = get_input(input_filename) 
+			ast =  yacc.parse(data,lexer = lex.lex(nowarn=1)) 
+			print(ast)
+			
+	# print("----------------------------------------------------------------------------------------------------")
+	# verify(Context(),  ast)
+	# print("OK! TYPE CHECKING PASSED!")
 
-	# interpretor(ContextInterpretor(),  ast)
-	# print("OK! INTERPRETATION PASSED!")
-	code_lines = codeGen.verify(ast)
-	code_string = '\n'.join(code_lines)
-	print("----------------------------------------------------------------------------------------------------")
-	print("----------------------------------------------------------------------------------------------------")
-	print(code_string)
-	with open("test.ll", "w") as file:
-		file.write(code_string)
+	# # interpretor(ContextInterpretor(),  ast)
+	# # print("OK! INTERPRETATION PASSED!")
+	# code_lines = codeGen.verify(ast)
+	# code_string = '\n'.join(code_lines)
+	# print("----------------------------------------------------------------------------------------------------")
+	# print("----------------------------------------------------------------------------------------------------")
+	# print(code_string)
+	# with open("test.ll", "w") as file:
+	# 	file.write(code_string)
 if __name__ == '__main__':
 	main()

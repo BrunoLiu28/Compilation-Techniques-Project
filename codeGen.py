@@ -864,12 +864,6 @@ def verify(node):
             id = f"biop{binary_Op_counter}"
             binary_Op_counter += 1
             return id
-        if op == '-':    #FALTA FAZER ESTE
-            if vt == 'int':
-                return 'int'
-            if vt == 'float':
-                return 'float'
-            raise TypeError(f"Operation {op} requires an integer or float. Got {vt} instead.")
     elif isinstance(node, IfStatement):
         condition = node.condition
 

@@ -18,6 +18,10 @@ precedence = (
     ('left', 'LPAREN', 'RPAREN'),  # Parentheses
 )
 
+@dataclass
+class ImportStatement():
+    filepath: str
+    functions: list
 
 #ACEDER A UM ARRAY
 @dataclass
@@ -132,6 +136,24 @@ def p_comment(t):
     """comment : COMMENT STRING_LITERAL"""
     t[0] = Comment(comment=t[2])
 
+def p_import_statement(t):
+    """import_statement : FROM STRING_LITERAL IMPORT ID_LIST SEMICOLON
+                        | FROM STRING_LITERAL IMPORT TIMES SEMICOLON"""
+    if t[4] == '*':
+        
+        t[0] = ImportStatement(filepath=t[2], functions=['*'])
+
+    else:
+        t[0] = ImportStatement(filepath=t[2], functions=t[4])
+
+def p_id_list(t):
+    """ID_LIST : ID COMMA ID_LIST
+               | ID"""
+    if len(t) == 2:
+        t[0] = [t[1]]
+    else:
+        t[0] = [t[1]] + t[3]
+
 
 def p_main_block(t):
 	"""main_block : constant_declaration
@@ -140,6 +162,7 @@ def p_main_block(t):
 	 | function_declaration 
      | main_function
      | comment
+     | import_statement
 	"""
 	if len(t) > 1:
 		t[0] = [t[1]]
@@ -403,4 +426,3 @@ def p_expression(t):
 def p_error(p):
     print("Syntax error in input!")
     print(p)
-

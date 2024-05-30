@@ -252,13 +252,15 @@
 
 
 #EXEMPLO IS LEAP YEAR
-function isLeapYear(val year:int) : bool {
-    if (year % 4 = 0 && year % 100 != 0) || (year % 400 = 0) {
-        isLeapYear := true;
-    } else {
-        isLeapYear := false;
-    }
-}
+# function isLeapYear(val year:int) : bool {
+#     if (year % 4 = 0 && year % 100 != 0) || (year % 400 = 0) {
+#         isLeapYear := true;
+#     } else {
+#         isLeapYear := false;
+#     }
+# }
+
+from "test2.pl" import *;
 
 function main(val args:[string]) {
     var year : int := 2023; 

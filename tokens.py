@@ -11,7 +11,7 @@ tokens = (
     'SEMICOLON','COMMA','COLON', 
     'IF','ELSE','WHILE',
     # 'TRUE','FALSE',
-    'MAIN'
+    'MAIN', 'IMPORT', 'FROM'
 )
 
 # Reserved keywords
@@ -30,7 +30,9 @@ reserved_keywords = {
     'while': 'WHILE',
     'true': 'BOOL_LITERAL',
     'false': 'BOOL_LITERAL',
-    'main': 'MAIN'
+    'main': 'MAIN',
+    'import': 'IMPORT',
+    'from': 'FROM'
 }
 
 # Tokens
