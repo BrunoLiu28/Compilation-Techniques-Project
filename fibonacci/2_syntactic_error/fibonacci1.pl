@@ -1,4 +1,4 @@
-val num : int := 1_0;
+val num : int := 1_5;
 
 function fibonacci(val n : int) : int {
     if n <= 1 {
@@ -9,11 +9,8 @@ function fibonacci(val n : int) : int {
     fibonacci := fibonacci;
 }
 
-
 function main(val args:[string]) {
-	val result :: int := fibonacci(num);    #Syntactic error, an extra :
+	val result :: int := fibonacci(num); # Syntactic error: unexpected token '::'
+    print("The fibonacci of the number you entered is:");
 	print_int(result);
 }
-
-
-

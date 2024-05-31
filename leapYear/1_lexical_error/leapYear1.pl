@@ -1,38 +1,17 @@
-val palindrome : string := "radar";
-
-function string_length(val str : string) : int;
-
-functio palindromeString(val str : string) : int {          #lexical error, should be function instead of functio
-	var result : int := 1;
-	var i : int := 0;
-    var j : int := string_length(str);
-    while (i < j) && (result = 1){
-        if str.get_array()[i] != str.get_array()[j] {
-            result := -1;
-        }
-        i := i + 1;
-        j := j - 1;
+function isLeapYear(val year:int) : bool {
+    if (year % 4 = 0 && year % 100 != 0) || (year % 400 ? 0) { # Error: '?' is not a valid operator
+        isLeapYear := true;
+    } else {
+        isLeapYear := false;
     }
-    palindromeString := result;
 }
-
 
 function main(val args:[string]) {
-	val result : int := is_palindrome(palindrome);
-    if result = -1 {
-        print_string("String is not palindrome");
+    var year : int := 2023; 
+    var leap : bool := isLeapYear(year);
+    if leap {
+        print("Leap year");
     } else {
-        print_string("String is palindrome");
+        print("Not a leap year");
     }
-	print_int(result);
 }
-
-# c implementation to get the size of the array
-int string_length(char str[]) {
-    int length = 0;
-    while (str[length] != '\0') {
-        length++;
-    }
-    return length;
-}
-

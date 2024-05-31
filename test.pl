@@ -88,20 +88,21 @@
 #     }
 # }
 
-
-val num : int := 1_5;
-
-function fibonacci(var n : int) : float {
-    if n <= 1 {
-        fibonacci := n;
-    } else {
-        fibonacci := fibonacci(n - 1) + fibonacci(n - 2);
+function sumMatrix(val f : int, val i : int) : int {
+    sumMatrix := 0;
+    var i1 : int := 0;
+    var f1 : int := 0;
+    var a : int := 1;
+    while i1 < i {
+        f1 :=0;
+        while f1 < f {
+            sumMatrix := sumMatrix + a;
+            f1 := f1+1;
+        }
+        i1 := i1 + 1;
     }
-    fibonacci := fibonacci;
 }
-
 function main(val args:[string]) {
-	val result : int := fibonacci(num);
-    print("The fibonacci of the number you entered is:");
+	val result : int := sumMatrix(3,3);
 	print_int(result);
 }

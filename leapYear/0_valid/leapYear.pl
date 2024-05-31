@@ -15,5 +15,3 @@ function main(val args:[string]) {
         print("Not a leap year");
     }
 }
-
-

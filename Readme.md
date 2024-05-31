@@ -1,5 +1,11 @@
 ## Plush Test Suite
 
+### Author: Bruno Liu fc56297
+
+### Structure of the project
+
+### How to run the program
+
 This repository is a shared test suite for the Plush programming language
 
 

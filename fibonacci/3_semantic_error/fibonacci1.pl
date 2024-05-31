@@ -1,4 +1,4 @@
-val num : string := "1_0";                      #Semantic error, input is a String instead of an int
+val num : int := 15.3; # Semantic error: expected type int, got float
 
 function fibonacci(val n : int) : int {
     if n <= 1 {
@@ -9,11 +9,8 @@ function fibonacci(val n : int) : int {
     fibonacci := fibonacci;
 }
 
-
 function main(val args:[string]) {
 	val result : int := fibonacci(num);
+    print("The fibonacci of the number you entered is:");
 	print_int(result);
 }
-
-
-

@@ -894,23 +894,24 @@ def verify(node):
         if_counter += 1
     elif isinstance(node, WhileStatement):	
         condition = node.condition
-
-        body.append(f"br label %while.cond{while_counter}")
+        whileaux = while_counter
+        while_counter += 1
+        body.append(f"br label %while.cond{whileaux}")
         #WHILE CONDITION
-        body.append(f"while.cond{while_counter}:")
+        body.append(f"while.cond{whileaux}:")
         id = verify(condition)
-        body.append(f"br i1 {id}, label %while.body{while_counter}, label %while.end{while_counter}")
+        body.append(f"br i1 {id}, label %while.body{whileaux}, label %while.end{whileaux}")
 
         #WHILE BODY
-        body.append(f"while.body{while_counter}:")
+        body.append(f"while.body{whileaux}:")
         for a in node.block_seq:
             verify(a)
 
-        body.append(f"br label %while.cond{while_counter}")
+        body.append(f"br label %while.cond{whileaux}")
 
         #END WHILE
-        body.append(f"while.end{while_counter}:")
-        while_counter += 1
+        body.append(f"while.end{whileaux}:")
+
     elif isinstance(node, Parameter):
         num_pairs, base_type = parse_type_specifier(node.type_specifier)
         arrayOrNot = '*' * num_pairs

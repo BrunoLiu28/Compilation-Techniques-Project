@@ -1,6 +1,6 @@
-val num : int := 1_0;
+val num : int := 1_5;
 
-function fibonacci(val n : inti) : int {             #lexical error, type named inti instead of int
+function fibonacci(val n : int) : int {
     if n <= 1 {
         fibonacci := n;
     } else {
@@ -9,11 +9,8 @@ function fibonacci(val n : inti) : int {             #lexical error, type named 
     fibonacci := fibonacci;
 }
 
-
-function main(val args:[string]) {
+function main(val~ args:[string]) {     # Lexical error: ~ is not a valid character
 	val result : int := fibonacci(num);
+    print("The fibonacci of the number you entered is:");
 	print_int(result);
 }
-
-
-
