@@ -26,9 +26,9 @@ The project also has the following files:
     README.md --> this file
 
 ### How to run the program
-First, run the **setup.sh** script, to build the docker image and run the docker with an interactive terminal
+First, run the **./setup.sh** script, to build the docker image and run the docker with an interactive terminal
 After opening the docker interactive terminal
-Use the **plush.sh** to run the examples and generate the .ll, if any error is found, it will be printed. These are some of the combination that are possible:
+Use the **./plush.sh** to run the examples and generate the .ll, if any error is found, it will be printed. These are some of the combination that are possible:
 For bubbleSort:
 
     ./plush.sh --tree bubbleSort/0_valid/bubbleSort.pl
