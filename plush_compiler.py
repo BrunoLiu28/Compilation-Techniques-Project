@@ -44,7 +44,6 @@ def main():
     args = arg_parser.parse_args()
     input_filename = args.filename
     tree_flag = args.tree
-
     data = get_input(input_filename)
     
     # Lexical and Parsing checking the input file
@@ -111,7 +110,7 @@ def main():
     try:
         code_lines = codeGen.verify(ast)
         code_string = '\n'.join(code_lines)
-        with open("test.ll", "w") as file:
+        with open("llCode.ll", "w") as file:
             file.write(code_string)
         print("llvm CODE GENERATED!")
     except Exception as e:

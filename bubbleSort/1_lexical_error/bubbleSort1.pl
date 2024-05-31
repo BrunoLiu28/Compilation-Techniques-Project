@@ -5,6 +5,13 @@ function $ (val args:[string]) { # Lexical error: '$' is not a valid token
     var sorted : [float] := getArrayRandomFloatsSize5(); 
 
     var i : int := 0;
+    print("Unsorted array:");
+    while i < n  {
+        print_float(sorted[i]);
+        i := i + 1;
+    }
+
+    i := 0;
     while i < n - 1 {
         if sorted[i] > sorted[i + 1] {
             var temp : float := sorted[i];
@@ -15,6 +22,7 @@ function $ (val args:[string]) { # Lexical error: '$' is not a valid token
     }
 
     i := 0;
+    print("Sorted array:");
     while i < n  {
         print_float(sorted[i]);
         i := i + 1;

@@ -82,7 +82,6 @@ contexts = []
 pass1 = True
 #FAZER 2 PASSAGENS PELO PROGRAMA
 
-
 def verify(ctx: Context, node):
     global pass1
     if isinstance(node, Program):
@@ -114,7 +113,6 @@ def verify(ctx: Context, node):
                 else:
                     if not ctx.has_var(name):
                         raise TypeError(f"The global variable {name} doesnt exist impossible to update")
-                    #variavel existe, verificar se é var ou val
                     if ctx.get_varOrVal(name) == "val":
                         raise TypeError(f"The global variable {name} is a val, impossible to update")
                     expr = node.expression
@@ -144,7 +142,6 @@ def verify(ctx: Context, node):
                 else:
                     if not ctx.has_var(name):
                         raise TypeError(f"Variable {name} doesnt exist impossible to update")
-                    #variavel existe, verificar se é var ou val
                     if ctx.get_varOrVal(name) == "val":
                         raise TypeError(f"Variable {name} is a val, impossible to update")
                     expr = node.expression

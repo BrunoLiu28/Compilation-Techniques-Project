@@ -5,6 +5,13 @@ functio main(val args:[string]) { # Syntactic error: 'functio' should be 'functi
     var sorted : [float] := getArrayRandomFloatsSize5(); 
 
     var i : int := 0;
+    print("Unsorted array:");
+    while i < n  {
+        print_float(sorted[i]);
+        i := i + 1;
+    }
+
+    i := 0;
     while i < n - 1 {
         if sorted[i] > sorted[i + 1] {
             var temp : float := sorted[i];
@@ -15,6 +22,7 @@ functio main(val args:[string]) { # Syntactic error: 'functio' should be 'functi
     }
 
     i := 0;
+    print("Sorted array:");
     while i < n  {
         print_float(sorted[i]);
         i := i + 1;

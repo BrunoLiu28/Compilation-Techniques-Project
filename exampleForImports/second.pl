@@ -1,4 +1,4 @@
-from "third.pl" import fibonacci;
+from "./exampleForImports/third.pl" import fibonacci;
 
 function getArrayRandomFloatsSize5() : [float];
 

@@ -1,4 +1,4 @@
-from "second.pl" import *;
+from "./exampleForImports/second.pl" import *;
 
 val num : int := 1_5;
 function main(val args:[string]) {
