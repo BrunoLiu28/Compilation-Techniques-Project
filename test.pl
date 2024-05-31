@@ -78,8 +78,6 @@
 #     }
 # }
 
-# from "test2.pl" import *;
-
 # function isLeapYear(val year:int) : bool {
 #     if (year % 4 = 0 && year % 100 != 0) || (year % 400 = 0) {
 #         isLeapYear := true;
@@ -88,21 +86,3 @@
 #     }
 # }
 
-function sumMatrix(val f : int, val i : int) : int {
-    sumMatrix := 0;
-    var i1 : int := 0;
-    var f1 : int := 0;
-    var a : int := 1;
-    while i1 < i {
-        f1 :=0;
-        while f1 < f {
-            sumMatrix := sumMatrix + a;
-            f1 := f1+1;
-        }
-        i1 := i1 + 1;
-    }
-}
-function main(val args:[string]) {
-	val result : int := sumMatrix(3,3);
-	print_int(result);
-}

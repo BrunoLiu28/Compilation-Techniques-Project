@@ -27,7 +27,7 @@ gcc -c functions.c || display_error "Compilation of 'functions.c' failed."
 gcc -no-pie -fno-PIE llCode.o functions.o -o a.out || display_error "Linking failed."
 
 # Run the executable
-./a.out || display_error "Execution of 'a.out' failed."
+./a.out
 
 # Check if the --rmaf flag is provided
 if [[ "$1" == "--rmaf" ]]; then
