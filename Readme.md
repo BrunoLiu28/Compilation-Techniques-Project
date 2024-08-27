@@ -1,4 +1,6 @@
 ## Plush Compiler Project
+The project was created for the compilation techniques subject in college. <br>
+Grade: 19/20
 
 ### Author: Bruno Liu fc56297
 
